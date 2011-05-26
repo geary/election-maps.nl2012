@@ -14,6 +14,9 @@ def splitTableName( table ):
 	return split
 
 
+def isGoogleSRID( srid ):
+	return srid == 3857 or srid == 900913
+
 class Database:
 	
 	def __init__( self, **kw ):
@@ -46,31 +49,31 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapeZip( self, zipfile, tempdir, tablename, create ):
+	def loadShapefile( self, zipfile, tempdir, tablename, create ):
+		shpfile = zipfile
 		zipname = os.path.basename( zipfile )
-		basename = os.path.splitext( zipname )[0]
+		basename, ext = os.path.splitext( zipname )
 		shpname = basename + '.shp'
 		sqlname = basename + '.sql'
 		unzipdir = tempfile.mkdtemp( dir=tempdir )
-		print 'Unzipping %s to %s' %( zipname, unzipdir )
-		ZipFile( zipfile, 'r' ).extractall( unzipdir )
-		shpfile = os.path.join( unzipdir, shpname )
+		if ext.lower() == 'zip':
+			print 'Unzipping %s to %s' %( zipname, unzipdir )
+			ZipFile( zipfile, 'r' ).extractall( unzipdir )
+			shpfile = os.path.join( unzipdir, shpname )
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
-		print 'Running shp2pgsql'
-		os.system(
-			'shp2pgsql -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
-				( '-a', '-c -I' )[create], shpfile, tablename, self.database, sqlfile
-			)
+		command = 'shp2pgsql -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
+			( '-a', '-c -I' )[create], shpfile, tablename, self.database, sqlfile
 		)
+		print 'Running shp2pgsql:\n%s' % command
+		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
-		print 'Running psql'
-		os.system(
-			'psql -q -U postgres -d census -f %s' %(
-				sqlfile
-			)
+		command = 'psql -q -U postgres -d turkey -f %s' %(
+			sqlfile
 		)
+		print 'Running psql:\n%s' % command
+		os.system( command )
 		t3 = time.clock()
 		print 'psql %.1f seconds' %( t3 - t2 )
 		shutil.rmtree( unzipdir )
@@ -248,7 +251,7 @@ class Database:
 		
 		print 'makeGeoJSON', filename
 		srid = self.getSRID( table, polyGeom )
-		digits = [ 0, 6 ][ srid == -1 ]  # integer only if google projection
+		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
 		## Temp filter for NYC test
 		#filter = '''
@@ -296,37 +299,31 @@ class Database:
 		
 		self.cursor.execute('''
 			SELECT
-				geoid10, namelsad10,
-				intptlat10, intptlon10, 
+				name, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
 				%(table)s
-			WHERE
-				aland10 > 0
-				-- AND %(filter)s
 			;
 		''' % {
 			'table': table,
 			'polyGeom': polyGeom,
-			'filter': filter,
 			'digits': digits,
 		})
 		t3 = time.clock()
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for fips, name, lat, lng, centroidjson, geomjson in self.cursor.fetchall():
+		for name, centroidjson, geomjson in self.cursor.fetchall():
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
 			features.append({
 				'type': 'Feature',
 				'bbox': geometry['bbox'],
 				'properties': {
-					'kind': 'TODO',
-					'fips': fips,
+					#'kind': 'TODO',
 					'name': name,
-					'center': 'TODO',
+					#'center': 'TODO',
 					'centroid': centroid['coordinates'],
 				},
 				'geometry': geometry,
@@ -335,10 +332,10 @@ class Database:
 		featurecollection = {
 			'type': 'FeatureCollection',
 			'properties': {
-				'kind': 'TODO',
-				'fips': 'TODO',
-				'name': 'TODO',
-				'center': 'TODO',
+				#'kind': 'TODO',
+				#'fips': 'TODO',
+				#'name': 'TODO',
+				#'center': 'TODO',
 				'centroid': extentcentroid['coordinates'],
 			},
 			'bbox': extent['bbox'],

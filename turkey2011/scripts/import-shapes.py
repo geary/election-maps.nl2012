@@ -5,48 +5,48 @@ from zipfile import ZipFile
 
 import pg
 import private
-import states
 
 
 # TODO:
 '''
-CREATE DATABASE census
+CREATE DATABASE turkey
   WITH ENCODING='UTF8'
        TEMPLATE=template_postgis
        CONNECTION LIMIT=-1;
 '''
 
 
-def censusFileName( kind, year, fips ):
-	return os.path.join(
-		private.SHAPEFILE_PATH, kind.upper(),
-		year,
-		'tl_2010_%s_%s%s' %( fips, kind, year[-2:] ) + '.zip'
-	)
-
-
 def process():
 	#db = pg.Database( database='postgres' )
-	#db.createGeoDatabase( 'census' )
+	#db.createGeoDatabase( 'turkey' )
 	#db.connection.close()
 	
-	db = pg.Database( database='census' )
-	#for year in '2000', '2010':
-	for year in '2010',:
-		schema = 'c' + year
-		db.createSchema( schema )
-		for kind in 'state', 'county', 'tract', 'bg':
-			table = schema + '.' + kind
-			create = True
-			for state in states.array:
-				fips = state['fips']
-				print 'Loading', table, fips, state['name']
-				zipfile = censusFileName( kind, year, fips )
-				db.loadShapeZip(
-					zipfile, private.TEMP_PATH,
-					table, create
-				)
-				create = False
+	schema = 't2011'
+	#level = ''
+	level = '-70'
+	
+	db = pg.Database( database='turkey' )
+	
+	#db.createSchema( schema )
+	
+	db.loadShapefile(
+		'../shapes/shp/provinces%s/provinces.shp' % level,
+		private.TEMP_PATH,
+		'%s.provinces' % schema, True
+	)
+	
+	db.loadShapefile(
+		'../shapes/shp/subprovinces%s/subprovinces.shp' % level,
+		private.TEMP_PATH,
+		'%s.subprovinces' % schema, True
+	)
+	
+	db.loadShapefile(
+		'../shapes/shp/districts%s/districts.shp' % level,
+		private.TEMP_PATH,
+		'%s.districts' % schema, True
+	)
+	
 	db.connection.close()
 
 
