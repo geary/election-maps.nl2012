@@ -7,6 +7,8 @@ def process():
 	level = ''
 	#for tbl in ( 'provinces', 'districts', ):
 	for tbl in ( 'provinces', ):
+		name = 'Turkey'
+		gid = '-1'
 		table = '%s.%s' %( schema, tbl )
 		boxGeom = 'full_geom'
 		targetGeom = 'full_geom'
@@ -14,10 +16,10 @@ def process():
 		#for level in ( '', '10', '100', '1000', '10000' ):
 		#	db.makeGeoJSON( opt.table, level )
 		#filename = '../web/test/%s-%s.json' %( table, targetGeom )
-		filename = '%s/turkey-%s-%s.json' %(
+		filename = '%s/turkey-%s-%s.jsonp' %(
 			private.GEOJSON_PATH, tbl, targetGeom
 		)
-		db.makeGeoJSON( filename, table, boxGeom, targetGeom )
+		db.makeGeoJSON( filename, table, boxGeom, targetGeom, tbl, name, gid, 'loadGeoJSON' )
 
 
 def main():

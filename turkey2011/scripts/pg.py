@@ -247,7 +247,7 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
-	def makeGeoJSON( self, filename, table, boxGeom, polyGeom ):
+	def makeGeoJSON( self, filename, table, boxGeom, polyGeom, kind, name, gid, jsonp ):
 		
 		print 'makeGeoJSON', filename
 		srid = self.getSRID( table, polyGeom )
@@ -299,7 +299,7 @@ class Database:
 		
 		self.cursor.execute('''
 			SELECT
-				name, 
+				gid, name, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
@@ -314,31 +314,28 @@ class Database:
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for name, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregid, featurename, centroidjson, geomjson in self.cursor.fetchall():
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
 			features.append({
 				'type': 'Feature',
 				'bbox': geometry['bbox'],
-				'properties': {
-					#'kind': 'TODO',
-					'name': name,
-					#'center': 'TODO',
-					'centroid': centroid['coordinates'],
-				},
+				#'kind': 'TODO',
+				'id': featuregid,
+				'name': featurename,
+				#'center': 'TODO',
+				'centroid': centroid['coordinates'],
 				'geometry': geometry,
 			})
 			del geometry['bbox']
 		featurecollection = {
 			'type': 'FeatureCollection',
-			'properties': {
-				#'kind': 'TODO',
-				#'fips': 'TODO',
-				#'name': 'TODO',
-				#'center': 'TODO',
-				'centroid': extentcentroid['coordinates'],
-			},
 			'bbox': extent['bbox'],
+			'kind': kind,
+			'id': gid,
+			'name': name,
+			#'center': 'TODO',
+			'centroid': extentcentroid['coordinates'],
 			'features': features,
 		}
 		if srid != -1:
@@ -351,6 +348,8 @@ class Database:
 		t4 = time.clock()
 		print 'Make featurecollection %.1f seconds' %( t4 - t3 )
 		fcjson = json.dumps( featurecollection )
+		if jsonp:
+			fcjson = jsonp + '(' + fcjson + ')'
 		file( filename, 'wb' ).write( fcjson )
 		t5 = time.clock()
 		print 'Write JSON %.1f seconds' %( t5 - t4 )
