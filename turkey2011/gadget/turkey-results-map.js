@@ -90,7 +90,7 @@ var prefs = new _IG_Prefs();
 
 var opt = window.GoogleElectionMapOptions || {};
 opt.fontsize = '15px';
-var sw = opt.panelWidth = 200;
+var sw = 300;
 
 opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/svn/trunk/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
@@ -642,7 +642,8 @@ function contentTable() {
 	function colorize( /* ?? */ ) {
 		//var locals = results.locals;
 		// Use wider borders in IE to cover up gaps between borders, except in House view
-		strokeWidth = $.browser.msie ? 2 : 1;
+		//strokeWidth = $.browser.msie ? 2 : 1;
+		strokeWidth = 1;
 		var features = geo.current.features;
 		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 			var id = feature.id;
@@ -659,9 +660,9 @@ function contentTable() {
 			}
 			var local = null;
 			//feature.precincts = feature.electoral = null;
-			feature.strokeColor = '#0000FF';
-			feature.strokeOpacity = 1;
-			feature.strokeWidth = 2; // strokeWidth;
+			feature.strokeColor = '#000000';
+			feature.strokeOpacity = .4;
+			feature.strokeWidth = strokeWidth;
 			//if( congress ) {
 			//	var province = provincesById[ feature.province.toUpperCase() ];
 			//	local = province && locals[province.name];
