@@ -4,7 +4,7 @@
 
 // Keep this in sync with ALL_ALL.xml
 var strings = {
-	nationwideLabel: 'Turkey',
+	nationwideLabel: 'Nationwide Results',
 	//chooseLabel: 'Choose a province and select a race:',
 	provinceLabel: 'Province:',
 	partyLabel: 'Party:',
@@ -392,7 +392,7 @@ function contentTable() {
 									'<td class="selectcell">',
 										'<div class="selectdiv">',
 											'<select id="stateSelector">',
-												option( '-1', 'Turkey'.T() ),
+												option( '-1', 'nationwideLabel'.T() ),
 												geo.provinces.features.mapjoin( function( province ) {
 													return provinceOption( province, province.abbr == opt.province, true );
 												}),
