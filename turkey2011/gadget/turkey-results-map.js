@@ -733,15 +733,28 @@ function contentTable() {
 		}
 	}
 	
-	function formatTipPartyRow( party, index ) {
+	function formatColorPatch( party, max ) {
+		var size = Math.sqrt( party.vsTop ) * max;
+		var margin1 = ( max - size ) / 2;
+		var margin2 = max - size - margin1;
+		return S(
+			'<div style="background:', party.color, '; width:', size, 'px; height:', size, 'px; margin:', margin1+2, 'px ', margin2+8, 'px ', margin2+2, 'px ', margin1+0, 'px; border:1px solid #AAA;">',
+			'</div>'
+		);
+	}
+	
+	function formatTipPartyRow( party ) {
 		return S(
 			'<tr>',
 				'<td>',
-					'<div style="background:', party.color, '; width:16px; height:16px; margin:2px 8px 0 0; border:1px solid #AAA;">',
-					'</div>',
+					formatColorPatch( party, 24 ),
 				'</td>',
 				'<td style="text-align:right; padding-right:12px;">',
-					percent( party.fraction ),
+					percent( party.vsAll ),
+				'</td>',
+				'<td>',
+					'<div style="background:url(', imgUrl('parties-24.png'), '); background-position:-', party.icon * 24, ' 0; width:24px; height:24px; margin:2px 8px 2px 0; border:1px solid #AAA;">',
+					'</div>',
 				'</td>',
 				'<td style="">',
 					party.abbr,
@@ -759,7 +772,7 @@ function contentTable() {
 		for( var i = -1;  ++i < parties.length; ) {
 			var party = top[i], votes = result[i];
 			party.votes = votes;
-			party.fraction = votes / total;
+			party.vsAll = votes / total;
 			//party.total = total;
 		}
 		// TODO: use fast sort?
@@ -772,6 +785,13 @@ function contentTable() {
 		}).slice( 0, max );
 		while( top.length  &&  ! top[top.length-1].votes )
 			top.pop();
+		if( top.length ) {
+			var most = top[0].votes;
+			for( var i = -1;  ++i < top.length; ) {
+				var party = top[i];
+				party.vsTop = party.votes / most;
+			}
+		}
 		return top;
 	}
 	
@@ -781,9 +801,7 @@ function contentTable() {
 		var topParties = topPartiesByVote( result, 4 )
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
-				topParties.mapjoin( function( party, index ) {
-					return formatTipPartyRow( party, index );
-				}),
+				topParties.mapjoin( formatTipPartyRow ),
 			'</table>'
 		);
 	}
