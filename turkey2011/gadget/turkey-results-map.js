@@ -13,8 +13,7 @@ var strings = {
 	thirdParty: 'Third',
 	fourthParty: 'Fourth',
 	turkey: 'Turkey',
-	stateDistrict: '{{province}} District {{number}}',
-	percentReporting: '{{percent}}% of {{total}} precincts reporting',
+	percentReporting: '{{percent}} counted ({{counted}}/{{total}} boxes)',
 	countdownHeading: 'Live results in:',
 	countdownHours: '{{hours}} hours',
 	countdownHour: '1 hour',
@@ -734,112 +733,91 @@ function contentTable() {
 		}
 	}
 	
-	function formatRace( feature, race, count, index ) {
-		var tally = race.votes
-		var precincts = feature.precincts;
-		if( ! precincts )
-			return opt.infoType == 'U.S. Senate' ? 'noSenate'.T() : '';
-		var total = 0;
-		for( var i = -1, vote;  vote = tally[++i]; ) total += vote.votes;
-		var unopposed = ! total  &&  tally.length == 1;
-		if( ! total  &&  ! unopposed ) {
-			var tally1 = [];
-			for( var i = -1, vote;  vote = tally[++i]; ) {
-				var candidate = feature.candidates[vote.id].split('|');
-				var p = candidate[0];
-				if( p == 'Dem'  ||  p == 'GOP' )
-					tally1.push( vote );
-			}
-			tally1.sort( function( a, b ) {
-				return Math.random() < .5;
-			});
-			tally = tally1;
-		}
+	function formatTipPartyRow( party, index ) {
 		return S(
-			'<div>',
-				'<table cellpadding="0" cellspacing="0">',
-					tally.mapjoin( function( vote, i ) {
-						if( i > 3 ) return '';
-						if( total && ! vote.votes ) return '';
-						var candidate = feature.candidates[vote.id].split('|');
-						var party = parties[ candidate[0] ];
-						var common = 'padding-top:6px; white-space:nowrap;' + ( total && i == 0 ? 'font-weight:bold;' : '' ) + ( count > 1 ? 'font-size:80%;' : '' );
-						return S(
-							'<tr>',
-								'<td style="', common, 'padding-right:12px;">',
-									candidate[2], ' (', party && party.letter || candidate[0], ')',
-								'</td>',
-								unopposed ? S(
-									'<td style="', common, '">',
-										'unopposed'.T(),
-									'</td>'
-								) : S(
-									'<td style="', common, 'text-align:right; padding-right:12px;">',
-										total ? percent( vote.votes / total ) : '0',
-									'</td>',
-									'<td style="', common, 'text-align:right;">',
-										formatNumber( vote.votes ),
-									'</td>'
-								),
-							'</tr>'
-						);
-					}),
-				'</table>',
-			'</div>'
+			'<tr>',
+				'<td>',
+					'<div style="background:', party.color, '; width:16px; height:16px; margin:2px 8px 0 0; border:1px solid #AAA;">',
+					'</div>',
+				'</td>',
+				'<td style="text-align:right; padding-right:12px;">',
+					percent( party.fraction ),
+				'</td>',
+				'<td style="">',
+					party.abbr,
+				'</td>',
+			'</tr>'
 		);
 	}
 	
-	function formatRaces( feature, races ) {
-		if( ! races )
+	function topPartiesByVote( result, max ) {
+		var top = parties.slice();
+		var total = 0;
+		for( var i = -1;  ++i < parties.length; ) {
+			total += result[i];
+		}
+		for( var i = -1;  ++i < parties.length; ) {
+			var party = top[i], votes = result[i];
+			party.votes = votes;
+			party.fraction = votes / total;
+			//party.total = total;
+		}
+		// TODO: use fast sort?
+		top = top.sort( function( a, b ) {
+			return(
+				a.votes < b.votes ? 1 :
+				a.votes > b.votes ? -1 :
+				0
+			);
+		}).slice( 0, max );
+		while( top.length  &&  ! top[top.length-1].votes )
+			top.pop();
+		return top;
+	}
+	
+	function formatTipParties( feature, result ) {
+		if( ! result[col.NumCountedBallotBoxes] )
 			return 'noVotes'.T();
+		var topParties = topPartiesByVote( result, 4 )
 		return S(
-			races.map( function( race, index ) {
-				return formatRace( feature, race, races.length, index );
-			}).join( S(
-				'<div style="margin-top:4px; padding-top:4px; border-top:1px solid #999;">',
-				'</div>'
-			) )
+			'<table cellpadding="0" cellspacing="0">',
+				topParties.mapjoin( function( party, index ) {
+					return formatTipPartyRow( party, index );
+				}),
+			'</table>'
 		);
 	}
 	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
-		return S(
+		var boxColor = '#F2EFE9';
+		var result = curResults.rowsByID[feature.id];
+		
+		var content = S(
 			'<div class="tipcontent">',
-				feature.name,
+				formatTipParties( feature, result ),
 			'</div>'
 		);
 		
-		var precincts = feature.precincts;
-		var races = feature.races;
-		var boxColor = '#F2EFE9';
-		var winner = feature.candidates[ races && races[0].final ];
-		if( winner ) {
-			var party = parties[ winner.split('|')[0] ];
-			boxColor = party && party.barColor || boxColor;
-		}
-		var content = S(
-			'<div class="tipcontent">',
-				formatRaces( feature, races ),
+		var boxes = result[col.NumBallotBoxes];
+		var counted = result[col.NumCountedBallotBoxes];
+		var footer = S(
+			'<div class="tipreporting">',
+				'percentReporting'.T({
+					counted: counted,
+					total: boxes,
+					percent: percent( counted / boxes )
+				}),
 			'</div>'
 		);
-		var footer = precincts ? S(
-			'<div class="tipreporting">',
-				'percentReporting'.T({ percent:Math.floor( precincts.reporting / precincts.total * 100 ), total:precincts.total }),
-			'</div>'
-		) : '';
+		
 		return S(
 			'<div class="tiptitlebar">',
-				'<div style="float:left; background:', boxColor, '; width:16px; height:16px; margin:2px 6px 0 0; border:1px solid #AAA;">',
-				'</div>',
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
-						feature.type != 'cd' ? feature.name :
-						feature.name == 'One' ? provinces.by.abbr(feature.province).name :
-						'stateDistrict'.T({ province:provinces.by.abbr(feature.province).name, number:feature.name }),
+						feature.name,
 						' ',
 					'</span>',
-					opt.infoType == 'President' && feature.type == 'province' ? 'EVs'.T({ votes:feature.electoral || feature.province == 'ak' && 3 }) : '',
 				'</div>',
 				'<div style="clear:left;">',
 				'</div>',
