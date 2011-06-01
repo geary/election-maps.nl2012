@@ -50,6 +50,14 @@ var parties = [
 	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12 }
 ];
 
+// Database column offsets
+var o = parties.length,
+	ID = o,
+	NumVoters = o + 1,
+	NumBallotBoxes = o + 2,
+	NumCountedBallotBoxes = o + 3,
+	DistrictName = o + 4;
+
 document.write(
 	'<style type="text/css">',
 		'html, body { margin:0; padding:0; border:0 none; }',
@@ -451,7 +459,10 @@ function contentTable() {
 	}
 	
 	function loadRegion( id ) {
-		getGeoJSON( opt.shapeUrl + 'turkey.jsonp' );
+			var file =
+				id < 0 ? 'turkey.jsonp' :
+				'province-' + id + '.jsonp';
+		getGeoJSON( opt.shapeUrl + file );
 	}
 	
 	function getGeoJSON( url ) {
@@ -568,13 +579,13 @@ function contentTable() {
 		}
 	}
 	
-	var  mousePlace;
+	var  mouseFeature;
 	
-	function getStateDistricts( places, province ) {
+	function getStateDistricts( features, province ) {
 		var districts = [];
-		for( var iPlace = -1, place;  place = places[++iPlace]; ) {
-			if( place.province.toUpperCase() == curProvince.abbr )
-				districts.push( place );
+		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+			if( feature.province.toUpperCase() == curProvince.abbr )
+				districts.push( feature );
 		}
 		return districts;
 	}
@@ -582,22 +593,22 @@ function contentTable() {
 	function polys() {
 		colorize( /* ?? */ );
 		var $container = $('#map');
-		function getPlace( event, where ) {
-			return where && where.place;
+		function getFeature( event, where ) {
+			return where && where.feature;
 		}
 		var events = {
 			mousemove: function( event, where ) {
-				var place = getPlace( event, where );
-				if( place == mousePlace ) return;
-				mousePlace = place;
-				$container[0].style.cursor = place ? 'pointer' : 'hand';
-				showTip( place );
+				var feature = getFeature( event, where );
+				if( feature == mouseFeature ) return;
+				mouseFeature = feature;
+				$container[0].style.cursor = feature ? 'pointer' : 'hand';
+				showTip( feature );
 			},
 			click: function( event, where ) {
-				var place = getPlace( event, where );
-				if( ! place ) return;
-				if( place.type == 'province'  || place.type == 'cd' )
-					setProvince( place.province );
+				var feature = getFeature( event, where );
+				if( ! feature ) return;
+				if( feature.type == 'province'  || feature.type == 'cd' )
+					setProvince( feature.province );
 			}
 		};
 		//map.clearOverlays();
@@ -617,56 +628,68 @@ function contentTable() {
 		//var locals = results.locals;
 		// Use wider borders in IE to cover up gaps between borders, except in House view
 		strokeWidth = $.browser.msie ? 2 : 1;
-		var places = geo.current.features;
-		for( var iPlace = -1, place;  place = places[++iPlace]; ) {
+		var features = geo.current.features;
+		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+			var id = feature.id;
+			//console.log( id );
+			var row = curResults.rowsByID[id];
+			var party = parties[row.partyMax];
+			if( party ) {
+				feature.fillColor = party.color;
+				feature.fillOpacity = .75;
+			}
+			else {
+				feature.fillColor = '#FFFFFF';
+				feature.fillOpacity = 0;
+			}
 			var local = null;
-			//place.precincts = place.electoral = null;
-			place.strokeColor = '#0000FF';
-			place.strokeOpacity = 1;
-			place.strokeWidth = 2; // strokeWidth;
+			//feature.precincts = feature.electoral = null;
+			feature.strokeColor = '#0000FF';
+			feature.strokeOpacity = 1;
+			feature.strokeWidth = 2; // strokeWidth;
 			//if( congress ) {
-			//	var province = provincesById[ place.province.toUpperCase() ];
+			//	var province = provincesById[ feature.province.toUpperCase() ];
 			//	local = province && locals[province.name];
 			//}
 			//else if( curProvince != stateUS  &&  opt.infoType == 'U.S. Senate' ) {
 			//	local = results.totals;
 			//}
 			//else {
-			//	local = locals[place.name];
+			//	local = locals[feature.name];
 			//}
 			if( ! local ) {
-				//place.fillColor = '#000000';
-				//place.fillOpacity = 1;
-				place.fillColor = '#FFFFFF';
-				place.fillOpacity = 0;
-				//window.console && console.log( 'Missing place', place.name );
+				//feature.fillColor = '#000000';
+				//feature.fillOpacity = 1;
+				//feature.fillColor = '#FFFFFF';
+				//feature.fillOpacity = 0;
+				//window.console && console.log( 'Missing feature', feature.name );
 				continue;
 			}
 			//var localrace = local.races[race];
 			//var localseats = getSeats( localrace, seat );
 			//if( localseats ) {
-			//	place.races = localseats;
+			//	feature.races = localseats;
 			//	var tally = localseats[0].votes;
-			//	place.precincts = local.precincts;
-			//	place.electoral = local.electoral;
+			//	feature.precincts = local.precincts;
+			//	feature.electoral = local.electoral;
 			//}
-			//place.candidates = results.candidates;
+			//feature.candidates = results.candidates;
 			//var id = null;
-			//if( place.type == 'province'  ||  place.type == 'cd' ) {
+			//if( feature.type == 'province'  ||  feature.type == 'cd' ) {
 			//	id = localseats && localseats[0].final;
 			//}
-			//else if( tally  &&  tally[0]  &&  tally[0].votes  &&  place.precincts && place.precincts.reporting == place.precincts.total )  {
+			//else if( tally  &&  tally[0]  &&  tally[0].votes  &&  feature.precincts && feature.precincts.reporting == feature.precincts.total )  {
 			//	id = tally[0].id;
 			//}
 			//var winner = id && results.candidates[id];
 			//if( winner ) {
 			//	var party = parties[ winner.split('|')[0] ];
-			//	place.fillColor = party.color;
-			//	place.fillOpacity = winner ? fillOpacity : 0;
+			//	feature.fillColor = party.color;
+			//	feature.fillOpacity = winner ? fillOpacity : 0;
 			//}
 			//else {
-			//	place.fillColor = '#FFFFFF';
-			//	place.fillOpacity = 0;
+			//	feature.fillColor = '#FFFFFF';
+			//	feature.fillOpacity = 0;
 			//}
 		}
 	}
@@ -684,9 +707,9 @@ function contentTable() {
 	var $maptip, tipHtml;
 	$('body').bind( 'mousemove', moveTip );
 	
-	function showTip( place ) {
+	function showTip( feature ) {
 		if( ! $maptip ) $maptip = $('#maptip');
-		tipHtml = formatTip( place );
+		tipHtml = formatTip( feature );
 		if( tipHtml ) {
 			$maptip.html( tipHtml ).show();
 		}
@@ -695,9 +718,9 @@ function contentTable() {
 		}
 	}
 	
-	function formatRace( place, race, count, index ) {
+	function formatRace( feature, race, count, index ) {
 		var tally = race.votes
-		var precincts = place.precincts;
+		var precincts = feature.precincts;
 		if( ! precincts )
 			return opt.infoType == 'U.S. Senate' ? 'noSenate'.T() : '';
 		var total = 0;
@@ -706,7 +729,7 @@ function contentTable() {
 		if( ! total  &&  ! unopposed ) {
 			var tally1 = [];
 			for( var i = -1, vote;  vote = tally[++i]; ) {
-				var candidate = place.candidates[vote.id].split('|');
+				var candidate = feature.candidates[vote.id].split('|');
 				var p = candidate[0];
 				if( p == 'Dem'  ||  p == 'GOP' )
 					tally1.push( vote );
@@ -722,7 +745,7 @@ function contentTable() {
 					tally.mapjoin( function( vote, i ) {
 						if( i > 3 ) return '';
 						if( total && ! vote.votes ) return '';
-						var candidate = place.candidates[vote.id].split('|');
+						var candidate = feature.candidates[vote.id].split('|');
 						var party = parties[ candidate[0] ];
 						var common = 'padding-top:6px; white-space:nowrap;' + ( total && i == 0 ? 'font-weight:bold;' : '' ) + ( count > 1 ? 'font-size:80%;' : '' );
 						return S(
@@ -750,12 +773,12 @@ function contentTable() {
 		);
 	}
 	
-	function formatRaces( place, races ) {
+	function formatRaces( feature, races ) {
 		if( ! races )
 			return 'noVotes'.T();
 		return S(
 			races.map( function( race, index ) {
-				return formatRace( place, race, races.length, index );
+				return formatRace( feature, race, races.length, index );
 			}).join( S(
 				'<div style="margin-top:4px; padding-top:4px; border-top:1px solid #999;">',
 				'</div>'
@@ -763,19 +786,25 @@ function contentTable() {
 		);
 	}
 	
-	function formatTip( place ) {
-		if( ! place ) return null;
-		var precincts = place.precincts;
-		var races = place.races;
+	function formatTip( feature ) {
+		if( ! feature ) return null;
+		return S(
+			'<div class="tipcontent">',
+				feature.name,
+			'</div>'
+		);
+		
+		var precincts = feature.precincts;
+		var races = feature.races;
 		var boxColor = '#F2EFE9';
-		var winner = place.candidates[ races && races[0].final ];
+		var winner = feature.candidates[ races && races[0].final ];
 		if( winner ) {
 			var party = parties[ winner.split('|')[0] ];
 			boxColor = party && party.barColor || boxColor;
 		}
 		var content = S(
 			'<div class="tipcontent">',
-				formatRaces( place, races ),
+				formatRaces( feature, races ),
 			'</div>'
 		);
 		var footer = precincts ? S(
@@ -789,12 +818,12 @@ function contentTable() {
 				'</div>',
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
-						place.type != 'cd' ? place.name :
-						place.name == 'One' ? provinces.by.abbr(place.province).name :
-						'stateDistrict'.T({ province:provinces.by.abbr(place.province).name, number:place.name }),
+						feature.type != 'cd' ? feature.name :
+						feature.name == 'One' ? provinces.by.abbr(feature.province).name :
+						'stateDistrict'.T({ province:provinces.by.abbr(feature.province).name, number:feature.name }),
 						' ',
 					'</span>',
-					opt.infoType == 'President' && place.type == 'province' ? 'EVs'.T({ votes:place.electoral || place.province == 'ak' && 3 }) : '',
+					opt.infoType == 'President' && feature.type == 'province' ? 'EVs'.T({ votes:feature.electoral || feature.province == 'ak' && 3 }) : '',
 				'</div>',
 				'<div style="clear:left;">',
 				'</div>',
@@ -943,17 +972,18 @@ function contentTable() {
 		clearTimeout( reloadTimer );
 		reloadTimer = null;
 		showTip( false );
-		map && map.clearOverlays();
+		//map && map.clearOverlays();
 		var id = opt.province;
 		var $select = $('#partySelector');
 		opt.infoType = $select.val();
 		
+		var province = -1;
 		//var province = curProvince = geo.provinces.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		//getShapes( opt.province, function() {
-			//getResults( province, function() {
+			getResults( province, function() {
 				geoReady( reload );
-			//});
+			});
 		//});
 	}
 	
@@ -961,16 +991,46 @@ function contentTable() {
 		if( province.shapes ) callback();
 		else getJSON( 'shapes', opt.shapeUrl, province.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
 			province.shapes = shapes;
-			//if( province == stateUS ) shapes.places.province.index('province');
+			//if( province == stateUS ) shapes.features.province.index('province');
 			callback();
 		});
 	}
 	
-	function getResults( province, callback ) {
-		getJSON( 'votes', opt.voteUrl, province.abbr.toLowerCase() + '-all.json', 300, function( results ) {
-			province.results = results;
-			callback();
-		});
+	function getResults( province ) {
+		var url = S(
+			'http://www.google.com/fusiontables/api/query?',
+			'jsonCallback=loadResults&',
+			'sql=SELECT+',
+			parties.map( function( party ) {
+				return S( "'VoteCount-", party.id, "'" );
+			}).join( ',' ),
+			',ID,NumVoters',
+			',NumBallotBoxes,NumCountedBallotBoxes',
+			",'DistrictName-tr'",
+			'+FROM+',
+			province < 0 ? '885915' : '885918'
+		);
+		$.getScript( url );
+	}
+	
+	loadResults = function( json ) {
+		var results = curResults = json.table;
+		var rowsByID = results.rowsByID = {};
+		var rows = curResults.rows;
+		for( var row, iRow = -1;  row = rows[++iRow]; ) {
+			rowsByID[ row[ID] ] = row;
+			var nParties = parties.length;
+			var max = 0,  partyMax = -1;
+			for( iCol = -1;  ++iCol < nParties; ) {
+				var count = row[iCol];
+				if( count > max ) {
+					max = count;
+					partyMax = iCol;
+				}
+			}
+			row.partyMax = partyMax;
+		}
+		geoReady( /*reload*/ );
 	}
 	
 	function objToSortedKeys( obj ) {
@@ -982,7 +1042,7 @@ function contentTable() {
 	var blank = imgUrl( 'blank.gif' );
 	
 	$window.bind( 'load', function() {
-		getGeoJSON( opt.shapeUrl + 'turkey.jsonp' );
+		loadRegion( -1 );
 	});
 
 })( jQuery );
