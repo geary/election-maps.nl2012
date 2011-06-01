@@ -21,8 +21,8 @@
 	<Require feature="analytics"/>
 	<!--<Require feature="setprefs"/>-->
 	
-	<Locale messages="http://election-results.googlecode.com/hg/turkey2011/ALL_ALL.xml" />
-	<Locale lang="tr" messages="http://election-results.googlecode.com/hg/turkey2011/tr_ALL.xml" />
+	<Locale messages="http://election-results.googlecode.com/hg/turkey2011/gadget/ALL_ALL.xml" />
+	<Locale lang="tr" messages="http://election-results.googlecode.com/hg/turkey2011/gadget/tr_ALL.xml" />
 	
 </ModulePrefs>
 
@@ -43,10 +43,10 @@
 	};
 </script>
 
-<script type="text/javascript" src="http://election-results.googlecode.com/hg/turkey2011/polygonzo.js">
+<script type="text/javascript" src="http://election-results.googlecode.com/hg/turkey2011/gadget/polygonzo.js">
 </script>
 
-<script type="text/javascript" src="http://election-results.googlecode.com/hg/turkey2011/turkey-results-map.js">
+<script type="text/javascript" src="http://election-results.googlecode.com/hg/turkey2011/gadget/turkey-results-map.js">
 </script>
 
 ]]>

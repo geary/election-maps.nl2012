@@ -21,8 +21,8 @@
 	<Require feature="analytics"/>
 	<!--<Require feature="setprefs"/>-->
 	
-	<Locale messages="http://election-results.googlecode.com/hg/turkey2011/ALL_ALL.xml" />
-	<Locale lang="tr" messages="http://election-results.googlecode.com/hg/turkey2011/tr_ALL.xml" />
+	<Locale messages="http://election-results.googlecode.com/hg/turkey2011/gadget/ALL_ALL.xml" />
+	<Locale lang="tr" messages="http://election-results.googlecode.com/hg/turkey2011/gadget/tr_ALL.xml" />
 	
 </ModulePrefs>
 
@@ -39,7 +39,7 @@
 
 <script type="text/javascript">
 	GoogleElectionMapOptions = {
-		codeUrl: 'localhost/election-results/hg/turkey2011/',
+		codeUrl: 'localhost/election-results/hg/turkey2011/gadget/',
 		_: null
 	};
 </script>
