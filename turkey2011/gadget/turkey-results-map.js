@@ -50,13 +50,23 @@ var parties = [
 	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12 }
 ];
 
-// Database column offsets
-var o = parties.length,
-	ID = o,
-	NumVoters = o + 1,
-	NumBallotBoxes = o + 2,
-	NumCountedBallotBoxes = o + 3,
-	DistrictName = o + 4;
+// Voting results column offsets
+var col = {};
+col.parties = 0;
+col.ID = parties.length;
+col.NumVoters = col.ID + 1;
+col.NumBallotBoxes = col.ID + 2;
+col.NumCountedBallotBoxes = col.ID + 3;
+
+function resultsFields() {
+	return S(
+		parties.map( function( party ) {
+			return S( "'VoteCount-", party.id, "'" );
+		}).join( ',' ),
+		',ID,NumVoters',
+		',NumBallotBoxes,NumCountedBallotBoxes'
+	);
+}
 
 document.write(
 	'<style type="text/css">',
@@ -1001,12 +1011,7 @@ function contentTable() {
 			'http://www.google.com/fusiontables/api/query?',
 			'jsonCallback=loadResults&',
 			'sql=SELECT+',
-			parties.map( function( party ) {
-				return S( "'VoteCount-", party.id, "'" );
-			}).join( ',' ),
-			',ID,NumVoters',
-			',NumBallotBoxes,NumCountedBallotBoxes',
-			",'DistrictName-tr'",
+			resultsFields(),
 			'+FROM+',
 			province < 0 ? '885915' : '885918'
 		);
@@ -1018,7 +1023,7 @@ function contentTable() {
 		var rowsByID = results.rowsByID = {};
 		var rows = curResults.rows;
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
-			rowsByID[ row[ID] ] = row;
+			rowsByID[ row[col.ID] ] = row;
 			var nParties = parties.length;
 			var max = 0,  partyMax = -1;
 			for( iCol = -1;  ++iCol < nParties; ) {
