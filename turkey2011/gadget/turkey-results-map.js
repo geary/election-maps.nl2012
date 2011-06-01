@@ -347,14 +347,7 @@ function raceOption( value, name ) {
 }
 
 function imgUrl( name ) {
-	return cacheUrl( opt.imgUrl + name );
-}
-
-function cacheUrl( url, cache ) {
-	if( opt.nocache ) return url + '?q=' + new Date().getTime();
-	url = _IG_GetCachedUrl( url, typeof cache == 'number' ? { refreshInterval:cache } : {} );
-	if( ! url.match(/^http:/) ) url = 'http://' + location.host + url;
-	return url;
+	return opt.imgUrl + name;
 }
 
 document.write(
