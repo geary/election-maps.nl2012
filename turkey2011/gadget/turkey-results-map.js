@@ -91,7 +91,7 @@ var opt = window.GoogleElectionMapOptions || {};
 opt.fontsize = '15px';
 var sw = 300;
 
-opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/svn/trunk/turkey2011/';
+opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
 
