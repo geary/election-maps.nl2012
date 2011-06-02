@@ -339,7 +339,7 @@ function optionHTML( value, name, selected, disabled ) {
 
 function provinceOption( province, selected, dated ) {
 	province.selectorIndex = index;
-	return option( province.abbr, province.name, selected );
+	return option( province.abbr, province.name, selected, true );
 }
 
 function raceOption( value, name ) {
@@ -385,6 +385,7 @@ function contentTable() {
 										'<div class="selectdiv">',
 											'<select id="provinceSelector">',
 												option( '-1', 'nationwideLabel'.T() ),
+												option( '', '', false, true ),
 												geo.provinces.features.mapjoin( function( province ) {
 													return provinceOption( province, province.abbr == opt.province, true );
 												}),
@@ -405,7 +406,7 @@ function contentTable() {
 												//option( '-2', 'secondParty'.T() ),
 												//option( '-3', 'thirdParty'.T() ),
 												//option( '-4', 'fourthParty'.T() ),
-												option( '', '' ),
+												option( '', '', false, true ),
 												parties.mapjoin( function( party ) {
 													return option( party.id, party.abbr );
 												}),
