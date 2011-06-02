@@ -13,7 +13,7 @@ var strings = {
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
 	turkey: 'Turkey',
-	percentReporting: '{{percent}} counted ({{counted}}/{{total}} boxes)',
+	percentReporting: '{{percent}} counted ({{counted}}/{{total}} ballot boxes)',
 	countdownHeading: 'Live results in:',
 	countdownHours: '{{hours}} hours',
 	countdownHour: '1 hour',
