@@ -568,11 +568,16 @@ function contentTable() {
 	
 	var reloadTimer;
 	
-	function geoReady( reload ) {
-		if( ! reload ) moveToGeo();
+	var geoMoveNext = true;
+	
+	function geoReady() {
+		if( geoMoveNext ) {
+			geoMoveNext = false;
+			moveToGeo();
+		}
 		polys();
 		$('#spinner').hide();
-		//reloadTimer = setTimeout( function() { loadView( true ); }, 300000 );
+		//reloadTimer = setTimeout( function() { loadView(); }, 300000 );
 	}
 	
 	function moveToGeo() {
@@ -894,6 +899,7 @@ function contentTable() {
 		var select = $('#provinceSelector')[0];
 		select && ( select.selectedIndex = province.selectorIndex );
 		opt.province = province.abbr.toLowerCase();
+		geoMoveNext = true;
 		loadView();
 	}
 	
@@ -929,7 +935,7 @@ function contentTable() {
 			var value = this.value;
 			if( opt.infoType == value ) return;
 			opt.infoType = value;
-			loadView( true );
+			loadView();
 		});
 	}
 	
@@ -944,7 +950,7 @@ function contentTable() {
 	function hittest( latlng ) {
 	}
 	
-	function loadView( reload ) {
+	function loadView() {
 		clearTimeout( reloadTimer );
 		reloadTimer = null;
 		showTip( false );
@@ -953,12 +959,12 @@ function contentTable() {
 		var $select = $('#partySelector');
 		opt.infoType = $select.val();
 		
-		var province = -1;
+		opt.province = +$('#provinceSelector').val();
 		//var province = curProvince = geo.provinces.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		//getShapes( opt.province, function() {
-			getResults( province, function() {
-				geoReady( reload );
+			getResults( opt.province, function() {
+				geoReady();
 			});
 		//});
 	}
@@ -972,7 +978,13 @@ function contentTable() {
 		});
 	}
 	
+	var cacheResults = {};
+	
 	function getResults( province ) {
+		if( cacheResults[province] ) {
+			loadResults( cacheResults[province] );
+			return;
+		}
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
 			'jsonCallback=loadResults&',
@@ -985,6 +997,8 @@ function contentTable() {
 	}
 	
 	loadResults = function( json ) {
+		// TEMP HACK - nationwide only
+		cacheResults[-1] = json;
 		var results = curResults = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = curResults.rows;
@@ -1001,7 +1015,7 @@ function contentTable() {
 			}
 			row.partyMax = partyMax;
 		}
-		geoReady( /*reload*/ );
+		geoReady();
 	}
 	
 	function objToSortedKeys( obj ) {
