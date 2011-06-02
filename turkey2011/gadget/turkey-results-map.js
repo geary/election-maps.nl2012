@@ -678,7 +678,7 @@ function contentTable() {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
 				feature.fillColor = color;
-				feature.fillOpacity = row[index] / max;
+				feature.fillOpacity = max ? row[index] / max : 0;
 				feature.strokeColor = '#000000';
 				feature.strokeOpacity = .4;
 				feature.strokeWidth = strokeWidth;
