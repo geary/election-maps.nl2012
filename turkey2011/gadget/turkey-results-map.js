@@ -442,29 +442,29 @@ function contentTable() {
 	
 	var fillOpacity = .75;
 	
-	function getJSON( type, path, file, cache, callback, retries ) {
-		var stamp = +new Date;
-		if( ! opt.nocache ) stamp = Math.floor( stamp / cache / 1000 );
-		if( retries ) stamp += '-' + retries;
-		if( retries == 3 ) showError( type, file );
-		_IG_FetchContent( path + file + '?' + stamp, function( json ) {
-			// Q&D test for bad JSON
-			if( json && json.charAt(0) == '{' ) {
-				$('#error').hide();
-				callback( eval( '(' + json + ')' ) );
-			}
-			else {
-				reportError( type, file );
-				retries = ( retries || 0 );
-				var delay = Math.min( Math.pow( 2, retries ), 128 ) * 1000;
-				setTimeout( function() {
-					getJSON( type, path, file, cache, callback, retries + 1 );
-				}, delay );
-			}
-		}, {
-			refreshInterval: opt.nocache ? 1 : cache
-		});
-	}
+	//function getJSON( type, path, file, cache, callback, retries ) {
+	//	var stamp = +new Date;
+	//	if( ! opt.nocache ) stamp = Math.floor( stamp / cache / 1000 );
+	//	if( retries ) stamp += '-' + retries;
+	//	if( retries == 3 ) showError( type, file );
+	//	_IG_FetchContent( path + file + '?' + stamp, function( json ) {
+	//		// Q&D test for bad JSON
+	//		if( json && json.charAt(0) == '{' ) {
+	//			$('#error').hide();
+	//			callback( eval( '(' + json + ')' ) );
+	//		}
+	//		else {
+	//			reportError( type, file );
+	//			retries = ( retries || 0 );
+	//			var delay = Math.min( Math.pow( 2, retries ), 128 ) * 1000;
+	//			setTimeout( function() {
+	//				getJSON( type, path, file, cache, callback, retries + 1 );
+	//			}, delay );
+	//		}
+	//	}, {
+	//		refreshInterval: opt.nocache ? 1 : cache
+	//	});
+	//}
 	
 	function loadRegion( id ) {
 			var file =
@@ -978,14 +978,14 @@ function contentTable() {
 		//});
 	}
 	
-	function getShapes( province, callback ) {
-		if( province.shapes ) callback();
-		else getJSON( 'shapes', opt.shapeUrl, province.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
-			province.shapes = shapes;
-			//if( province == stateUS ) shapes.features.province.index('province');
-			callback();
-		});
-	}
+	//function getShapes( province, callback ) {
+	//	if( province.shapes ) callback();
+	//	else getJSON( 'shapes', opt.shapeUrl, province.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
+	//		province.shapes = shapes;
+	//		//if( province == stateUS ) shapes.features.province.index('province');
+	//		callback();
+	//	});
+	//}
 	
 	var cacheResults = {};
 	
