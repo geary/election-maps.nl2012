@@ -135,7 +135,7 @@ Array.prototype.mapjoin = function( fun, delim ) {
 
 if( ! Array.prototype.index ) {
 	Array.prototype.index = function( field ) {
-		this.by = {};
+		this.by = this.by || {};
 		if( field ) {
 			var by = this.by[field] = {};
 			for( var i = 0, n = this.length;  i < n;  ++i ) {
@@ -285,7 +285,7 @@ document.write(
 		'* { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
 		'#outer {}',
 		opt.tpm ? '.fullpanel { background-color:#CCC7AA; }' : '.fullpanel { background-color:#EEE; }',
-		'#stateSelector, #partySelector { width:', sw - 12, 'px; }',
+		'#provinceSelector, #partySelector { width:', sw - 12, 'px; }',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
 		'.content table { xwidth:100%; }',
@@ -377,13 +377,13 @@ function contentTable() {
 							'<table class="selects" cellspacing="0" cellpadding="0" style="margin-right:6px;">',
 								'<tr>',
 									'<td class="labelcell">',
-										'<label for="stateSelector">',
+										'<label for="provinceSelector">',
 											'provinceLabel'.T(),
 										'</label>',
 									'</td>',
 									'<td class="selectcell">',
 										'<div class="selectdiv">',
-											'<select id="stateSelector">',
+											'<select id="provinceSelector">',
 												option( '-1', 'nationwideLabel'.T() ),
 												geo.provinces.features.mapjoin( function( province ) {
 													return provinceOption( province, province.abbr == opt.province, true );
@@ -401,13 +401,13 @@ function contentTable() {
 									'<td class="selectcell">',
 										'<div class="selectdiv">',
 											'<select id="partySelector">',
-												option( '1', 'topParty'.T() ),
-												option( '2', 'secondParty'.T() ),
-												option( '3', 'thirdParty'.T() ),
-												option( '4', 'fourthParty'.T() ),
-												option( '', '' ),
+												option( '-1', 'topParty'.T() ),
+												option( '-2', 'secondParty'.T() ),
+												option( '-3', 'thirdParty'.T() ),
+												option( '-4', 'fourthParty'.T() ),
+												option( '', '<hr>' ),
 												parties.mapjoin( function( party ) {
-													return option( party.abbr, party.abbr );
+													return option( party.id, party.abbr );
 												}),
 											'</select>',
 										'</div>',
@@ -483,6 +483,7 @@ function contentTable() {
 				json.features.index('id').index('abbr');
 				geo.current = geo.provinces = json;
 				$('#outer').html( contentTable() );
+				initSelectors();
 				$map = $('#map');
 				$map.height( wh - $map.offset().top );
 				loadView();
@@ -538,7 +539,12 @@ function contentTable() {
 		});
 	};
 	
-	var map, gonzo, overlay;
+	var map, gonzo;
+	
+	var overlays = [];
+	overlays.clear = function() {
+		while( overlays.length ) overlays.pop().setMap( null );
+	};
 	
 	//var province = provinces[opt.province];
 	
@@ -574,7 +580,7 @@ function contentTable() {
 		$('#map').show();
 		initMap();
 		gme.trigger( map, 'resize' );
-		//map.clearOverlays();
+		overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
 		var bbox = json.bbox;
@@ -618,87 +624,60 @@ function contentTable() {
 					setProvince( feature.province );
 			}
 		};
-		//map.clearOverlays();
+		overlays.clear();
 		// Let map display before drawing polys
 		setTimeout( function() {
-			overlay = new PolyGonzo.PgOverlay({
+			var overlay = new PolyGonzo.PgOverlay({
 				map: map,
 				geo: geo.current,
 				events: events
 			});
+			overlays.push( overlay );
 			overlay.setMap( map );
 			//overlay.redraw( null, true );
 		}, 250 );
 	}
 	
 	function colorize( /* ?? */ ) {
-		//var locals = results.locals;
 		// Use wider borders in IE to cover up gaps between borders, except in House view
 		//strokeWidth = $.browser.msie ? 2 : 1;
 		strokeWidth = 1;
 		var features = geo.current.features;
-		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-			var id = feature.id;
-			//console.log( id );
-			var row = curResults.rowsByID[id];
-			var party = parties[row.partyMax];
-			if( party ) {
-				feature.fillColor = party.color;
-				feature.fillOpacity = .75;
+		var partyID = $('#partySelector').val();
+		if( partyID < 0 ) {
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var id = feature.id;
+				var row = curResults.rowsByID[id];
+				var party = parties[row.partyMax];
+				if( party ) {
+					feature.fillColor = party.color;
+					feature.fillOpacity = .75;
+				}
+				else {
+					feature.fillColor = '#FFFFFF';
+					feature.fillOpacity = 0;
+				}
+				feature.strokeColor = '#000000';
+				feature.strokeOpacity = .4;
+				feature.strokeWidth = strokeWidth;
 			}
-			else {
-				feature.fillColor = '#FFFFFF';
-				feature.fillOpacity = 0;
+		}
+		else {
+			var party = parties.by.id[partyID], color = party.color, index = party.index;
+			var max = 0;
+			var rows = curResults.rows;
+			for( var row, iRow = -1;  row = rows[++iRow]; ) {
+				max = Math.max( max, row[index] );
 			}
-			var local = null;
-			//feature.precincts = feature.electoral = null;
-			feature.strokeColor = '#000000';
-			feature.strokeOpacity = .4;
-			feature.strokeWidth = strokeWidth;
-			//if( congress ) {
-			//	var province = provincesById[ feature.province.toUpperCase() ];
-			//	local = province && locals[province.name];
-			//}
-			//else if( curProvince != stateUS  &&  opt.infoType == 'U.S. Senate' ) {
-			//	local = results.totals;
-			//}
-			//else {
-			//	local = locals[feature.name];
-			//}
-			if( ! local ) {
-				//feature.fillColor = '#000000';
-				//feature.fillOpacity = 1;
-				//feature.fillColor = '#FFFFFF';
-				//feature.fillOpacity = 0;
-				//window.console && console.log( 'Missing feature', feature.name );
-				continue;
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var id = feature.id;
+				var row = curResults.rowsByID[id];
+				feature.fillColor = color;
+				feature.fillOpacity = row[index] / max;
+				feature.strokeColor = '#000000';
+				feature.strokeOpacity = .4;
+				feature.strokeWidth = strokeWidth;
 			}
-			//var localrace = local.races[race];
-			//var localseats = getSeats( localrace, seat );
-			//if( localseats ) {
-			//	feature.races = localseats;
-			//	var tally = localseats[0].votes;
-			//	feature.precincts = local.precincts;
-			//	feature.electoral = local.electoral;
-			//}
-			//feature.candidates = results.candidates;
-			//var id = null;
-			//if( feature.type == 'province'  ||  feature.type == 'cd' ) {
-			//	id = localseats && localseats[0].final;
-			//}
-			//else if( tally  &&  tally[0]  &&  tally[0].votes  &&  feature.precincts && feature.precincts.reporting == feature.precincts.total )  {
-			//	id = tally[0].id;
-			//}
-			//var winner = id && results.candidates[id];
-			//if( winner ) {
-			//	var party = parties[ winner.split('|')[0] ];
-			//	feature.fillColor = party.color;
-			//	feature.fillOpacity = winner ? fillOpacity : 0;
-			//}
-			//else {
-			//	feature.fillColor = '#FFFFFF';
-			//	feature.fillOpacity = 0;
-			//}
 		}
 	}
 	
@@ -789,9 +768,9 @@ function contentTable() {
 	}
 	
 	function formatTipParties( feature, result ) {
-		if( ! result[col.NumCountedBallotBoxes] )
-			return 'noVotes'.T();
 		var topParties = topPartiesByVote( result, 4 )
+		if( ! topParties.length )
+			return 'noVotes'.T();
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
 				topParties.mapjoin( formatTipPartyRow ),
@@ -912,7 +891,7 @@ function contentTable() {
 	function setProvince( province ) {
 		if( ! province ) return;
 		if( typeof province == 'string' ) province = provinces.by.abbr( province );
-		var select = $('#stateSelector')[0];
+		var select = $('#provinceSelector')[0];
 		select && ( select.selectedIndex = province.selectorIndex );
 		opt.province = province.abbr.toLowerCase();
 		loadView();
@@ -935,31 +914,23 @@ function contentTable() {
 		});
 	}
 	
-	function load() {
+	function initSelectors() {
 		
-		setProvinceByAbbr( opt.province );
+		//setProvinceByAbbr( opt.province );
 		
-		$('#stateSelector')
-			.change( stateSelectorChange )
-			.keyup( stateSelectorChange );
-			
-		function stateSelectorChange() {
+		$('#provinceSelector').bind( 'change keyup', function() {
 			var value = this.value.replace('!','').toLowerCase();
 			if( opt.province == value ) return;
 			opt.province = value;
 			loadView();
-		}
+		});
 		
-		$('#partySelector')
-			.change( infoSelectorChange )
-			.keyup( infoSelectorChange );
-		
-		function infoSelectorChange() {
+		$('#partySelector').bind( 'change keyup', function() {
 			var value = this.value;
 			if( opt.infoType == value ) return;
 			opt.infoType = value;
 			loadView( true );
-		}
+		});
 	}
 	
 	function oneshot() {
@@ -977,7 +948,7 @@ function contentTable() {
 		clearTimeout( reloadTimer );
 		reloadTimer = null;
 		showTip( false );
-		//map && map.clearOverlays();
+		overlays.clear();
 		var id = opt.province;
 		var $select = $('#partySelector');
 		opt.infoType = $select.val();
