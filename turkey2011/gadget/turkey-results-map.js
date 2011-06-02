@@ -472,8 +472,16 @@ function contentTable() {
 		getGeoJSON( opt.shapeUrl + file );
 	}
 	
+	function getScript( url ) {
+		$.ajax({
+			url: url,
+			dataType: 'script',
+			cache: true
+		});
+	}
+	
 	function getGeoJSON( url ) {
-		$.getScript( url );
+		getScript( url );
 	}
 	
 	loadGeoJSON = function( json ) {
@@ -993,7 +1001,7 @@ function contentTable() {
 			'+FROM+',
 			province < 0 ? '885915' : '885918'
 		);
-		$.getScript( url );
+		getScript( url );
 	}
 	
 	loadResults = function( json ) {
