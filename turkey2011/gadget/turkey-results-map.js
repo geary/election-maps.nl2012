@@ -1000,7 +1000,7 @@ function contentTable() {
 			'sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			province < 0 ? '885915' : '885918'
+			province < 0 ? '934475' : '931824'
 		);
 		getScript( url );
 	}
