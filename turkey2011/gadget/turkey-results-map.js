@@ -614,7 +614,7 @@ function contentTable() {
 				var feature = getFeature( event, where );
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
-				$container[0].style.cursor = feature ? 'pointer' : 'hand';
+				map.setOptions({ draggableCursor: feature ? 'pointer' : null });
 				showTip( feature );
 			},
 			click: function( event, where ) {
