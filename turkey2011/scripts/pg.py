@@ -162,7 +162,7 @@ class Database:
 			UPDATE
 				%(table)s
 			SET
-				%(googeom)s = ST_Transform( %(llgeom)s, 3857 )
+				%(googeom)s = ST_Multi( ST_Transform( ST_Force_2D( %(llgeom)s ), 3857 ) )
 			;
 		''' % {
 			'table': table,
