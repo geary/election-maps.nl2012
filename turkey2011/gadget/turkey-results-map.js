@@ -578,6 +578,7 @@ function contentTable() {
 	var reloadTimer;
 	
 	var geoMoveNext = true;
+	var polyTimeNext = 250;
 	
 	function geoReady() {
 		if( geoMoveNext ) {
@@ -594,7 +595,7 @@ function contentTable() {
 		$('#map').show();
 		initMap();
 		gme.trigger( map, 'resize' );
-		overlays.clear();
+		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
 		var bbox = json.bbox;
@@ -638,18 +639,25 @@ function contentTable() {
 					setProvince( feature.province );
 			}
 		};
-		overlays.clear();
+		//overlays.clear();
 		// Let map display before drawing polys
-		setTimeout( function() {
+		function draw() {
 			var overlay = new PolyGonzo.PgOverlay({
 				map: map,
 				geo: geo.current,
 				events: events
 			});
-			overlays.push( overlay );
 			overlay.setMap( map );
+			setTimeout( function() {
+				overlays.clear();
+				overlays.push( overlay );
+			}, 1 );
 			//overlay.redraw( null, true );
-		}, 250 );
+		}
+		var pt = polyTimeNext;
+		polyTimeNext = 0;
+		if( pt ) setTimeout( draw, 250 );
+		else draw();
 	}
 	
 	function colorize( /* ?? */ ) {
@@ -963,7 +971,7 @@ function contentTable() {
 		clearTimeout( reloadTimer );
 		reloadTimer = null;
 		showTip( false );
-		overlays.clear();
+		//overlays.clear();
 		var id = opt.province;
 		var $select = $('#partySelector');
 		opt.infoType = $select.val();
