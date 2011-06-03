@@ -13,7 +13,7 @@ var strings = {
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
 	turkey: 'Turkey',
-	percentReporting: '{{percent}} counted ({{counted}}/{{total}} ballot boxes)',
+	percentReporting: '{{percent}} reporting',
 	countdownHeading: 'Live results in:',
 	countdownHours: '{{hours}} hours',
 	countdownHour: '1 hour',
@@ -732,7 +732,7 @@ function contentTable() {
 		var margin1 = ( max - size ) / 2;
 		var margin2 = max - size - margin1;
 		return S(
-			'<div style="background:', party.color, '; width:', size, 'px; height:', size, 'px; margin:', margin1+2, 'px ', margin2+8, 'px ', margin2+2, 'px ', margin1+0, 'px; border:1px solid #AAA;">',
+			'<div style="background:', party.color, '; width:', size, 'px; height:', size, 'px; margin:', margin1+2, 'px ', margin2+2, 'px ', margin2+2, 'px ', margin1+0, 'px; border:1px solid #AAA;">',
 			'</div>'
 		);
 	}
@@ -741,17 +741,17 @@ function contentTable() {
 		return S(
 			'<tr>',
 				'<td>',
-					formatColorPatch( party, 24 ),
-				'</td>',
-				'<td style="text-align:right; padding-right:12px;">',
-					percent( party.vsAll ),
-				'</td>',
-				'<td>',
 					'<div style="background:url(', imgUrl('parties-24.png'), '); background-position:-', party.icon * 24, ' 0; width:24px; height:24px; margin:2px 8px 2px 0; border:1px solid #AAA;">',
 					'</div>',
 				'</td>',
 				'<td style="">',
 					party.abbr,
+				'</td>',
+				'<td style="text-align:right; padding:0 8px 0 12px;">',
+					percent( party.vsAll ),
+				'</td>',
+				'<td>',
+					formatColorPatch( party, 24 ),
 				'</td>',
 			'</tr>'
 		);
@@ -816,8 +816,6 @@ function contentTable() {
 		var footer = S(
 			'<div class="tipreporting">',
 				'percentReporting'.T({
-					counted: counted,
-					total: boxes,
 					percent: percent( counted / boxes )
 				}),
 			'</div>'
