@@ -619,13 +619,23 @@ function contentTable() {
 	}
 	
 	function polys() {
+		var dragging;
 		colorize( /* ?? */ );
 		var $container = $('#map');
 		function getFeature( event, where ) {
 			return where && where.feature;
 		}
 		var events = {
+			mousedown: function( event, where ) {
+				dragging = true;
+				showTip( false );
+			},
+			mouseup: function( event, where ) {
+				dragging = false;
+				mouseFeature = null;
+			},
 			mousemove: function( event, where ) {
+				if( dragging ) return;
 				var feature = getFeature( event, where );
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
