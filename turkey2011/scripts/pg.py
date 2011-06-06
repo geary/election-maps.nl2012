@@ -183,16 +183,17 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_Transform %.1f seconds' %( t2 - t1 )
 	
-	def addLandGeometry( self,
-		sourceTable, sourceGeom,
-		targetTable, targetGeom,
-		idColumn
+	def mergeGeometry( self,
+		sourceTable, sourceIdCol, sourceGeom,
+		targetTable, targetIdCol, targetGeom
 	):
-		print 'addCountyLandGeometry %s %s %s %s' %(
-			sourceTable, sourceGeom, targetTable, targetGeom
+		print 'mergeGeometry %s %s %s %s %s %s' %(
+			sourceTable, sourceIdCol, sourceGeom,
+			targetTable, targetIdCol, targetGeom
 		)
-		self.addGeometryColumn( targetTable, targetGeom, -1, True )
 		t1 = time.clock()
+		srid = self.getSRID( sourceTable, sourceGeom )
+		self.addGeometryColumn( targetTable, targetGeom, srid, True )
 		self.cursor.execute('''
 			UPDATE
 				%(targetTable)s
@@ -203,20 +204,20 @@ class Database:
 					FROM
 						%(sourceTable)s
 					WHERE
-						%(targetTable)s.%(idColumn)s = %(sourceTable)s.%(idColumn)s
-						AND
-						aland10 > 0
+						%(targetTable)s.%(targetIdCol)s = %(sourceTable)s.%(sourceIdCol)s
 					GROUP BY
-						%(idColumn)s
+						%(sourceTable)s.%(sourceIdCol)s
+						-- %(targetTable)s.%(targetIdCol)s
 				);
 			
 			SELECT Populate_Geometry_Columns();
 		''' % {
 			'sourceTable': sourceTable,
+			'sourceIdCol': sourceIdCol,
 			'sourceGeom': sourceGeom,
 			'targetTable': targetTable,
+			'targetIdCol': targetIdCol,
 			'targetGeom': targetGeom,
-			'idColumn': idColumn,
 		})
 		self.connection.commit()
 		t2 = time.clock()
@@ -309,11 +310,13 @@ class Database:
 		
 		self.cursor.execute('''
 			SELECT
-				gid, name, 
+				id, name_tr, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
 				%(table)s
+			WHERE
+				%(polyGeom)s IS NOT NULL
 			;
 		''' % {
 			'table': table,
@@ -325,6 +328,8 @@ class Database:
 		
 		features = []
 		for featuregid, featurename, centroidjson, geomjson in self.cursor.fetchall():
+			#if not centroidjson or not geomjson:
+			#	continue
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
 			features.append({

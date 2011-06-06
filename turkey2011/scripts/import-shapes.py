@@ -56,7 +56,63 @@ def loadSHP( db, schema, name, level ):
 		'tableSHP': tableSHP,
 		'geom': geom,
 	})
+	
+	geom = 'geom_' + level
+	db.mergeGeometry(
+		't2011.districts', 'parent', geom,
+		't2011.provinces', 'id', geom
+	)
+	
+	db.cursor.execute( 'DROP TABLE %s;' % tableSHP )
+	
 	db.connection.commit()
+
+
+# TODO: refactor!
+def loadProvinceFT( db, schema ):
+	for row in loadFT(
+		db, schema, 'provinces',
+		'CREATE TABLE t2011.provinces (' +
+			'id integer, ' +
+			'voters integer, ' +
+			'boxes integer, ' +
+			'name_tr varchar, ' +
+			'CONSTRAINT provinces_pkey PRIMARY KEY (id)' +
+		');',
+		'SELECT+' +
+			"ID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
+			'+FROM+934719'
+	):
+		db.cursor.execute('''
+			INSERT INTO t2011.provinces
+			VALUES ( '%s', %d, %d, '%s' )
+		''' % (
+			row[0], int(float(row[1])), int(float(row[2])), row[3]
+		) )
+
+
+def loadDistrictFT( db, schema ):
+	for row in loadFT(
+		db, schema, 'districts',
+		'CREATE TABLE t2011.districts (' +
+			'id integer, ' +
+			'parent integer, ' +
+			'voters integer, ' +
+			'boxes integer, ' +
+			'name_tr varchar, ' +
+			'CONSTRAINT districts_pkey PRIMARY KEY (id)' +
+		');',
+		'SELECT+' +
+			"ID,ParentID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
+			'+FROM+928147'
+	):
+		db.cursor.execute('''
+			INSERT INTO t2011.districts
+			VALUES ( '%s', '%s', %d, %d, '%s' )
+		''' % (
+			row[0], row[1], int(float(row[2])), int(float(row[3])), row[4]
+		) )
+
 
 def process():
 	#db = pg.Database( database='postgres' )
@@ -71,54 +127,25 @@ def process():
 	db.createSchema( schema )
 	db.connection.commit()
 	
-	# TODO: refactor!
-	for row in loadFT(
-		db, schema, 'provinces',
-		'CREATE TABLE t2011.provinces (' +
-			'id integer, ' +
-			'voters integer, ' +
-			'boxes integer, ' +
-			'nametr varchar, ' +
-			'CONSTRAINT provinces_pkey PRIMARY KEY (id)' +
-		');',
-		'SELECT+' +
-			"ID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
-			'+FROM+934719'
-	):
-		db.cursor.execute('''
-			INSERT INTO t2011.provinces
-			VALUES ( '%s', %d, %d, '%s' )
-		''' % (
-			row[0], int(float(row[1])), int(float(row[2])), row[3]
-		) )
-		
-	for row in loadFT(
-		db, schema, 'districts',
-		'CREATE TABLE t2011.districts (' +
-			'id integer, ' +
-			'parent integer, ' +
-			'voters integer, ' +
-			'boxes integer, ' +
-			'nametr varchar, ' +
-			'CONSTRAINT districts_pkey PRIMARY KEY (id)' +
-		');',
-		'SELECT+' +
-			"ID,ParentID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
-			'+FROM+928147'
-	):
-		db.cursor.execute('''
-			INSERT INTO t2011.districts
-			VALUES ( '%s', '%s', %d, %d, '%s' )
-		''' % (
-			row[0], row[1], int(float(row[2])), int(float(row[3])), row[4]
-		) )
+	loadProvinceFT( db, schema )
+	loadDistrictFT( db, schema )
 	
-	loadSHP( db, schema, 'districts', '00' )
-	loadSHP( db, schema, 'districts', '50' )
-	loadSHP( db, schema, 'districts', '60' )
-	loadSHP( db, schema, 'districts', '70' )
-	loadSHP( db, schema, 'districts', '80' )
-	loadSHP( db, schema, 'districts', '90' )
+	#for level in '00 50 60 70 80 90'.split(' '):
+	for level in '50'.split(' '):
+		loadSHP( db, schema, 'districts', level )
+		#for tbl in ( 'provinces', 'districts', ):
+		for tbl in ( 'provinces', ):
+			name = tbl # 'Turkey'
+			table = '%s.%s' %( schema, tbl )
+			gid = '-1'
+			targetGeom = 'geom_' + level
+			#boxGeom = 'geom_00'
+			boxGeom = targetGeom
+			#db.addGoogleGeometry( table, geom, googGeom )
+			filename = '%s/turkey-%s-%s.jsonp' %(
+				private.GEOJSON_PATH, tbl, targetGeom
+			)
+			db.makeGeoJSON( filename, table, boxGeom, targetGeom, tbl, name, gid, 'loadGeoJSON' )
 	
 	db.connection.commit()
 	db.connection.close()
