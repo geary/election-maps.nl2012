@@ -49,7 +49,7 @@ def loadSHP( db, schema, name, level ):
 		FROM
 			%(tableSHP)s shp
 		WHERE
-			%(table)s.id = shp.gid
+			%(table)s.id = shp.name::INTEGER
 		;
 	''' % {
 		'table': table,
