@@ -680,7 +680,7 @@ function contentTable() {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
-				var party = parties[row.partyMax];
+				var party = row && parties[row.partyMax];
 				if( party ) {
 					feature.fillColor = party.color;
 					feature.fillOpacity = .75;
@@ -768,6 +768,7 @@ function contentTable() {
 	}
 	
 	function topPartiesByVote( result, max ) {
+		if( ! result ) return [];
 		var top = parties.slice();
 		var total = 0;
 		for( var i = -1;  ++i < parties.length; ) {
@@ -815,21 +816,24 @@ function contentTable() {
 		var boxColor = '#F2EFE9';
 		var result = curResults.rowsByID[feature.id];
 		
-		var content = S(
-			'<div class="tipcontent">',
-				formatTipParties( feature, result ),
-			'</div>'
-		);
-		
-		var boxes = result[col.NumBallotBoxes];
-		var counted = result[col.NumCountedBallotBoxes];
-		var footer = S(
-			'<div class="tipreporting">',
-				'percentReporting'.T({
-					percent: percent( counted / boxes )
-				}),
-			'</div>'
-		);
+		var content = footer = '';
+		if( result ) {
+			var content = S(
+				'<div class="tipcontent">',
+					formatTipParties( feature, result ),
+				'</div>'
+			);
+			
+			var boxes = result[col.NumBallotBoxes];
+			var counted = result[col.NumCountedBallotBoxes];
+			var footer = S(
+				'<div class="tipreporting">',
+					'percentReporting'.T({
+						percent: percent( counted / boxes )
+					}),
+				'</div>'
+			);
+		}
 		
 		return S(
 			'<div class="tiptitlebar">',
