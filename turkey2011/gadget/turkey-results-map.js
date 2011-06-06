@@ -76,11 +76,6 @@ var gm = google.maps, gme = gm.event;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
-// TEMP
-ww = 740;
-wh = 426;
-// END TEMP
-
 var geo = {};
 var $map;
 
