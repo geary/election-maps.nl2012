@@ -37,13 +37,15 @@ def loadSHP( db, schema, name, level ):
 	)
 	db.connection.commit()
 	geom = 'geom_' + str(level)
-	db.addGeometryColumn( table, geom, 3857 )
+	#db.addGeometryColumn( table, geom, 3857 )
+	db.addGeometryColumn( table, geom, 4269 )
 	db.connection.commit()
 	db.cursor.execute('''
 		UPDATE
 			%(table)s
 		SET
-			%(geom)s = ST_Transform( ST_Force_2D(shp.full_geom), 3857 )
+			-- %(geom)s = ST_Transform( ST_Force_2D(shp.full_geom), 3857 )
+			%(geom)s = ST_Force_2D(shp.full_geom)
 		FROM
 			%(tableSHP)s shp
 		WHERE
