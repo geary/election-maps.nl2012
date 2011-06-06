@@ -707,12 +707,28 @@ function contentTable() {
 		}
 	}
 	
-	function formatColorPatch( party, max ) {
-		var size = Math.sqrt( party.vsTop ) * max;
-		var margin1 = ( max - size ) / 2;
+	function formatPartyAreaPatch( party, max ) {
+		var size = Math.round( Math.sqrt( party.vsTop ) * max );
+		var margin1 = Math.floor( ( max - size ) / 2 );
 		var margin2 = max - size - margin1;
 		return S(
-			'<div style="background:', party.color, '; width:', size, 'px; height:', size, 'px; margin:', margin1+2, 'px ', margin2+2, 'px ', margin2+2, 'px ', margin1+0, 'px; border:1px solid #AAA;">',
+			'<div style="margin:', margin1, 'px ', margin2, 'px ', margin2, 'px ', margin1, 'px;">',
+				formatColorPatch( party.color, size, size ),
+			'</div>'
+		);
+	}
+	
+	function formatColorPatch( color, width, height, border ) {
+		border = border || '1px solid #AAA';
+		return S(
+			'<div style="background:', color, '; width:', width, 'px; height:', height, 'px; border:', border, '">',
+			'</div>'
+		);
+	}
+	
+	function formatPartyIcon( party, size ) {
+		return S(
+			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, ' 0; width:', size, 'px; height:', size, 'px; border:1px solid #AAA;">',
 			'</div>'
 		);
 	}
@@ -721,7 +737,8 @@ function contentTable() {
 		return S(
 			'<tr>',
 				'<td>',
-					'<div style="background:url(', imgUrl('parties-24.png'), '); background-position:-', party.icon * 24, ' 0; width:24px; height:24px; margin:2px 8px 2px 0; border:1px solid #AAA;">',
+					'<div style="margin:4px 10px 4px 0;">',
+						formatPartyIcon( party, 24 ),
 					'</div>',
 				'</td>',
 				'<td style="">',
@@ -731,7 +748,7 @@ function contentTable() {
 					percent( party.vsAll ),
 				'</td>',
 				'<td>',
-					formatColorPatch( party, 24 ),
+					formatPartyAreaPatch( party, 24 ),
 				'</td>',
 			'</tr>'
 		);
