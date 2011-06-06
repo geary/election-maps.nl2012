@@ -18,7 +18,7 @@ CREATE DATABASE turkey
 def loadFT( db, schema, name, create, query ):
 	table = '%s.%s' %( schema, name )
 	print 'Loading %s' % table
-	db.cursor.execute( create )
+	db.execute( create )
 	query = 'http://www.google.com/fusiontables/api/query?sql=' + query
 	reader = csv.reader( urllib2.urlopen(query) )
 	header = reader.next()
@@ -40,7 +40,7 @@ def loadSHP( db, schema, name, level ):
 	#db.addGeometryColumn( table, geom, 3857 )
 	db.addGeometryColumn( table, geom, 4269 )
 	db.connection.commit()
-	db.cursor.execute('''
+	db.execute('''
 		UPDATE
 			%(table)s
 		SET
@@ -63,7 +63,7 @@ def loadSHP( db, schema, name, level ):
 		't2011.provinces', 'id', geom
 	)
 	
-	db.cursor.execute( 'DROP TABLE %s;' % tableSHP )
+	db.execute( 'DROP TABLE %s;' % tableSHP )
 	
 	db.connection.commit()
 
@@ -83,7 +83,7 @@ def loadProvinceFT( db, schema ):
 			"ID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
 			'+FROM+934719'
 	):
-		db.cursor.execute('''
+		db.execute('''
 			INSERT INTO t2011.provinces
 			VALUES ( '%s', %d, %d, '%s' )
 		''' % (
@@ -106,7 +106,7 @@ def loadDistrictFT( db, schema ):
 			"ID,ParentID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
 			'+FROM+928147'
 	):
-		db.cursor.execute('''
+		db.execute('''
 			INSERT INTO t2011.districts
 			VALUES ( '%s', '%s', %d, %d, '%s' )
 		''' % (

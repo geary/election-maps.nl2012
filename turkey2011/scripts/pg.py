@@ -30,17 +30,21 @@ class Database:
 		)
 		self.cursor = self.connection.cursor()
 	
+	def execute( self, query ):
+		print query
+		self.cursor.execute( query )
+	
 	def createGeoDatabase( self, database ):
 		isolation_level = self.connection.isolation_level
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		#self.cursor.execute('''
+		#self.execute('''
 		#	DROP DATABASE %(database)s;
 		#''' % {
 		#	'database': database,
 		#})
-		self.cursor.execute('''
+		self.execute('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
 			TEMPLATE = template_postgis
@@ -51,7 +55,7 @@ class Database:
 		self.connection.set_isolation_level( isolation_level )
 	
 	def createSchema( self, schema ):
-		self.cursor.execute('''
+		self.execute('''
 			DROP SCHEMA %(schema)s CASCADE;
 			CREATE SCHEMA %(schema)s AUTHORIZATION postgres;
 		''' % {
@@ -91,7 +95,7 @@ class Database:
 	
 	def getSRID( self, table, column ):
 		( schema, table ) = splitTableName( table )
-		self.cursor.execute('''
+		self.execute('''
 			SELECT Find_SRID( '%(schema)s', '%(table)s', '%(column)s');
 		''' % {
 			'schema': schema,
@@ -101,7 +105,7 @@ class Database:
 		return self.cursor.fetchone()[0]
 	
 	def columnExists( self, table, column ):
-		self.cursor.execute('''
+		self.execute('''
 			SELECT
 				attname
 			FROM
@@ -124,10 +128,10 @@ class Database:
 		if self.columnExists( table, geom ):
 			if not always:
 				return
-			self.cursor.execute('''
+			self.execute('''
 				ALTER TABLE %(schema)s.%(table)s DROP COLUMN %(geom)s;
 			''' % vars )
-		self.cursor.execute('''
+		self.execute('''
 			SELECT
 				AddGeometryColumn(
 					'%(schema)s', '%(table)s', '%(geom)s',
@@ -141,7 +145,7 @@ class Database:
 		print 'indexGeometryColumn %s %s %s' %( table, geom, index )
 		vars = { 'table':table, 'geom':geom, 'index':index, }
 		t1 = time.clock()
-		self.cursor.execute('''
+		self.execute('''
 			CREATE INDEX %(index)s ON %(table)s
 			USING GIST ( %(geom)s );
 		''' % vars )
@@ -157,7 +161,7 @@ class Database:
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		self.cursor.execute('''
+		self.execute('''
 			VACUUM ANALYZE %(table)s;
 		''' % { 'table':table } )
 		self.connection.set_isolation_level( isolation_level )
@@ -168,7 +172,7 @@ class Database:
 		print 'addGoogleGeometry %s %s %s' %( table, llgeom, googeom )
 		self.addGeometryColumn( table, googeom, 3857, True )
 		t1 = time.clock()
-		self.cursor.execute('''
+		self.execute('''
 			UPDATE
 				%(table)s
 			SET
@@ -194,7 +198,7 @@ class Database:
 		t1 = time.clock()
 		srid = self.getSRID( sourceTable, sourceGeom )
 		self.addGeometryColumn( targetTable, targetGeom, srid, True )
-		self.cursor.execute('''
+		self.execute('''
 			UPDATE
 				%(targetTable)s
 			SET
@@ -234,7 +238,7 @@ class Database:
 			self.getSRID(table,sourceGeom), True
 		)
 		t1 = time.clock()
-		self.cursor.execute('''
+		self.execute('''
 			UPDATE
 				%(table)s
 			SET
@@ -286,7 +290,7 @@ class Database:
 		filter = ''
 		
 		t1 = time.clock()
-		self.cursor.execute('''
+		self.execute('''
 			SELECT
 				ST_AsGeoJSON( ST_Centroid( ST_Extent( %(polyGeom)s ) ), %(digits)s ),
 				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 )
@@ -308,7 +312,7 @@ class Database:
 		t2 = time.clock()
 		print 'ST_Extent %.1f seconds' %( t2 - t1 )
 		
-		self.cursor.execute('''
+		self.execute('''
 			SELECT
 				id, name_tr, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
