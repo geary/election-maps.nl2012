@@ -303,7 +303,8 @@ document.write(
 		'#selectors { background-color:#E4E4E4; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#legend { background-color:#EEE; }',
+		'#legend { padding: 6px 6px 4px 6px; background-color:#EEE; }',
+		'#legend * { display: inline-block; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #AAA; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
@@ -393,7 +394,9 @@ function contentTable() {
 				'</div>',
 			'</div>',
 			'<div id="legend">',
-				'&nbsp;',
+				'<div style="height:20px;">',
+					'&nbsp;',
+				'</div>',
 			'</div>',
 			'<div style="width:100%;">',
 				'<div id="map" style="width:100%; height:100%;">',
@@ -551,6 +554,7 @@ function contentTable() {
 	var polyTimeNext = 250;
 	
 	function geoReady() {
+		setLegend();
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
@@ -754,8 +758,18 @@ function contentTable() {
 		);
 	}
 	
+	function totalResults( results ) {
+		var rows = results.rows;
+		var total = [];
+		for( var row, i = -1;  row = rows[++i]; )
+			for( var n = row.length, j = -1;  ++j < n; )
+				total[j] = ( total[j] || 0 ) + row[j];
+		return total;
+	}
+	
 	function topPartiesByVote( result, max ) {
 		if( ! result ) return [];
+		if( result == -1 ) result = totalResults( curResults );
 		var top = parties.slice();
 		var total = 0;
 		for( var i = -1;  ++i < parties.length; ) {
@@ -785,6 +799,35 @@ function contentTable() {
 			}
 		}
 		return top;
+	}
+	
+	function setLegend() {
+		$('#legend').html( formatLegend() );
+	}
+	
+	function formatLegend() {
+		var topParties = topPartiesByVote( totalResults(curResults), 6 )
+		if( ! topParties.length )
+			return 'noVotes'.T();
+		return S(
+			'<div>',
+				topParties.map( formatLegendParty ).join( '&nbsp;&nbsp;&nbsp;&nbsp;' ),
+			'</div>'
+		);
+	}
+	
+	function formatLegendParty( party ) {
+		return S(
+			'<div style="font-size:16px;">',
+				formatColorPatch( party.color, 24, 14 ),
+				'&nbsp;',
+				//formatPartyIcon( party, 16 ),
+				//'&nbsp;',
+				party.abbr,
+				'&nbsp;',
+				percent( party.vsAll ),
+			'</div>'
+		);
 	}
 	
 	function formatTipParties( feature, result ) {
