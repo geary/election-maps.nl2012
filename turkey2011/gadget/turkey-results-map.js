@@ -4,23 +4,22 @@
 
 // Keep this in sync with ALL_ALL.xml
 var strings = {
-	nationwideLabel: 'Nationwide Results',
+	nationwideLabel: 'Tüm Türkiye',
 	//chooseLabel: 'Choose a province and select a race:',
-	provinceLabel: 'Province:&nbsp;',
-	partyLabel: 'Party:&nbsp;',
-	topParty: 'Top Votes',
+	provinceLabel: 'İller:&nbsp;',
+	partyLabel: 'Partiler:&nbsp;',
+	topParty: 'En Fazla Oy Oranı',
 	//secondParty: 'Second',
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
-	turkey: 'Turkey',
-	percentReporting: '{{percent}} reporting',
-	countdownHeading: 'Live results in:',
-	countdownHours: '{{hours}} hours',
-	countdownHour: '1 hour',
-	countdownMinutes: '{{minutes}} minutes',
-	countdownMinute: '1 minute',
-	noVotes: 'No votes reported',
-	unopposed: 'Unopposed'
+	//turkey: 'Turkey',
+	percentReporting: '{{percent}} açıldı',
+	//countdownHeading: 'Live results in:',
+	//countdownHours: '{{hours}} hours',
+	//countdownHour: '1 hour',
+	//countdownMinutes: '{{minutes}} minutes',
+	//countdownMinute: '1 minute',
+	noVotes: 'Oy bilgisi alınmadı'
 };
 
 var parties = [
