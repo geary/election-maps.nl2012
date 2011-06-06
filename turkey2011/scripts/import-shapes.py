@@ -65,8 +65,11 @@ def process():
 	
 	db = pg.Database( database='turkey' )
 	
+	#db.createGeoDatabase( 'turkey' )
+	
 	schema = 't2011'
-	#db.createSchema( schema )
+	db.createSchema( schema )
+	db.connection.commit()
 	
 	# TODO: refactor!
 	for row in loadFT(
@@ -117,6 +120,7 @@ def process():
 	loadSHP( db, schema, 'districts', '80' )
 	loadSHP( db, schema, 'districts', '90' )
 	
+	db.connection.commit()
 	db.connection.close()
 
 

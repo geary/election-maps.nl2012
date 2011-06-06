@@ -31,6 +31,15 @@ class Database:
 		self.cursor = self.connection.cursor()
 	
 	def createGeoDatabase( self, database ):
+		isolation_level = self.connection.isolation_level
+		self.connection.set_isolation_level(
+			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+		)
+		#self.cursor.execute('''
+		#	DROP DATABASE %(database)s;
+		#''' % {
+		#	'database': database,
+		#})
 		self.cursor.execute('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
@@ -39,11 +48,12 @@ class Database:
 		''' % {
 			'database': database,
 		})
-		self.connection.commit()
+		self.connection.set_isolation_level( isolation_level )
 	
 	def createSchema( self, schema ):
 		self.cursor.execute('''
-			CREATE SCHEMA %(schema)s;
+			DROP SCHEMA %(schema)s CASCADE;
+			CREATE SCHEMA %(schema)s AUTHORIZATION postgres;
 		''' % {
 			'schema': schema,
 		})
