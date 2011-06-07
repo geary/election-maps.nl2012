@@ -83,16 +83,14 @@ var $map;
 var prefs = new _IG_Prefs();
 
 var opt = window.GoogleElectionMapOptions || {};
+opt.province = -1;
+opt.districts = false;
 opt.fontsize = '15px';
 var sw = 300;
 
 opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
-
-opt.voteUrl = '???';
-
-opt.province = opt.province || 'turkey';
 
 if( ! Array.prototype.forEach ) {
 	Array.prototype.forEach = function( fun /*, thisp*/ ) {
@@ -408,6 +406,8 @@ function contentTable() {
 (function( $ ) {
 	
 	opt.province = prefs.getString('province');
+	opt.districts = false;
+	
 	opt.party = '1';
 	
 	//opt.zoom = opt.zoom || 3;
@@ -439,9 +439,9 @@ function contentTable() {
 	//}
 	
 	var jsonRegion = {};
-	function loadRegion( id ) {
+	function loadRegion() {
 		var level = 70;
-		var kind = ( id < 0 ? 'provinces' : 'districts' );
+		var kind = ( opt.districts ? 'districts' : 'provinces' );
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
@@ -473,7 +473,7 @@ function contentTable() {
 			// TODO: refactor
 			provinces: function() {
 				json.features.index('id').index('abbr');
-				geo.current = geo.provinces = json;
+				geo.provinces = json;
 				if( ! didLoadGeoJSON ) {
 					didLoadGeoJSON = true;
 					$('#outer').html( contentTable() );
@@ -481,18 +481,31 @@ function contentTable() {
 					$map = $('#map');
 					$map.height( wh - $map.offset().top );
 				}
-				loadView();
+				//setDistricts( false );
+				getResults();
 				_IG_Analytics( 'UA-5730550-1', '/provinces' );
 			},
 			districts: function() {
 				json.features.index('id').index('abbr');
-				geo.current = geo.districts = json;
-				loadView();
+				geo.districts = json;
+				//setDistricts( true );
+				getResults();
 				_IG_Analytics( 'UA-5730550-1', '/districts' );
 			}
 		}[json.kind];
 		loader();
 	};
+	
+	var setDistrictsFirst = true;
+	function setDistricts( districts, force ) {
+		districts = !! districts;
+		if( districts == opt.districts  &&  ! force  &&  ! setDistrictsFirst )
+			return;
+		setDistrictsFirst = false;
+		opt.districts = districts;
+		$('#chkDistricts').prop( 'checked', districts );
+		loadView();
+	}
 	
 	function showError( type, file ) {
 		file = file.replace( '.json', '' ).replace( '-all', '' ).toUpperCase();
@@ -581,8 +594,12 @@ function contentTable() {
 		//reloadTimer = setTimeout( function() { loadView(); }, 300000 );
 	}
 	
+	function currentGeo() {
+		return opt.districts ? geo.districts : geo.provinces;
+	}
+	
 	function moveToGeo() {
-		var json = geo.current;
+		var json = currentGeo();
 		$('#map').show();
 		initMap();
 		gme.trigger( map, 'resize' );
@@ -600,7 +617,7 @@ function contentTable() {
 	
 	var  mouseFeature;
 	
-	function getStateDistricts( features, province ) {
+	function getProvinceDistricts( features, province ) {
 		var districts = [];
 		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 			if( feature.province.toUpperCase() == curProvince.abbr )
@@ -645,7 +662,7 @@ function contentTable() {
 		function draw() {
 			var overlay = new PolyGonzo.PgOverlay({
 				map: map,
-				geo: geo.current,
+				geo: currentGeo(),
 				events: events
 			});
 			overlay.setMap( map );
@@ -665,7 +682,7 @@ function contentTable() {
 		// Use wider borders in IE to cover up gaps between borders, except in House view
 		//strokeWidth = $.browser.msie ? 2 : 1;
 		strokeWidth = 1;
-		var features = geo.current.features;
+		var features = currentGeo().features;
 		var partyID = $('#partySelector').val();
 		if( partyID < 0 ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
@@ -981,7 +998,7 @@ function contentTable() {
 		select && ( select.selectedIndex = province.selectorIndex );
 		opt.province = province.abbr.toLowerCase();
 		geoMoveNext = true;
-		loadView();
+		setDistricts( true );
 	}
 	
 	function initMap() {
@@ -1001,12 +1018,7 @@ function contentTable() {
 		});
 		
 		gme.addListener( map, 'zoom_changed', function() {
-			var districts = ( map.getZoom() >= 8 );
-			var checked = !! $('#chkDistricts')[0].checked;
-			if( districts != checked ) {
-				$('#chkDistricts')[0].checked = districts;
-				loadProvincesOrDistricts( districts );
-			}
+			setDistricts( map.getZoom() >= 8 );
 		});
 	}
 	
@@ -1018,7 +1030,7 @@ function contentTable() {
 			var value = this.value.replace('!','').toLowerCase();
 			if( opt.province == value ) return;
 			opt.province = value;
-			loadView();
+			setDistricts( value > 0 );
 		});
 		
 		$('#partySelector').bind( 'change keyup', function() {
@@ -1029,12 +1041,8 @@ function contentTable() {
 		});
 		
 		$('#chkDistricts').click( function() {
-			loadProvincesOrDistricts( this.checked );
+			setDistricts( this.checked );
 		});
-	}
-	
-	function loadProvincesOrDistricts( districts ) {
-		loadRegion( districts ? 0 : -1 );
 	}
 	
 	function oneshot() {
@@ -1060,11 +1068,7 @@ function contentTable() {
 		opt.province = +$('#provinceSelector').val();
 		//var province = curProvince = geo.provinces.features.by.abbr[opt.abbr];
 		$('#spinner').show();
-		//getShapes( opt.province, function() {
-			getResults( opt.province, function() {
-				geoReady();
-			});
-		//});
+		loadRegion();
 	}
 	
 	//function getShapes( province, callback ) {
@@ -1078,25 +1082,37 @@ function contentTable() {
 	
 	var cacheResults = {};
 	
-	function getResults( province ) {
-		if( cacheResults[province] ) {
-			loadResults( cacheResults[province] );
+	function getResults() {
+		if( cacheResults[opt.districts] ) {
+			loadResults( cacheResults[opt.districts], opt.districts );
 			return;
 		}
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
-			'jsonCallback=loadResults&',
-			'sql=SELECT+',
+			'jsonCallback=', opt.districts ? 'loadDistricts' : 'loadProvinces',
+			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			province < 0 ? '934475' : '931824'
+			// TODO: use dynamic tables
+			//opt.districts ? '928540' : '933803'
+			// instead of merge tables:
+			opt.districts ? '931824' : '934475'
 		);
 		getScript( url );
 	}
 	
-	loadResults = function( json ) {
-		// TEMP HACK - nationwide only
-		cacheResults[-1] = json;
+	loadProvinces = function( json ) {
+		loadResults( json, false );
+	};
+	
+	loadDistricts = function( json ) {
+		loadResults( json, true );
+	};
+	
+	loadResults = function( json, districts ) {
+		opt.district = districts;
+		$('#chkDistricts').prop( 'checked', districts );
+		cacheResults[districts] = json;
 		var results = curResults = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = curResults.rows;
@@ -1125,7 +1141,7 @@ function contentTable() {
 	var blank = imgUrl( 'blank.gif' );
 	
 	$window.bind( 'load', function() {
-		loadRegion( -1 );
+		loadView();
 	});
 
 })( jQuery );
