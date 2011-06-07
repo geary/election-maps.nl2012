@@ -130,11 +130,11 @@ def process():
 	loadProvinceFT( db, schema )
 	loadDistrictFT( db, schema )
 	
-	#for level in '00 50 60 70 80 90'.split(' '):
-	for level in '50'.split(' '):
+	for level in '00 50 60 70 80 90'.split(' '):
+	#for level in '50'.split(' '):
 		loadSHP( db, schema, 'districts', level )
-		#for tbl in ( 'provinces', 'districts', ):
-		for tbl in ( 'provinces', ):
+		for tbl in ( 'provinces', 'districts', ):
+		#for tbl in ( 'provinces', ):
 			name = tbl # 'Turkey'
 			table = '%s.%s' %( schema, tbl )
 			gid = '-1'
