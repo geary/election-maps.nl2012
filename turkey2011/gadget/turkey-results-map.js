@@ -14,7 +14,7 @@ var strings = {
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
 	districtsCheckbox: 'Göstermek İlçeler',
-	percentReporting: '{{percent}} açıldı',
+	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -876,7 +876,9 @@ function contentTable() {
 			var footer = S(
 				'<div class="tipreporting">',
 					'percentReporting'.T({
-						percent: percent( counted / boxes )
+						percent: percent( counted / boxes ),
+						counted: counted,
+						total: boxes
 					}),
 				'</div>'
 			);
