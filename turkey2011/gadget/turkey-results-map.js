@@ -997,6 +997,15 @@ function contentTable() {
 				style: gm.ZoomControlStyle.SMALL
 			}
 		});
+		
+		gme.addListener( map, 'zoom_changed', function() {
+			var districts = ( map.getZoom() >= 8 );
+			var checked = !! $('#chkDistricts')[0].checked;
+			if( districts != checked ) {
+				$('#chkDistricts')[0].checked = districts;
+				loadProvincesOrDistricts( districts );
+			}
+		});
 	}
 	
 	function initSelectors() {
@@ -1018,8 +1027,12 @@ function contentTable() {
 		});
 		
 		$('#chkDistricts').click( function() {
-			loadRegion( this.checked ? 0 : -1 );
+			loadProvincesOrDistricts( this.checked );
 		});
+	}
+	
+	function loadProvincesOrDistricts( districts ) {
+		loadRegion( districts ? 0 : -1 );
 	}
 	
 	function oneshot() {
