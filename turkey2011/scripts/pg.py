@@ -316,7 +316,7 @@ class Database:
 		
 		self.execute('''
 			SELECT
-				id, name_tr, 
+				id, %(parent)s, name_tr, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( ST_MakeValid(%(polyGeom)s), %(digits)s, 1 )
 			FROM
@@ -328,17 +328,21 @@ class Database:
 			'table': table,
 			'polyGeom': polyGeom,
 			'digits': digits,
+			'parent': {
+				'districts': 'parent',
+				'provinces': 'null'
+			}[kind],
 		})
 		t3 = time.clock()
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregid, featurename, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregid, parentgid, featurename, centroidjson, geomjson in self.cursor.fetchall():
 			#if not centroidjson or not geomjson:
 			#	continue
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
-			features.append({
+			feature = {
 				'type': 'Feature',
 				'bbox': geometry['bbox'],
 				#'kind': 'TODO',
@@ -347,7 +351,10 @@ class Database:
 				#'center': 'TODO',
 				'centroid': centroid['coordinates'],
 				'geometry': geometry,
-			})
+			}
+			if parentgid:
+				feature['parent'] = parentgid,
+			features.append( feature )
 			del geometry['bbox']
 		featurecollection = {
 			'type': 'FeatureCollection',

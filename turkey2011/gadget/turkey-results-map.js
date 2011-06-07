@@ -13,6 +13,7 @@ var strings = {
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
+	districtsCheckbox: 'Göstermek İlçeler',
 	percentReporting: '{{percent}} açıldı',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
@@ -386,6 +387,9 @@ function contentTable() {
 							return option( party.id, party.abbr );
 						}),
 					'</select>',
+					'&nbsp;&nbsp;&nbsp;',
+					'<input type="checkbox" id="chkDistricts">',
+					'<label for="chkDistricts">', 'districtsCheckbox'.T(), '</label>',
 				'</div>',
 			'</div>',
 			'<div id="legend">',
@@ -434,11 +438,18 @@ function contentTable() {
 	//	});
 	//}
 	
+	var jsonRegion = {};
 	function loadRegion( id ) {
-			var file =
-				id < 0 ? 'turkey.jsonp' :
-				'province-' + id + '.jsonp';
-		getGeoJSON( opt.shapeUrl + file );
+		var level = 70;
+		var kind = ( id < 0 ? 'provinces' : 'districts' );
+		var json = jsonRegion[kind];
+		if( json ) {
+			loadGeoJSON( json );
+		}
+		else {
+			var file = S( 'turkey-', kind, '-geom_', level, '.jsonp' );
+			getGeoJSON( opt.shapeUrl + file );
+		}
 	}
 	
 	function getScript( url ) {
@@ -450,23 +461,34 @@ function contentTable() {
 	}
 	
 	function getGeoJSON( url ) {
+		$('#spinner').show();
 		getScript( url );
 	}
 	
+	var didLoadGeoJSON;
 	loadGeoJSON = function( json ) {
+		jsonRegion[json.kind] = json;
 		//debugger;
 		var loader = {
+			// TODO: refactor
 			provinces: function() {
 				json.features.index('id').index('abbr');
 				geo.current = geo.provinces = json;
-				$('#outer').html( contentTable() );
-				initSelectors();
-				$map = $('#map');
-				$map.height( wh - $map.offset().top );
+				if( ! didLoadGeoJSON ) {
+					didLoadGeoJSON = true;
+					$('#outer').html( contentTable() );
+					initSelectors();
+					$map = $('#map');
+					$map.height( wh - $map.offset().top );
+				}
 				loadView();
-				_IG_Analytics( 'UA-5730550-1', '/results' );
+				_IG_Analytics( 'UA-5730550-1', '/provinces' );
 			},
 			districts: function() {
+				json.features.index('id').index('abbr');
+				geo.current = geo.districts = json;
+				loadView();
+				_IG_Analytics( 'UA-5730550-1', '/districts' );
 			}
 		}[json.kind];
 		loader();
@@ -674,7 +696,7 @@ function contentTable() {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
 				feature.fillColor = color;
-				feature.fillOpacity = max ? row[index] / max : 0;
+				feature.fillOpacity = row && max ? row[index] / max : 0;
 				feature.strokeColor = '#000000';
 				feature.strokeOpacity = .4;
 				feature.strokeWidth = strokeWidth;
@@ -860,6 +882,8 @@ function contentTable() {
 			);
 		}
 		
+		var parent = geo.provinces.features.by.id[feature.parent];
+		
 		return S(
 			'<div class="tiptitlebar">',
 				'<div style="float:left;">',
@@ -870,6 +894,7 @@ function contentTable() {
 				'</div>',
 				'<div style="clear:left;">',
 				'</div>',
+				parent ? ' ' + parent.name : '',
 			'</div>',
 			content,
 			footer
@@ -990,6 +1015,10 @@ function contentTable() {
 			if( opt.infoType == value ) return;
 			opt.infoType = value;
 			loadView();
+		});
+		
+		$('#chkDistricts').click( function() {
+			loadRegion( this.checked ? 0 : -1 );
 		});
 	}
 	
