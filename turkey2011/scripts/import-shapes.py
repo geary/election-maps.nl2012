@@ -44,12 +44,14 @@ def loadSHP( db, schema, name, level ):
 		UPDATE
 			%(table)s
 		SET
-			-- %(geom)s = ST_Transform( ST_Force_2D(shp.full_geom), 3857 )
-			%(geom)s = ST_Force_2D(shp.full_geom)
+			-- %(geom)s = ST_Multi( ST_Transform( ST_MakeValid( ST_Force_2D( ST_MakeValid(shp.full_geom) ) ), 3857 ) ST_Multi( 
+			%(geom)s = ST_Multi( ST_MakeValid(  ST_Force_2D(shp.full_geom) ) )
 		FROM
 			%(tableSHP)s shp
 		WHERE
 			%(table)s.id = shp.name::INTEGER
+		AND
+			ST_IsValid( shp.full_geom )
 		;
 	''' % {
 		'table': table,

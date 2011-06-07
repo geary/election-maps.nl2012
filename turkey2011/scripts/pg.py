@@ -176,7 +176,7 @@ class Database:
 			UPDATE
 				%(table)s
 			SET
-				%(googeom)s = ST_Multi( ST_Transform( ST_Force_2D( %(llgeom)s ), 3857 ) )
+				%(googeom)s = ST_Multi( ST_Transform( ST_Force_2D( ST_MakeValid(%(llgeom)s) ), 3857 ) )
 			;
 		''' % {
 			'table': table,
@@ -204,7 +204,7 @@ class Database:
 			SET
 				%(targetGeom)s = (
 					SELECT
-						ST_Multi( ST_Union( %(sourceGeom)s ) )
+						ST_Multi( ST_MakeValid( ST_Union(%(sourceGeom)s) ) )
 					FROM
 						%(sourceTable)s
 					WHERE
@@ -244,9 +244,11 @@ class Database:
 			SET
 				%(targetGeom)s =
 					ST_Multi(
-						ST_SimplifyPreserveTopology(
-							%(sourceGeom)s,
-							%(tolerance)f
+						ST_MakeValid(
+							ST_SimplifyPreserveTopology(
+								%(sourceGeom)s,
+								%(tolerance)f
+							)
 						)
 					)
 			;
@@ -316,11 +318,11 @@ class Database:
 			SELECT
 				id, name_tr, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
-				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
+				ST_AsGeoJSON( ST_MakeValid(%(polyGeom)s), %(digits)s, 1 )
 			FROM
 				%(table)s
 			WHERE
-				%(polyGeom)s IS NOT NULL
+				ST_IsValid( %(polyGeom)s )
 			;
 		''' % {
 			'table': table,
