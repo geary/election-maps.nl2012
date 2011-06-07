@@ -40,7 +40,7 @@ class Database:
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
 		#self.execute('''
-		#	DROP DATABASE %(database)s;
+		#	DROP DATABASE IF EXISTS %(database)s;
 		#''' % {
 		#	'database': database,
 		#})
@@ -56,7 +56,7 @@ class Database:
 	
 	def createSchema( self, schema ):
 		self.execute('''
-			DROP SCHEMA %(schema)s CASCADE;
+			DROP SCHEMA IF EXISTS %(schema)s CASCADE;
 			CREATE SCHEMA %(schema)s AUTHORIZATION postgres;
 		''' % {
 			'schema': schema,
@@ -129,7 +129,7 @@ class Database:
 			if not always:
 				return
 			self.execute('''
-				ALTER TABLE %(schema)s.%(table)s DROP COLUMN %(geom)s;
+				ALTER TABLE %(schema)s.%(table)s DROP COLUMN IF EXISTS %(geom)s;
 			''' % vars )
 		self.execute('''
 			SELECT

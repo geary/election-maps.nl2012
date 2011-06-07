@@ -63,7 +63,7 @@ def loadSHP( db, schema, name, level ):
 		't2011.provinces', 'id', geom
 	)
 	
-	db.execute( 'DROP TABLE %s;' % tableSHP )
+	db.execute( 'DROP TABLE IF EXISTS %s;' % tableSHP )
 	
 	db.connection.commit()
 
