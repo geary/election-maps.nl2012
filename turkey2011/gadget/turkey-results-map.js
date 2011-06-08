@@ -1131,6 +1131,8 @@ function contentTable() {
 				//	mt.ROADMAP, mt.SATELLITE, mt.HYBRID, mt.TERRAIN
 				//]
 			},
+			panControl: false,
+			rotateControl: false,
 			zoomControlOptions: {
 				style: gm.ZoomControlStyle.SMALL
 			}
