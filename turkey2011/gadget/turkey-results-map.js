@@ -13,7 +13,7 @@ var strings = {
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
-	districtsCheckbox: 'Göstermek İlçeler',
+	districtsCheckbox: 'İlçeleri Göster',
 	legendLabel: 'Türkiye Genelinde Sonuçlar:&nbsp;',
 	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
