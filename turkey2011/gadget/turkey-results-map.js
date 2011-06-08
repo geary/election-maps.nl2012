@@ -25,9 +25,9 @@ var strings = {
 };
 
 var parties = [
-	{ id: 22, abbr: 'AKP', color: '#FFFF00', icon: 1 },
+	{ id: 22, abbr: 'AKP', color: '#008000', icon: 1 },
 	{ id: 7, abbr: 'BBP', color: '#6666CC', icon: 2 },
-	{ id: 23, abbr: 'CHP', color: '#008000', icon: 3 },
+	{ id: 23, abbr: 'CHP', color: '#FFFF00', icon: 3 },
 	{ id: 8, abbr: 'DP', color: '#800080', icon: 4 },
 	{ id: 4, abbr: 'DSP', color: '#000080', icon: 5 },
 	{ id: 35, abbr: 'DYP', color: '#993300', icon: 6 },
