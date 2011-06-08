@@ -50,6 +50,96 @@ var parties = [
 	{ id: 32, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true }
 ];
 
+var independents = {
+	'20:1': 'MURAT BOZLAK',
+	'20:2': 'VELİ BÜYÜKŞAHİN',
+	'20:4': 'HALİL AKSOY',
+	'20:6': 'MUSTAFA HULKİ CEVİZOĞLU',
+	'27:6': 'CEYHAN MUMCU',
+	'28:6': 'CERCİŞ UTAŞ',
+	'20:84': 'ERDOGAN KARAKUS',
+	'27:84': 'SADRETTIN GÜVENER',
+	'20:7': 'İHSAN NERGİZ',
+	'20:75': 'YÜKSEL AVŞAR',
+	'20:9': 'MEHMET BAYRAKTAR',
+	'20:10': 'TURAN CENGİZ',
+	'20:72': 'BENGİ YILDIZ',
+	'27:72': 'AYLA AKAT ATA',
+	'20:12': 'İDRİS BALUKEN',
+	'20:13': 'HÜSAMETTİN ZENDERLİOĞLU',
+	'27:13': 'EDİP SAFDER GAYDALI',
+	'20:16': 'MEHMET DENİZ BÜYÜK',
+	'20:20': 'KEMAL BELER',
+	'27:20': 'MUSTAFA GÜLEÇ',
+	'28:20': 'KAZIM GÜRDAL',
+	'20:21': 'LEYLA ZANA',
+	'27:21': 'HATİP DİCLE',
+	'28:21': 'NURSEL AYDOĞAN',
+	'29:21': 'EMİNE AYNA',
+	'30:21': 'ALTAN TAN',
+	'31:21': 'ŞERAFETTİN ELÇİ',
+	'32:21': 'MEHMET SELİM ENSARİOĞLU',
+	'20:25': 'SEBAHATTIN YILMAZ',
+	'20:26': 'HASAN YALÇINKAYA',
+	'20:27': 'AKIN BİRDAL',
+	'20:30': 'ESAT CANAN',
+	'27:30': 'SELAHATTİN DEMİRTAŞ',
+	'28:30': 'ADİL KURT',
+	'20:31': 'MAHMUT AYDINCI',
+	'20:76': 'PERVİN BULDAN',
+	'20:34': 'SEBAHAT TUNCEL',
+	'27:34': 'AHMET TUNCAY ÖZKAN',
+	'20:82': 'SIRRI SÜREYYA ÖNDER',
+	'27:82': 'ÇETİN DOĞAN',
+	'20:83': 'MUSTAFA AVCI',
+	'27:83': 'ABDULLAH LEVENT TÜZEL',
+	'28:83': 'HANİFİ AVCI',
+	'20:35': 'MEHMET TANHAN',
+	'27:35': 'YAŞAR MÜJDECİ',
+	'28:35': 'TUNCER SÜMER',
+	'29:35': 'İSMAİL ALTIKULAÇ',
+	'20:85': 'DOĞU PERİNÇEK',
+	'27:85': 'ERDAL AVCI ',
+	'28:85': 'RAHMİYE KUBİLAY',
+	'29:85': 'TERCAN ÜLÜK',
+	'30:85': 'ALİ ACAR',
+	'20:46': 'MUSTAFA NAMAKLI',
+	'20:36': 'MÜLKİYE BİRTANE',
+	'20:40': 'FAİK KARADAŞ',
+	'20:41': 'EMRULLAH BİNGÖL',
+	'20:42': 'HACI MEHMET BOZDAĞ',
+	'20:44': 'KANİ ŞAVATA',
+	'20:45': 'NİZAMETTİN ÖZTÜRK',
+	'20:47': 'SÜLEYMAN BÖLÜNMEZ',
+	'27:47': 'GÜLSEREN YILDIRIM',
+	'28:47': 'EROL DORA',
+	'29:47': 'AHMET TÜRK',
+	'20:33': 'ERTUĞRUL KÜRKÇÜ',
+	'20:48': 'ŞEHBAL ŞENYURT ARINLI',
+	'20:49': 'SIRRI SAKIK',
+	'27:49': 'DEMİR ÇELİK',
+	'20:52': 'MURAT HAZİNEDAR',
+	'20:80': 'KAMURAN BABRAK',
+	'20:54': 'HÜSEYİN TANAS',
+	'20:56': 'GÜLTAN KIŞANAK',
+	'20:58': 'ABDÜLLATİF ŞENER',
+	'20:63': 'İBRAHİM BİNİCİ',
+	'27:63': 'İBRAHİM AYHAN',
+	'28:63': 'AHMET ERSİN BUCAK',
+	'29:63': 'ZÜLFÜKAR İZOL',
+	'20:73': 'HASİP KAPLAN',
+	'27:73': 'FAYSAL SARIYILDIZ',
+	'28:73': 'SELMA IRMAK',
+	'20:59': 'KEREM TOSUN',
+	'20:62': 'FERHAT TUNÇ YOSLUN',
+	'20:65': 'AYSEL TUĞLUK',
+	'27:65': 'KEMAL AKTAŞ',
+	'28:65': 'NAZMİ GÜR',
+	'29:65': 'ÖZDAL ÜÇER',
+	'20:77': 'İHSAN COŞKUN',
+	'20:67': 'ALİ UZUN'
+};
+
 // Voting results column offsets
 var col = {};
 col.parties = 0;
@@ -787,27 +877,6 @@ function contentTable() {
 		);
 	}
 	
-	function formatTipPartyRow( party ) {
-		return S(
-			'<tr>',
-				'<td>',
-					'<div style="margin:4px 10px 4px 0;">',
-						formatPartyIcon( party, 24 ),
-					'</div>',
-				'</td>',
-				'<td style="">',
-					party.abbr,
-				'</td>',
-				'<td style="text-align:right; padding:0 8px 0 12px;">',
-					percent( party.vsAll ),
-				'</td>',
-				'<td>',
-					formatPartyAreaPatch( party, 24 ),
-				'</td>',
-			'</tr>'
-		);
-	}
-	
 	function totalResults( results ) {
 		var rows = results.rows;
 		var total = [];
@@ -881,13 +950,43 @@ function contentTable() {
 		);
 	}
 	
+	function nameCase( name ) {
+		return name.split(' ').map( function( word ) {
+			return word.slice( 0, 1 ) + word.slice( 1 ).toLowerCase();
+		}).join(' ');
+	}
+	
 	function formatTipParties( feature, result ) {
 		var topParties = topPartiesByVote( result, 4 )
 		if( ! topParties.length )
 			return 'noVotes'.T();
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
-				topParties.mapjoin( formatTipPartyRow ),
+				topParties.mapjoin( function( party ) {
+					var name = party.abbr;
+					if( party.bgmz ) {
+						var id = party.id + ':' + ( feature.parent || feature.id );
+						name = nameCase(independents[id]) || name;
+					}
+					return S(
+						'<tr>',
+							'<td>',
+								'<div style="margin:4px 10px 4px 0;">',
+									formatPartyIcon( party, 24 ),
+								'</div>',
+							'</td>',
+							'<td style="">',
+								name,
+							'</td>',
+							'<td style="text-align:right; padding:0 8px 0 12px;">',
+								percent( party.vsAll ),
+							'</td>',
+							'<td>',
+								formatPartyAreaPatch( party, 24 ),
+							'</td>',
+						'</tr>'
+					);
+				}),
 			'</table>'
 		);
 	}
