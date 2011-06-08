@@ -184,6 +184,8 @@ opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey20
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
 
+var zoom;
+
 if( ! Array.prototype.forEach ) {
 	Array.prototype.forEach = function( fun /*, thisp*/ ) {
 		if( typeof fun != 'function' )
@@ -705,6 +707,7 @@ function contentTable() {
 				new gm.LatLng( bbox[1], bbox[0] ),
 				new gm.LatLng( bbox[3], bbox[2] )
 			) );
+			zoom = map.getZoom();
 		}
 	}
 	
@@ -1134,7 +1137,12 @@ function contentTable() {
 		});
 		
 		gme.addListener( map, 'zoom_changed', function() {
-			setDistricts( map.getZoom() >= 8 );
+			var oldZoom = zoom;
+			zoom = map.getZoom();
+			if( zoom > oldZoom  &&  zoom >= 8 )
+				setDistricts( true );
+			else if( zoom < oldZoom  &&  zoom < 8 )
+				setDistricts( false );
 		});
 	}
 	
