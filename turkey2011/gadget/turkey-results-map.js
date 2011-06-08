@@ -388,12 +388,12 @@ document.write(
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
 		'.tipcontent { padding:4px 8px 8px 8px; }',
 		'.tipreporting { font-size:80%; padding:4px 8px; border-top:1px solid #AAA; }',
-		'#selectors { background-color:#E4E4E4; }',
+		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#legend { padding: 6px 6px 4px 6px; background-color:#EEE; }',
+		'#legend { padding: 6px 6px 4px 6px; background-color:#EAF0FA; }',
 		'#legend * { display: inline-block; }',
-		'#selectors, #legend { width:100%; border-bottom:1px solid #AAA; }',
+		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
@@ -866,7 +866,7 @@ function contentTable() {
 	}
 	
 	function formatColorPatch( color, width, height, border ) {
-		border = border || '1px solid #AAA';
+		border = border || '1px solid #C2C2C2';
 		return S(
 			'<div style="background:', color, '; width:', width, 'px; height:', height, 'px; border:', border, '">',
 			'</div>'
@@ -875,7 +875,7 @@ function contentTable() {
 	
 	function formatPartyIcon( party, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, ' 0; width:', size, 'px; height:', size, 'px; border:1px solid #AAA;">',
+			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, ' 0; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
