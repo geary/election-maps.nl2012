@@ -14,7 +14,7 @@ var strings = {
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
 	districtsCheckbox: 'Göstermek İlçeler',
-	legendLabel: 'Türkiye Genellinde Sonuçlar:&nbsp;',
+	legendLabel: 'Türkiye Genelinde Sonuçlar:&nbsp;',
 	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
