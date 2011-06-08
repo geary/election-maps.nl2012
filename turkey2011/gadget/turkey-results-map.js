@@ -14,6 +14,7 @@ var strings = {
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
 	districtsCheckbox: 'Göstermek İlçeler',
+	legendLabel: 'Türkiye Genellinde Sonuçlar:&nbsp;',
 	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
@@ -845,6 +846,7 @@ function contentTable() {
 			return 'noVotes'.T();
 		return S(
 			'<div>',
+				'legendLabel'.T(),
 				topParties.map( formatLegendParty ).join( '&nbsp;&nbsp;&nbsp;&nbsp;' ),
 			'</div>'
 		);
