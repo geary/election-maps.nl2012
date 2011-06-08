@@ -1230,10 +1230,7 @@ function contentTable() {
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			// TODO: use dynamic tables
-			//opt.districts ? '928540' : '933803'
-			// instead of merge tables:
-			opt.districts ? '931824' : '934475'
+			opt.districts ? '928540' : '933803'
 		);
 		getScript( url );
 	}
