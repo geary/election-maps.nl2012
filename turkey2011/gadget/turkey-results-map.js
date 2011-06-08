@@ -271,7 +271,18 @@ function join( array, delim ) {
 	return Array.prototype.join.call( array, delim || '' );
 }
 
-//jQuery.extend( jQuery.fn, {
+jQuery.extend( jQuery.fn, {
+	bindSelector: function( events, listener, delay ) {
+		var timer;
+		this.bind( events, function() {
+			var self = this, args = arguments;
+			if( timer ) clearTimeout( timer );
+			timer = setTimeout( function() {
+				timer = null;
+				listener.apply( self, args );
+			}, delay || 50 );
+		});
+	}
 //	html: function( a ) {
 //		if( a == null ) return this[0] && this[0].innerHTML;
 //		return this.empty().append( join( a.charAt ? arguments : a ) );
@@ -279,7 +290,7 @@ function join( array, delim ) {
 //	setClass: function( cls, yes ) {
 //		return this[ yes ? 'addClass' : 'removeClass' ]( cls );
 //	}
-//});
+});
 
 function randomInt( n ) {
 	return Math.floor( Math.random() * n );
@@ -1152,14 +1163,14 @@ function contentTable() {
 		
 		//setProvinceByAbbr( opt.province );
 		
-		$('#provinceSelector').bind( 'change keyup', function() {
+		$('#provinceSelector').bindSelector( 'change keyup', function() {
 			var value = this.value.replace('!','').toLowerCase();
 			if( opt.province == value ) return;
 			opt.province = value;
 			setDistricts( value > 0 );
 		});
 		
-		$('#partySelector').bind( 'change keyup', function() {
+		$('#partySelector').bindSelector( 'change keyup mousemove', function() {
 			var value = this.value;
 			if( opt.infoType == value ) return;
 			opt.infoType = value;
