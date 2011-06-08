@@ -33,21 +33,21 @@ var parties = [
 	{ id: 14, abbr: 'MP', color: '#CCFFCC', icon: 13 },
 	{ id: 16, abbr: 'SP', color: '#FF9900', icon: 14 },
 	{ id: 17, abbr: 'TKP', color: '#FF0000', icon: 15 },
-	{ id: 20, abbr: 'BGMZ1', color: '#993366', icon: 0 },
-	{ id: 21, abbr: 'BGMZDIGER', color: '#993366', icon: 0 },
 	{ id: 22, abbr: 'AKP', color: '#FFCC00', icon: 1 },
 	{ id: 23, abbr: 'CHP', color: '#FF6600', icon: 3 },
 	{ id: 24, abbr: 'MHP', color: '#808000', icon: 11 },
-	{ id: 27, abbr: 'BGMZ2', color: '#993366', icon: 0 },
-	{ id: 28, abbr: 'BGMZ3', color: '#993366', icon: 0 },
-	{ id: 29, abbr: 'BGMZ4', color: '#993366', icon: 0 },
-	{ id: 30, abbr: 'BGMZ5', color: '#993366', icon: 0 },
-	{ id: 31, abbr: 'BGMZ6', color: '#993366', icon: 0 },
-	{ id: 32, abbr: 'BGMZ7', color: '#993366', icon: 0 },
 	{ id: 33, abbr: 'HEPAR', color: '#B3D580', icon: 9 },
 	{ id: 34, abbr: 'HAS', color: '#808080', icon: 8 },
 	{ id: 35, abbr: 'DYP', color: '#E1C7E1', icon: 6 },
-	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12 }
+	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12 },
+	{ id: 21, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 20, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 27, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 28, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 29, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 30, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 31, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true },
+	{ id: 32, abbr: 'Bağımsız', color: '#993366', icon: 0, bgmz: true }
 ];
 
 // Voting results column offsets
@@ -57,6 +57,7 @@ col.ID = parties.length;
 col.NumVoters = col.ID + 1;
 col.NumBallotBoxes = col.ID + 2;
 col.NumCountedBallotBoxes = col.ID + 3;
+col.bgmz = -1;
 
 function resultsFields() {
 	return S(
@@ -266,7 +267,7 @@ function randomInt( n ) {
 	}
 })( jQuery );
 
-parties.index('id').index('abbr');
+parties.index('id');
 
 document.body.scroll = 'no';
 
@@ -383,8 +384,9 @@ function contentTable() {
 						//option( '-4', 'fourthParty'.T() ),
 						option( '', '', false, true ),
 						parties.mapjoin( function( party ) {
-							return option( party.id, party.abbr );
+							return party.bgmz ? '' : option( party.id, party.abbr );
 						}),
+						option( '0', 'Bağımsız' ),
 					'</select>',
 					'&nbsp;&nbsp;&nbsp;',
 					'<input type="checkbox" id="chkDistricts">',
@@ -704,11 +706,24 @@ function contentTable() {
 			}
 		}
 		else {
-			var party = parties.by.id[partyID], color = party.color, index = party.index;
-			var max = 0;
 			var rows = curResults.rows;
-			for( var row, iRow = -1;  row = rows[++iRow]; ) {
-				max = Math.max( max, row[index] );
+			var max = 0;
+			if( partyID == 0 ) {
+				var color = '#993366', index = col.bgmz;
+				var nCols = parties.length;
+				for( var row, iRow = -1;  row = rows[++iRow]; ) {
+					var tot = 0;
+					for( var iCol = -1;  ++iCol < nCols; )
+						tot += row[iCol];
+					row[index] = tot;
+					max = Math.max( max, row[index] );
+				}
+			}
+			else {
+				var party = parties.by.id[partyID], color = party.color, index = party.index;
+				for( var row, iRow = -1;  row = rows[++iRow]; ) {
+					max = Math.max( max, row[index] );
+				}
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
