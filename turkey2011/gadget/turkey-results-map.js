@@ -25,29 +25,29 @@ var strings = {
 };
 
 var parties = [
-	{ id: 22, abbr: 'AKP', color: '#008000', icon: 1 },
-	{ id: 7, abbr: 'BBP', color: '#6666CC', icon: 2 },
-	{ id: 23, abbr: 'CHP', color: '#FFFF00', icon: 3 },
-	{ id: 8, abbr: 'DP', color: '#800080', icon: 4 },
-	{ id: 4, abbr: 'DSP', color: '#000080', icon: 5 },
-	{ id: 35, abbr: 'DYP', color: '#993300', icon: 6 },
-	{ id: 9, abbr: 'EMEP', color: '#FF00FF', icon: 7 },
-	{ id: 34, abbr: 'HAS', color: '#808080', icon: 8 },
-	{ id: 33, abbr: 'HEPAR', color: '#B3D580', icon: 9 },
-	{ id: 13, abbr: 'LDP', color: '#FF6600', icon: 10 },
-	{ id: 24, abbr: 'MHP', color: '#FF0000', icon: 11 },
-	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12 },
-	{ id: 14, abbr: 'MP', color: '#CCFFCC', icon: 13 },
-	{ id: 16, abbr: 'SP', color: '#33CCCC', icon: 14 },
-	{ id: 17, abbr: 'TKP', color: '#993366', icon: 15 },
-	{ id: 21, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 20, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 27, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 28, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 29, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 30, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 31, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true },
-	{ id: 32, abbr: 'Bağımsız', color: '#3366FF', icon: 0, bgmz: true }
+	{ id: 22, abbr: 'AKP', color: '#008000', icon: 1, name: 'Adalet ve Kalkınma Partisi' },
+	{ id: 7, abbr: 'BBP', color: '#6666CC', icon: 2, name: 'Büyük Birlik Partisi' },
+	{ id: 23, abbr: 'CHP', color: '#FFFF00', icon: 3, name: 'Cumhuriyet Halk Partisi' },
+	{ id: 8, abbr: 'DP', color: '#800080', icon: 4, name: 'Demokrat Parti' },
+	{ id: 4, abbr: 'DSP', color: '#000080', icon: 5, name: 'Demokratik Sol Parti' },
+	{ id: 35, abbr: 'DYP', color: '#993300', icon: 6, name: 'Doğru Yol Partisi' },
+	{ id: 9, abbr: 'EMEP', color: '#FF00FF', icon: 7, name: 'Emek Partisi' },
+	{ id: 34, abbr: 'HAS', color: '#808080', icon: 8, name: 'Halkın Sesi Partisi' },
+	{ id: 33, abbr: 'HEPAR', color: '#B3D580', icon: 9, name: 'Hak ve Eşitlik Partisi' },
+	{ id: 13, abbr: 'LDP', color: '#FF6600', icon: 10, name: 'Liberal Demokrat Parti' },
+	{ id: 24, abbr: 'MHP', color: '#FF0000', icon: 11, name: 'Milliyetçi Hareket Partisi' },
+	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12, name: 'Milliyetçi ve Muhafazakar Parti' },
+	{ id: 14, abbr: 'MP', color: '#CCFFCC', icon: 13, name: 'Millet Partisi' },
+	{ id: 16, abbr: 'SP', color: '#33CCCC', icon: 14, name: 'Saadet Partisi' },
+	{ id: 17, abbr: 'TKP', color: '#993366', icon: 15, name: 'Türkiye Komünist Partisi' },
+	{ id: 21, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 20, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 27, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 28, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 29, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 30, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 31, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
+	{ id: 32, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' }
 ];
 
 var independents = {
@@ -520,9 +520,13 @@ function contentTable() {
 						//option( '-4', 'fourthParty'.T() ),
 						option( '', '', false, true ),
 						parties.mapjoin( function( party ) {
-							return party.bgmz ? '' : option( party.id, party.abbr );
+							return party.bgmz ? '' : option(
+								party.id,
+								party.abbr + ' - ' + party.name
+							);
 						}),
-						option( '0', 'Bağımsız' ),
+						option( '', '', false, true ),
+						option( '0', 'BGMZ - Bağımsız' ),
 					'</select>',
 					'&nbsp;&nbsp;&nbsp;',
 					'<input type="checkbox" id="chkDistricts">',
