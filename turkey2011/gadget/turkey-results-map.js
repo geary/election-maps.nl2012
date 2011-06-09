@@ -977,7 +977,11 @@ function contentTable() {
 	}
 	
 	function formatLegend() {
-		var topParties = topPartiesByVote( totalResults(curResults), 6 )
+		var nParties = ww < 900 ? 4 : 6;
+		var topParties = topPartiesByVote(
+			totalResults(curResults),
+			nParties
+		);
 		if( ! topParties.length )
 			return 'noVotes'.T();
 		return S(
