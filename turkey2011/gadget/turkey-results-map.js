@@ -1020,7 +1020,7 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function nameCase( name ) {
-		return name.split(' ').map( function( word ) {
+		return name && name.split(' ').map( function( word ) {
 			return word.slice( 0, 1 ) + word.slice( 1 ).toLowerCase();
 		}).join(' ');
 	}
