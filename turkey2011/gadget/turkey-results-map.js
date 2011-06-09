@@ -472,9 +472,9 @@ function optionHTML( value, name, selected, disabled ) {
 	);
 }
 
-function provinceOption( province, selected, dated ) {
+function provinceOption( province, selected ) {
 	province.selectorIndex = index;
-	return option( province.abbr, province.name, selected, true );
+	return option( province.id, province.name, selected );
 }
 
 function raceOption( value, name ) {
@@ -507,7 +507,7 @@ function contentTable() {
 						option( '-1', 'nationwideLabel'.T() ),
 						option( '', '', false, true ),
 						geo.provinces.features.mapjoin( function( province ) {
-							return provinceOption( province, province.abbr == opt.province, true );
+							return provinceOption( province, province.abbr == opt.province );
 						}),
 					'</select>',
 					'&nbsp;&nbsp;&nbsp;',
@@ -771,14 +771,16 @@ function formatLegendTable( partyCells ) {
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
-		var bbox = json.bbox;
-		if( bbox ) {
-			map.fitBounds( new gm.LatLngBounds(
-				new gm.LatLng( bbox[1], bbox[0] ),
-				new gm.LatLng( bbox[3], bbox[2] )
-			) );
-			zoom = map.getZoom();
-		}
+		fitBbox( json.bbox );
+	}
+	
+	function fitBbox( bbox ) {
+		if( ! bbox ) return;
+		map.fitBounds( new gm.LatLngBounds(
+			new gm.LatLng( bbox[1], bbox[0] ),
+			new gm.LatLng( bbox[3], bbox[2] )
+		) );
+		zoom = map.getZoom();
 	}
 	
 	var  mouseFeature;
@@ -1254,6 +1256,8 @@ function formatLegendTable( partyCells ) {
 			if( opt.province == value ) return;
 			opt.province = value;
 			setDistricts( value > 0 );
+			var province = geo.provinces.features.by.id[value];
+			fitBbox( province ? province.bbox : geo.provinces.bbox );
 		});
 		
 		$('#partySelector').bindSelector( 'change keyup mousemove', function() {
