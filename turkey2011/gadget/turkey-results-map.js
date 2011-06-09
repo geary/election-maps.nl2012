@@ -4,6 +4,8 @@
 
 // Keep this in sync with ALL_ALL.xml
 var strings = {
+	mapTypeName: 'Simple',
+	mapTypeAlt: 'Show simple map',
 	nationwideLabel: 'Tüm Türkiye',
 	//chooseLabel: 'Choose a province and select a race:',
 	provinceLabel: 'İller:&nbsp;',
@@ -1173,16 +1175,45 @@ function contentTable() {
 		setDistricts( true );
 	}
 	
+	var mapStyles = [
+		{
+			featureType: "road",
+			elementType: "all",
+			stylers: [ { visibility: "off" } ]
+		},{
+			featureType: "transit",
+			elementType: "all",
+			stylers: [ { visibility: "off" } ]
+		},{
+			featureType: "landscape",
+			elementType: "all",
+			stylers: [ { saturation: -100 }, { lightness: 30 } ]
+		},{
+			featureType: "administrative",
+			elementType: "all",
+			stylers: [ { visibility: "off" } ]
+		},{
+			featureType: "administrative.locality",
+			elementType: "labels",
+			stylers: [ { visibility: "on" } ]
+		}
+	];
+	
 	function initMap() {
 		if( map ) return;
+		var mapType = new gm.StyledMapType( mapStyles, {
+			name: 'mapTypeName'.T(),
+			alt: 'mapTypeAlt'.T(),
+		});
 		var mt = gm.MapTypeId;
 		map = new gm.Map( $map[0],  {
 			mapTypeId: mt.ROADMAP,
 			streetViewControl: false,
 			mapTypeControlOptions: {
-				//mapTypeIds: [
-				//	mt.ROADMAP, mt.SATELLITE, mt.HYBRID, mt.TERRAIN
-				//]
+				mapTypeIds: [
+					'simple', mt.ROADMAP, mt.TERRAIN,
+					mt.SATELLITE, mt.HYBRID
+				]
 			},
 			panControl: false,
 			rotateControl: false,
@@ -1190,6 +1221,8 @@ function contentTable() {
 				style: gm.ZoomControlStyle.SMALL
 			}
 		});
+		map.mapTypes.set( 'simple', mapType );
+		map.setMapTypeId( 'simple' );
 		
 		gme.addListener( map, 'zoom_changed', function() {
 			var oldZoom = zoom;
