@@ -826,10 +826,9 @@ function contentTable() {
 	}
 	
 	function colorize( /* ?? */ ) {
-		// Use wider borders in IE to cover up gaps between borders, except in House view
-		//strokeWidth = $.browser.msie ? 2 : 1;
-		strokeWidth = 1;
-		var features = currentGeo().features;
+		var geo = currentGeo();
+		var strokeWidth = geo.kind == 'provinces' ? 2 : 1;
+		var features = geo.features;
 		var partyID = $('#partySelector').val();
 		if( partyID < 0 ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
@@ -844,8 +843,8 @@ function contentTable() {
 					feature.fillColor = '#FFFFFF';
 					feature.fillOpacity = 0;
 				}
-				feature.strokeColor = '#000000';
-				feature.strokeOpacity = .4;
+				feature.strokeColor = '#666666';
+				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
 			}
 		}
