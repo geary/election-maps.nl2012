@@ -372,6 +372,10 @@ function randomInt( n ) {
 
 parties.index('id');
 
+function imgUrl( name ) {
+	return opt.imgUrl + name;
+}
+
 document.body.scroll = 'no';
 
 document.write(
@@ -409,8 +413,8 @@ document.write(
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; filter:alpha(opacity=70); opacity:0.70; -moz-opacity:0.70; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
-		'#attrib { z-index:999999; position:absolute; right:4px; bottom:16px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
+		'#cihan-logo { display:block; position:absolute; left:4px; bottom:34px; width:48px; height:32px; background: url(', imgUrl('cihan-logo-48x32.png'), ') no-repeat; }',
 	'</style>'
 );
 
@@ -443,17 +447,13 @@ function raceOption( value, name ) {
 	return option( value, name, value == opt.infoType );
 }
 
-function imgUrl( name ) {
-	return opt.imgUrl + name;
-}
-
 document.write(
 	'<div id="outer">',
 	'</div>',
 	'<div id="maptip">',
 	'</div>',
-	'<div id="attrib">',
-	'</div>',
+	'<a id="cihan-logo" target="_blank" href="http://www.cihan.com.tr/">',
+	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
 	'<div id="spinner">',
