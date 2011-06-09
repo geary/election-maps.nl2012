@@ -441,8 +441,7 @@ document.write(
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#legend { padding: 6px 6px 4px 6px; background-color:#EAF0FA; }',
-		'#legend * { display: inline-block; }',
+		'#legend { padding: 6px 6px 6px 6px; background-color:#EAF0FA; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
@@ -536,15 +535,35 @@ function contentTable() {
 				'</div>',
 			'</div>',
 			'<div id="legend">',
-				'<div style="height:20px;">',
-					'&nbsp;',
-				'</div>',
+				formatLegendTable(),
 			'</div>',
 			'<div style="width:100%;">',
 				'<div id="map" style="width:100%; height:100%;">',
 				'</div>',
 			'</div>',
 		'</div>'
+	);
+}
+
+function formatLegendTable( partyCells ) {
+	partyCells = partyCells || S(
+		'<td>',
+			'<div style="background:transparent; width:1px; height:14px; border:1px transparent">',
+			'</div>',
+		'</td>',
+		'<td style="font-size:16px;">',
+			'&nbsp;',
+		'</td>'
+	);
+	return S(
+		'<table cellspacing="0" cellpadding="0">',
+			'<tr valign="middle">',
+				'<td>',
+					'legendLabel'.T(),
+				'</td>',
+				partyCells,
+			'</tr>',
+		'</table>'
 	);
 }
 
@@ -983,27 +1002,20 @@ function contentTable() {
 			totalResults(curResults),
 			nParties
 		);
-		if( ! topParties.length )
-			return 'noVotes'.T();
-		return S(
-			'<div>',
-				'legendLabel'.T(),
-				topParties.map( formatLegendParty ).join( '&nbsp;&nbsp;&nbsp;&nbsp;' ),
-			'</div>'
+		return formatLegendTable(
+			topParties.mapjoin( formatLegendParty )
 		);
 	}
 	
 	function formatLegendParty( party ) {
 		return S(
-			'<div style="font-size:16px;">',
+			'<td>',
 				formatColorPatch( party.color, 24, 14 ),
-				'&nbsp;',
-				//formatPartyIcon( party, 16 ),
-				//'&nbsp;',
-				party.abbr,
-				'&nbsp;',
-				percent( party.vsAll ),
-			'</div>'
+			'</td>',
+			'<td style="font-size:16px;">',
+				'&nbsp;', party.abbr, '&nbsp;&nbsp;',
+				percent( party.vsAll ), '&nbsp;&nbsp;&nbsp;&nbsp;', 
+			'</td>'
 		);
 	}
 	
