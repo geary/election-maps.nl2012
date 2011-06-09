@@ -1202,7 +1202,7 @@ function contentTable() {
 		if( map ) return;
 		var mapType = new gm.StyledMapType( mapStyles, {
 			name: 'mapTypeName'.T(),
-			alt: 'mapTypeAlt'.T(),
+			alt: 'mapTypeAlt'.T()
 		});
 		var mt = gm.MapTypeId;
 		map = new gm.Map( $map[0],  {
