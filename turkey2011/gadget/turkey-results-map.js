@@ -180,6 +180,9 @@ opt.districts = false;
 opt.fontsize = '15px';
 var sw = 300;
 
+opt.resultCacheTime = 60 * 1000;
+opt.reloadTime = 120 * 1000;
+
 opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
@@ -270,6 +273,36 @@ function S() {
 function join( array, delim ) {
 	return Array.prototype.join.call( array, delim || '' );
 }
+
+function Cache() {
+	this.cache = {};
+}
+
+$.extend( Cache.prototype, {
+	add: function( key, data, time ) {
+		this.cache[key] = { data: data, expire: +new Date + time };
+		//console.log( 'cache#add', key, this.cache[key].expire );
+	},
+	get: function( key, loader ) {
+		var item = this.cache[key];
+		if( ! item ) {
+			//console.log( 'cache#get miss', key );
+			return null;
+		}
+		var expired = +new Date > item.expire;
+		if( expired ) {
+			//console.log( 'cache#get expired', key );
+			delete this.cache[key];
+			return null;
+		}
+		//console.log( 'cache#get hit', key );
+		return item.data;
+	},
+	remove: function( key ) {
+		//console.log( 'cache#remove', key );
+		delete this.cache[key];
+	}
+});
 
 jQuery.extend( jQuery.fn, {
 	bindSelector: function( events, listener, delay ) {
@@ -697,7 +730,8 @@ function contentTable() {
 		}
 		polys();
 		$('#spinner').hide();
-		//reloadTimer = setTimeout( function() { loadView(); }, 300000 );
+		//console.log( 'setting reload timer' );
+		reloadTimer = setTimeout( loadView, opt.reloadTime );
 	}
 	
 	function currentGeo() {
@@ -1217,11 +1251,12 @@ function contentTable() {
 	//	});
 	//}
 	
-	var cacheResults = {};
+	var cacheResults = new Cache;
 	
 	function getResults() {
-		if( cacheResults[opt.districts] ) {
-			loadResults( cacheResults[opt.districts], opt.districts );
+		var results = cacheResults.get( opt.districts );
+		if( results ) {
+			loadResults( results, opt.districts, false );
 			return;
 		}
 		var url = S(
@@ -1236,17 +1271,18 @@ function contentTable() {
 	}
 	
 	loadProvinces = function( json ) {
-		loadResults( json, false );
+		loadResults( json, false, true );
 	};
 	
 	loadDistricts = function( json ) {
-		loadResults( json, true );
+		loadResults( json, true, true );
 	};
 	
-	loadResults = function( json, districts ) {
+	function loadResults( json, districts, loading ) {
 		opt.district = districts;
 		$('#chkDistricts').prop( 'checked', districts );
-		cacheResults[districts] = json;
+		if( loading )
+			cacheResults.add( districts, json, opt.resultCacheTime );
 		var results = curResults = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = curResults.rows;
