@@ -1003,7 +1003,7 @@ function formatLegendTable( partyCells ) {
 	
 	function formatPartyIcon( party, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, ' 0; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
