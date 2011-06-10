@@ -754,7 +754,8 @@ function formatLegendTable( partyCells ) {
 		polys();
 		$('#spinner').hide();
 		//console.log( 'setting reload timer' );
-		reloadTimer = setTimeout( loadView, opt.reloadTime );
+		if( ! reloadTimer )
+			reloadTimer = setInterval( loadView, opt.reloadTime );
 	}
 	
 	function currentGeo() {
