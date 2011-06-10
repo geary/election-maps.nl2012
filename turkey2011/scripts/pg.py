@@ -74,6 +74,7 @@ class Database:
 			print 'Unzipping %s to %s' %( zipname, unzipdir )
 			ZipFile( zipfile, 'r' ).extractall( unzipdir )
 			shpfile = os.path.join( unzipdir, shpname )
+		print 'loadShapeFile %s' % shpfile
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
 		command = 'shp2pgsql -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
