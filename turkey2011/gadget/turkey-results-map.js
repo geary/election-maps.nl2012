@@ -871,7 +871,9 @@ function formatLegendTable( partyCells ) {
 		}
 		var features = geo.features;
 		var partyID = $('#partySelector').val();
-		if( partyID < 0 ) {
+		var isMulti = ( partyID < 0 );
+		var isBGMZ = ( partyID == 0 );
+		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
@@ -892,7 +894,7 @@ function formatLegendTable( partyCells ) {
 		else {
 			var rows = curResults.rows;
 			var max = 0;
-			if( partyID == 0 ) {  // BGMZ
+			if( isBGMZ ) {
 				var color = '#3366FF';
 			}
 			else {
@@ -902,22 +904,27 @@ function formatLegendTable( partyCells ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
+				var total = 0, value = 0;
 				if( row ) {
-					if( partyID == 0 ) {  // BGMZ
-						var bgmz = 0, tot = 0;
+					if( isBGMZ ) {
 						for( var iCol = -1;  ++iCol < bgmzCol; )
-							tot += row[iCol];
-						for( ;  iCol < nCols;  ++iCol )
-							bgmz += row[iCol];
-						tot += bgmz;
-						max = Math.max( max, row.fract = bgmz / tot );
+							total += row[iCol];
+						while( iCol < nCols )
+							value += row[iCol++];
+						total += value;
+						max = Math.max( max,
+							row.fract = total ? value / total : 0
+						);
 					}
 					else {
-						var tot = 0;
+						var total = 0;
 						for( var iCol = -1;  ++iCol < nCols; )
-							tot += row[iCol];
-						max = Math.max( max, row.fract = row[index] / tot );
+							total += row[iCol];
+						value = row[index];
 					}
+					max = Math.max( max,
+						row.fract = total ? value / total : 0
+					);
 				}
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
