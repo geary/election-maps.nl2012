@@ -451,7 +451,7 @@ document.write(
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; filter:alpha(opacity=70); opacity:0.70; -moz-opacity:0.70; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
-		'#cihan-logo { display:block; position:absolute; left:4px; bottom:34px; width:48px; height:32px; background: url(', imgUrl('cihan-logo-48x32.png'), ') no-repeat; }',
+		'#cihan-logo { display:block; position:absolute; right:6px; top:2px; width:48px; height:32px; background: url(', imgUrl('cihan-logo-48x32.png'), ') no-repeat; }',
 	'</style>'
 );
 
