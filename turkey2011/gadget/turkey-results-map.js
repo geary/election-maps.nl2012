@@ -171,7 +171,7 @@ var gm = google.maps, gme = gm.event;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
-var geo = {};
+var geos = {};
 var $map;
 
 var prefs = new _IG_Prefs();
@@ -506,7 +506,7 @@ function contentTable() {
 					'<select id="provinceSelector">',
 						option( '-1', 'nationwideLabel'.T() ),
 						option( '', '', false, true ),
-						geo.provinces.features.mapjoin( function( province ) {
+						geos.provinces.features.mapjoin( function( province ) {
 							return provinceOption( province, province.abbr == opt.province );
 						}),
 					'</select>',
@@ -635,7 +635,7 @@ function formatLegendTable( partyCells ) {
 			// TODO: refactor
 			provinces: function() {
 				json.features.index('id').index('abbr');
-				geo.provinces = json;
+				geos.provinces = json;
 				if( ! didLoadGeoJSON ) {
 					didLoadGeoJSON = true;
 					$('#outer').html( contentTable() );
@@ -649,7 +649,7 @@ function formatLegendTable( partyCells ) {
 			},
 			districts: function() {
 				json.features.index('id').index('abbr');
-				geo.districts = json;
+				geos.districts = json;
 				//setDistricts( true );
 				getResults();
 				_IG_Analytics( 'UA-5730550-1', '/districts' );
@@ -758,12 +758,15 @@ function formatLegendTable( partyCells ) {
 			reloadTimer = setInterval( loadView, opt.reloadTime );
 	}
 	
-	function currentGeo() {
-		return opt.districts ? geo.districts : geo.provinces;
+	function currentGeos() {
+		geos.provinces.hittest = ! opt.districts;
+		return opt.districts ?
+			[ geos.districts, geos.provinces ] :
+			[ geos.provinces ];
 	}
 	
 	function moveToGeo() {
-		var json = currentGeo();
+		var json = currentGeos()[0];  // TODO
 		$('#map').show();
 		initMap();
 		gme.trigger( map, 'resize' );
@@ -829,7 +832,7 @@ function formatLegendTable( partyCells ) {
 		function draw() {
 			var overlay = new PolyGonzo.PgOverlay({
 				map: map,
-				geo: currentGeo(),
+				geos: currentGeos(),
 				events: events
 			});
 			overlay.setMap( map );
@@ -846,8 +849,22 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function colorize( /* ?? */ ) {
-		var geo = currentGeo();
-		var strokeWidth = geo.kind == 'provinces' ? 2 : 1;
+		if( opt.districts ) {
+			var features = geos.provinces.features;
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				feature.fillColor = '#000000';
+				feature.fillOpacity = 0;
+				feature.strokeColor = '#666666';
+				feature.strokeOpacity = 1;
+				feature.strokeWidth = 2;
+			}
+		}
+		if( opt.districts ) {
+			var geo = geos.districts, strokeWidth = 1, strokeColor = '#666666';
+		}
+		else {
+			var geo = geos.provinces, strokeWidth = 2, strokeColor = '#222222';
+		}
 		var features = geo.features;
 		var partyID = $('#partySelector').val();
 		if( partyID < 0 ) {
@@ -863,7 +880,7 @@ function formatLegendTable( partyCells ) {
 					feature.fillColor = '#FFFFFF';
 					feature.fillOpacity = 0;
 				}
-				feature.strokeColor = '#666666';
+				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
 			}
@@ -893,8 +910,8 @@ function formatLegendTable( partyCells ) {
 				var row = curResults.rowsByID[id];
 				feature.fillColor = color;
 				feature.fillOpacity = row && max ? row[index] / max : 0;
-				feature.strokeColor = '#000000';
-				feature.strokeOpacity = .4;
+				feature.strokeColor = strokeColor;
+				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
 			}
 		}
@@ -1087,7 +1104,7 @@ function formatLegendTable( partyCells ) {
 			);
 		}
 		
-		var parent = geo.provinces.features.by.id[feature.parent];
+		var parent = geos.provinces.features.by.id[feature.parent];
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1255,8 +1272,8 @@ function formatLegendTable( partyCells ) {
 			if( opt.province == value ) return;
 			opt.province = value;
 			setDistricts( value > 0 );
-			var province = geo.provinces.features.by.id[value];
-			fitBbox( province ? province.bbox : geo.provinces.bbox );
+			var province = geos.provinces.features.by.id[value];
+			fitBbox( province ? province.bbox : geos.provinces.bbox );
 		});
 		
 		$('#partySelector').bindSelector( 'change keyup mousemove', function() {
@@ -1292,7 +1309,7 @@ function formatLegendTable( partyCells ) {
 		opt.infoType = $select.val();
 		
 		opt.province = +$('#provinceSelector').val();
-		//var province = curProvince = geo.provinces.features.by.abbr[opt.abbr];
+		//var province = curProvince = geos.provinces.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		loadRegion();
 	}
