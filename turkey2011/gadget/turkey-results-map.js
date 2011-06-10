@@ -888,7 +888,7 @@ function formatLegendTable( partyCells ) {
 			var rows = curResults.rows;
 			var max = 0;
 			if( partyID == 0 ) {
-				var color = '#993366', index = col.bgmz;
+				var color = '#3366FF', index = col.bgmz;
 				var nCols = parties.length;
 				for( var row, iRow = -1;  row = rows[++iRow]; ) {
 					var tot = 0;
