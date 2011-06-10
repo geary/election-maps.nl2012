@@ -24,7 +24,7 @@ var strings = {
 	noVotes: 'Oy bilgisi alınmadı'
 };
 
-var parties = [
+var parties1 = [
 	{ id: 22, abbr: 'AKP', color: '#FFFF00', icon: 1, name: 'Adalet ve Kalkınma Partisi' },
 	{ id: 7, abbr: 'BBP', color: '#6666CC', icon: 2, name: 'Büyük Birlik Partisi' },
 	{ id: 23, abbr: 'CHP', color: '#008000', icon: 3, name: 'Cumhuriyet Halk Partisi' },
@@ -39,7 +39,10 @@ var parties = [
 	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12, name: 'Milliyetçi ve Muhafazakar Parti' },
 	{ id: 14, abbr: 'MP', color: '#CCFFCC', icon: 13, name: 'Millet Partisi' },
 	{ id: 16, abbr: 'SP', color: '#33CCCC', icon: 14, name: 'Saadet Partisi' },
-	{ id: 17, abbr: 'TKP', color: '#993366', icon: 15, name: 'Türkiye Komünist Partisi' },
+	{ id: 17, abbr: 'TKP', color: '#993366', icon: 15, name: 'Türkiye Komünist Partisi' }
+];
+
+var partiesBGMZ = [
 	{ id: 21, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
 	{ id: 20, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
 	{ id: 27, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
@@ -49,6 +52,8 @@ var parties = [
 	{ id: 31, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
 	{ id: 32, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' }
 ];
+
+var parties = parties1.concat( partiesBGMZ );
 
 var independents = {
 	'20:1': 'MURAT BOZLAK',
@@ -143,11 +148,11 @@ var independents = {
 // Voting results column offsets
 var col = {};
 col.parties = 0;
+col.bgmz = parties1.length;
 col.ID = parties.length;
 col.NumVoters = col.ID + 1;
 col.NumBallotBoxes = col.ID + 2;
 col.NumCountedBallotBoxes = col.ID + 3;
-col.bgmz = -1;
 
 function resultsFields() {
 	return S(
@@ -887,28 +892,39 @@ function formatLegendTable( partyCells ) {
 		else {
 			var rows = curResults.rows;
 			var max = 0;
-			if( partyID == 0 ) {
-				var color = '#3366FF', index = col.bgmz;
-				var nCols = parties.length;
-				for( var row, iRow = -1;  row = rows[++iRow]; ) {
-					var tot = 0;
-					for( var iCol = -1;  ++iCol < nCols; )
-						tot += row[iCol];
-					row[index] = tot;
-					max = Math.max( max, row[index] );
-				}
+			if( partyID == 0 ) {  // BGMZ
+				var color = '#3366FF';
 			}
 			else {
 				var party = parties.by.id[partyID], color = party.color, index = party.index;
-				for( var row, iRow = -1;  row = rows[++iRow]; ) {
-					max = Math.max( max, row[index] );
+			}
+			var nCols = parties.length, bgmzCol = col.bgmz;
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var id = feature.id;
+				var row = curResults.rowsByID[id];
+				if( row ) {
+					if( partyID == 0 ) {  // BGMZ
+						var bgmz = 0, tot = 0;
+						for( var iCol = -1;  ++iCol < bgmzCol; )
+							tot += row[iCol];
+						for( ;  iCol < nCols;  ++iCol )
+							bgmz += row[iCol];
+						tot += bgmz;
+						max = Math.max( max, row.fract = bgmz / tot );
+					}
+					else {
+						var tot = 0;
+						for( var iCol = -1;  ++iCol < nCols; )
+							tot += row[iCol];
+						max = Math.max( max, row.fract = row[index] / tot );
+					}
 				}
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = curResults.rowsByID[id];
 				feature.fillColor = color;
-				feature.fillOpacity = row && max ? row[index] / max : 0;
+				feature.fillOpacity = row && max ? row.fract / max : 0;
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
