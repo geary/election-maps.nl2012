@@ -29,10 +29,12 @@ def loadFT( db, schema, name, create, query ):
 
 	
 def loadSHP( db, schema, name, level ):
+	#suffix = ''  # hack
+	suffix = '-edited'  # hack
 	table = '%s.%s' %( schema, name )
 	tableSHP = '%s%s' %( table, level )
 	db.loadShapefile(
-		'../shapes/shp/%s-%s/%s.shp' %( name, level, name ),
+		'../shapes/shp/%s-%s%s/%s.shp' %( name, level, suffix, name ),
 		private.TEMP_PATH, tableSHP, True
 	)
 	db.connection.commit()
@@ -45,13 +47,11 @@ def loadSHP( db, schema, name, level ):
 			%(table)s
 		SET
 			-- %(geom)s = ST_Multi( ST_Transform( ST_MakeValid( ST_Force_2D( ST_MakeValid(shp.full_geom) ) ), 3857 ) ST_Multi( 
-			%(geom)s = ST_Multi( ST_MakeValid(  ST_Force_2D(shp.full_geom) ) )
+			%(geom)s = ST_Multi( ST_Buffer(  ST_Force_2D(shp.full_geom), 0.0 ) )
 		FROM
 			%(tableSHP)s shp
 		WHERE
 			%(table)s.id = shp.name::INTEGER
-		AND
-			ST_IsValid( shp.full_geom )
 		;
 	''' % {
 		'table': table,
@@ -128,8 +128,8 @@ def process():
 	loadProvinceFT( db, schema )
 	loadDistrictFT( db, schema )
 	
-	for level in '00 50 60 70 80 90'.split(' '):
-	#for level in '50'.split(' '):
+	#for level in '00 50 60 70 80 90'.split(' '):
+	for level in '90'.split(' '):
 		loadSHP( db, schema, 'districts', level )
 		for tbl in ( 'provinces', 'districts', ):
 		#for tbl in ( 'provinces', ):

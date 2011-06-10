@@ -604,7 +604,7 @@ function formatLegendTable( partyCells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = 70;
+		var level = 90;
 		var kind = ( opt.districts ? 'districts' : 'provinces' );
 		var json = jsonRegion[kind];
 		if( json ) {
