@@ -1283,9 +1283,9 @@ function formatLegendTable( partyCells ) {
 		gme.addListener( map, 'zoom_changed', function() {
 			var oldZoom = zoom;
 			zoom = map.getZoom();
-			if( zoom > oldZoom  &&  zoom >= 8 )
+			if( zoom > oldZoom  &&  zoom >= 7 )
 				setDistricts( true );
-			else if( zoom < oldZoom  &&  zoom < 8 )
+			else if( zoom < oldZoom  &&  zoom < 7 )
 				setDistricts( false );
 		});
 	}
