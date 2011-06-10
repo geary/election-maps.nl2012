@@ -1340,8 +1340,6 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function loadView() {
-		clearTimeout( reloadTimer );
-		reloadTimer = null;
 		showTip( false );
 		//overlays.clear();
 		var id = opt.province;
