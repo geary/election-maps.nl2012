@@ -576,8 +576,6 @@ function formatLegendTable( partyCells ) {
 	
 	//opt.zoom = opt.zoom || 3;
 	
-	var fillOpacity = .75;
-	
 	//function getJSON( type, path, file, cache, callback, retries ) {
 	//	var stamp = +new Date;
 	//	if( ! opt.nocache ) stamp = Math.floor( stamp / cache / 1000 );
@@ -858,7 +856,7 @@ function formatLegendTable( partyCells ) {
 				var party = row && parties[row.partyMax];
 				if( party ) {
 					feature.fillColor = party.color;
-					feature.fillOpacity = .75;
+					feature.fillOpacity = .6;
 				}
 				else {
 					feature.fillColor = '#FFFFFF';
