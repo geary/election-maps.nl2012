@@ -76,20 +76,18 @@ def loadProvinceFT( db, schema ):
 		db, schema, 'provinces',
 		'CREATE TABLE t2011.provinces (' +
 			'id integer, ' +
-			'voters integer, ' +
-			'boxes integer, ' +
 			'name_tr varchar, ' +
 			'CONSTRAINT provinces_pkey PRIMARY KEY (id)' +
 		');',
 		'SELECT+' +
-			"ID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
+			"ID,'DistrictName-tr'" +
 			'+FROM+934719'
 	):
 		db.execute('''
 			INSERT INTO t2011.provinces
-			VALUES ( '%s', %d, %d, '%s' )
+			VALUES ( '%s', '%s' )
 		''' % (
-			row[0], int(float(row[1])), int(float(row[2])), row[3]
+			row[0], row[1]
 		) )
 
 
@@ -99,20 +97,18 @@ def loadDistrictFT( db, schema ):
 		'CREATE TABLE t2011.districts (' +
 			'id integer, ' +
 			'parent integer, ' +
-			'voters integer, ' +
-			'boxes integer, ' +
 			'name_tr varchar, ' +
 			'CONSTRAINT districts_pkey PRIMARY KEY (id)' +
 		');',
 		'SELECT+' +
-			"ID,ParentID,NumVoters,NumBallotBoxes,'DistrictName-tr'" +
+			"ID,ParentID,'DistrictName-tr'" +
 			'+FROM+928147'
 	):
 		db.execute('''
 			INSERT INTO t2011.districts
-			VALUES ( '%s', '%s', %d, %d, '%s' )
+			VALUES ( '%s', '%s', '%s' )
 		''' % (
-			row[0], row[1], int(float(row[2])), int(float(row[3])), row[4]
+			row[0], row[1], row[2]
 		) )
 
 
