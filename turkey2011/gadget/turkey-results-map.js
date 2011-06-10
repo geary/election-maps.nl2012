@@ -4,8 +4,6 @@
 
 // Keep this in sync with ALL_ALL.xml
 var strings = {
-	mapTypeName: 'Simple',
-	mapTypeAlt: 'Show simple map',
 	nationwideLabel: 'Tüm Türkiye',
 	//chooseLabel: 'Choose a province and select a race:',
 	provinceLabel: 'İller:&nbsp;',
@@ -1257,19 +1255,11 @@ function formatLegendTable( partyCells ) {
 	
 	function initMap() {
 		if( map ) return;
-		var mapType = new gm.StyledMapType( mapStyles, {
-			name: 'mapTypeName'.T(),
-			alt: 'mapTypeAlt'.T()
-		});
-		var mt = gm.MapTypeId;
 		map = new gm.Map( $map[0],  {
-			mapTypeId: mt.ROADMAP,
+			mapTypeId: 'simple',
 			streetViewControl: false,
 			mapTypeControlOptions: {
-				mapTypeIds: [
-					'simple', mt.ROADMAP, mt.TERRAIN,
-					mt.SATELLITE, mt.HYBRID
-				]
+				mapTypeIds: []
 			},
 			panControl: false,
 			rotateControl: false,
@@ -1277,8 +1267,8 @@ function formatLegendTable( partyCells ) {
 				style: gm.ZoomControlStyle.SMALL
 			}
 		});
+		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
-		map.setMapTypeId( 'simple' );
 		
 		gme.addListener( map, 'zoom_changed', function() {
 			var oldZoom = zoom;
