@@ -818,6 +818,7 @@ function formatLegendTable( partyCells ) {
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
 				map.setOptions({ draggableCursor: feature ? 'pointer' : null });
+				outlineFeature( feature );
 				showTip( feature );
 			},
 			click: function( event, where ) {
@@ -915,6 +916,32 @@ function formatLegendTable( partyCells ) {
 				feature.strokeWidth = strokeWidth;
 			}
 		}
+	}
+	
+	// TODO: refactor this into PolyGonzo
+	var outlineOverlay;
+	function outlineFeature( feature ) {
+		if( outlineOverlay )
+			outlineOverlay.setMap( null );
+		outlineOverlay = null;
+		if( ! feature ) return;
+		var geo = currentGeos()[0];
+		var feat = $.extend( {}, feature, {
+			fillColor: '#000000',
+			fillOpacity: 0,
+			strokeWidth: opt.districts ? 3 : 4,
+			strokeColor: '#000000',
+			strokeOpacity: 1
+		});
+		outlineOverlay = new PolyGonzo.PgOverlay({
+			map: map,
+			geos: [{
+				crs: geo.crs,
+				kind: geo.kind,
+				features: [ feat ]
+			}]
+		});
+		outlineOverlay.setMap( map );
 	}
 	
 	function getSeats( race, seat ) {
