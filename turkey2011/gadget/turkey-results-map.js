@@ -649,14 +649,14 @@ function formatLegendTable( partyCells ) {
 				}
 				//setDistricts( false );
 				getResults();
-				_IG_Analytics( 'UA-5730550-1', '/provinces' );
+				analytics( '/provinces' );
 			},
 			districts: function() {
 				json.features.index('id').index('abbr');
 				geos.districts = json;
 				//setDistricts( true );
 				getResults();
-				_IG_Analytics( 'UA-5730550-1', '/districts' );
+				analytics( '/districts' );
 			}
 		}[json.kind];
 		loader();
@@ -680,7 +680,14 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function reportError( type, file ) {
-		_IG_Analytics( 'UA-6203275-1', '/' + type + '/' + file );
+		analytics( '/' + type + '/' + file );
+	}
+	
+	function analytics( path ) {
+		analytics.seen = analytics.seen || {};
+		if( analytics.seen[path] ) return;
+		analytics.seen[path] = true;
+		_IG_Analytics( 'UA-5730550-1', '/turkey2011' + path );
 	}
 	
 	function htmlEscape( str ) {
