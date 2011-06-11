@@ -178,6 +178,7 @@ var geos = {};
 var $map;
 
 var prefs = new _IG_Prefs();
+var debug = prefs.getBool('debug');
 
 var opt = window.GoogleElectionMapOptions || {};
 opt.province = -1;
@@ -1159,12 +1160,14 @@ function formatLegendTable( partyCells ) {
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
 						feature.name,
+						debug ? ' (#' + feature.id + ')' : '',
 						' ',
 					'</span>',
 				'</div>',
 				'<div style="clear:left;">',
 				'</div>',
 				parent ? ' ' + parent.name : '',
+				parent && debug ? ' (#' + parent.id + ')' : '',
 			'</div>',
 			content,
 			footer

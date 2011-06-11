@@ -26,6 +26,8 @@
 	
 </ModulePrefs>
 
+<UserPref name="debug" default_value="false" datatype="bool" display_name="Debug"/>
+
 <UserPref name="countdown" default_value="true" datatype="bool" display_name="Countdown"/>
 
 <Content type="html">
