@@ -764,7 +764,6 @@ function formatLegendTable( partyCells ) {
 		}
 		polys();
 		$('#spinner').hide();
-		//console.log( 'setting reload timer' );
 		if( ! reloadTimer )
 			reloadTimer = setInterval( loadView, opt.reloadTime );
 	}
@@ -1382,6 +1381,7 @@ function formatLegendTable( partyCells ) {
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
 			'jsonCallback=', opt.districts ? 'loadDistricts' : 'loadProvinces',
+			'&_=', Math.floor( +new Date / opt.resultCacheTime ),
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
