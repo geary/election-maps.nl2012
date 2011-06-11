@@ -256,6 +256,47 @@ Array.prototype.random = function() {
 	return this[ randomInt(this.length) ];
 };
 
+// See scriptino-base.js in scriptino project for documentation
+function sortArrayBy( array, key, opt ) {
+	opt = opt || {};
+	var sep = unescape('%uFFFF');
+	var i = 0, n = array.length, sorted = new Array( n );
+	
+	// Separate loops for each case for speed
+	if( opt.numeric ) {
+		if( typeof key == 'function' ) {
+			for( ;  i < n;  ++i )
+				sorted[i] = [ ( 1000000000000000 + key(array[i]) + '' ).slice(-15), i ].join(sep);
+		}
+		else {
+			for( ;  i < n;  ++i )
+				sorted[i] = [ ( 1000000000000000 + array[i][key] + '' ).slice(-15), i ].join(sep);
+		}
+	}
+	else {
+		if( typeof key == 'function' ) {
+			for( ;  i < n;  ++i )
+				sorted[i] = [ key(array[i]), i ].join(sep);
+		}
+		else if( opt.caseDependent ) {
+			for( ;  i < n;  ++i )
+				sorted[i] = [ array[i][key], i ].join(sep);
+		}
+		else {
+			for( ;  i < n;  ++i )
+				sorted[i] = [ array[i][key].toLowerCase(), i ].join(sep);
+		}
+	}
+	
+	sorted.sort();
+	
+	var output = new Array( n );
+	for( i = 0;  i < n;  ++i )
+		output[i] = array[ sorted[i].split(sep)[1] ];
+	
+	return output;
+}
+
 String.prototype.trim = function() {
 	return this.replace( /^\s\s*/, '' ).replace( /\s\s*$/, '' );
 };
@@ -510,9 +551,13 @@ function contentTable() {
 					'<select id="provinceSelector">',
 						option( '-1', 'nationwideLabel'.T() ),
 						option( '', '', false, true ),
-						geos.provinces.features.mapjoin( function( province ) {
-							return provinceOption( province, province.abbr == opt.province );
-						}),
+						sortArrayBy( geos.provinces.features, 'name' )
+							.mapjoin( function( province ) {
+								return provinceOption(
+									province,
+									province.abbr == opt.province
+								);
+							}),
 					'</select>',
 					'&nbsp;&nbsp;&nbsp;',
 					'<label for="partySelector">',
@@ -1045,14 +1090,9 @@ function formatLegendTable( partyCells ) {
 			party.vsAll = votes / total;
 			//party.total = total;
 		}
-		// TODO: use fast sort?
-		top = top.sort( function( a, b ) {
-			return(
-				a.votes < b.votes ? 1 :
-				a.votes > b.votes ? -1 :
-				0
-			);
-		}).slice( 0, max );
+		top = sortArrayBy( top, 'votes', { numeric:true } )
+			.reverse()
+			.slice( 0, max );
 		while( top.length  &&  ! top[top.length-1].votes )
 			top.pop();
 		if( top.length ) {
