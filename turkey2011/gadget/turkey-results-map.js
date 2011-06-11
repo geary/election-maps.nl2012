@@ -111,7 +111,7 @@ var independents = {
 	'20:46': 'MUSTAFA NAMAKLI',
 	'20:36': 'MÜLKİYE BİRTANE',
 	'20:40': 'FAİK KARADAŞ',
-	'20:41': 'EMRULLAH BİNGÖL',
+	'20:41': 'EMRULLAH BINGÜL',
 	'20:42': 'HACI MEHMET BOZDAĞ',
 	'20:44': 'KANİ ŞAVATA',
 	'20:45': 'NİZAMETTİN ÖZTÜRK',
