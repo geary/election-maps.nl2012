@@ -1342,14 +1342,16 @@ function formatLegendTable( partyCells ) {
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		
-		gme.addListener( map, 'zoom_changed', function() {
-			var oldZoom = zoom;
-			zoom = map.getZoom();
-			if( zoom > oldZoom  &&  zoom >= 7 )
-				setDistricts( true );
-			else if( zoom < oldZoom  &&  zoom < 7 )
-				setDistricts( false );
-		});
+		if( ! PolyGonzo.isVML() ) {
+			gme.addListener( map, 'zoom_changed', function() {
+				var oldZoom = zoom;
+				zoom = map.getZoom();
+				if( zoom > oldZoom  &&  zoom >= 7 )
+					setDistricts( true );
+				else if( zoom < oldZoom  &&  zoom < 7 )
+					setDistricts( false );
+			});
+		}
 	}
 	
 	function initSelectors() {
