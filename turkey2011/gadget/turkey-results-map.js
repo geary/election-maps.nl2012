@@ -452,8 +452,22 @@ function randomInt( n ) {
 
 parties.index('id');
 
+function cacheUrl( url, cache, always ) {
+	if( opt.nocache ) {
+		if( ! always )
+			return url + '?q=' + new Date().getTime();
+		cache = 0;
+	}
+	if( typeof cache != 'number' )
+		cache = 3600;
+	url = _IG_GetCachedUrl( url, { refreshInterval:cache } );
+	if( ! url.match(/^http:/) )
+		url = 'http://' + location.host + url;
+	return url;
+}
+
 function imgUrl( name ) {
-	return opt.imgUrl + name;
+	return cacheUrl( opt.imgUrl + name );
 }
 
 document.body.scroll = 'no';
@@ -673,7 +687,7 @@ function formatLegendTable( partyCells ) {
 	
 	function getGeoJSON( url ) {
 		$('#spinner').show();
-		getScript( url );
+		getScript( cacheUrl( url ) );
 	}
 	
 	var didLoadGeoJSON;
