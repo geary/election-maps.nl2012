@@ -672,7 +672,7 @@ function formatLegendTable( partyCells ) {
 			loadGeoJSON( json );
 		}
 		else {
-			var file = S( 'turkey-', kind, '-geom_', level, '.jsonp' );
+			var file = S( 'turkey-', kind, '-geom_', level, '.jsonp?1' );
 			getGeoJSON( opt.shapeUrl + file );
 		}
 	}
