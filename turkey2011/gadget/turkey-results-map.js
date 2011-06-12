@@ -1085,15 +1085,25 @@ function formatLegendTable( partyCells ) {
 		return total;
 	}
 	
-	function topPartiesByVote( result, max ) {
+	function topPartiesByVote( result, max, combineBGMZ ) {
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( curResults );
-		var top = parties.slice();
+		if( combineBGMZ ) {
+			var bgmz = 0;
+			for( var i = col.bgmz;  i < parties.length;  ++i ) {
+				bgmz += result[i];
+			}
+			var top = parties1.slice().concat( partiesBGMZ[0] );
+			result = result.slice( 0, col.bgmz ).concat( bgmz );
+		}
+		else {
+			var top = parties.slice();
+		}
 		var total = 0;
-		for( var i = -1;  ++i < parties.length; ) {
+		for( var i = -1;  ++i < top.length; ) {
 			total += result[i];
 		}
-		for( var i = -1;  ++i < parties.length; ) {
+		for( var i = -1;  ++i < top.length; ) {
 			var party = top[i], votes = result[i];
 			party.votes = votes;
 			party.vsAll = votes / total;
@@ -1122,7 +1132,7 @@ function formatLegendTable( partyCells ) {
 		var nParties = ww < 900 ? 4 : 6;
 		var topParties = topPartiesByVote(
 			totalResults(curResults),
-			nParties
+			nParties, true
 		);
 		return formatLegendTable(
 			topParties.mapjoin( formatLegendParty )
@@ -1148,7 +1158,7 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function formatTipParties( feature, result ) {
-		var topParties = topPartiesByVote( result, 4 )
+		var topParties = topPartiesByVote( result, 4, false )
 		if( ! topParties.length )
 			return 'noVotes'.T();
 		return S(
