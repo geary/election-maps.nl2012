@@ -852,7 +852,6 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function polys() {
-		var dragging;
 		colorize( /* ?? */ );
 		var $container = $('#map');
 		function getFeature( event, where ) {
@@ -860,15 +859,10 @@ function formatLegendTable( partyCells ) {
 		}
 		var events = {
 			mousedown: function( event, where ) {
-				dragging = true;
-				showTip( false );
 			},
 			mouseup: function( event, where ) {
-				dragging = false;
-				mouseFeature = null;
 			},
 			mousemove: function( event, where ) {
-				if( dragging ) return;
 				var feature = getFeature( event, where );
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
@@ -877,10 +871,11 @@ function formatLegendTable( partyCells ) {
 				showTip( feature );
 			},
 			click: function( event, where ) {
-				var feature = getFeature( event, where );
-				if( ! feature ) return;
-				if( feature.type == 'province'  || feature.type == 'cd' )
-					setProvince( feature.province );
+				events.mousemove( event, where );
+				//var feature = getFeature( event, where );
+				//if( ! feature ) return;
+				//if( feature.type == 'province'  || feature.type == 'cd' )
+				//	setProvince( feature.province );
 			}
 		};
 		//overlays.clear();
