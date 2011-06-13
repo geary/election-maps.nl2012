@@ -187,7 +187,8 @@ opt.fontsize = '15px';
 var sw = 300;
 
 opt.resultCacheTime = 60 * 1000;
-opt.reloadTime = 120 * 1000;
+//opt.reloadTime = 120 * 1000;
+opt.reloadTime = false;  // no auto-reload
 
 opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
@@ -823,7 +824,7 @@ function formatLegendTable( partyCells ) {
 		}
 		polys();
 		$('#spinner').hide();
-		if( ! reloadTimer )
+		if( opt.reloadTime  &&  ! reloadTimer )
 			reloadTimer = setInterval( loadView, opt.reloadTime );
 	}
 	
