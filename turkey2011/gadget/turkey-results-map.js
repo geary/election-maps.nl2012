@@ -190,7 +190,8 @@ opt.districts = false;
 opt.fontsize = '15px';
 var sw = 300;
 
-opt.resultCacheTime = 60 * 1000;
+//opt.resultCacheTime = 60 * 1000;
+opt.resultCacheTime = Infinity;  // cache forever
 //opt.reloadTime = 120 * 1000;
 opt.reloadTime = false;  // no auto-reload
 
