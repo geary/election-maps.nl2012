@@ -1474,7 +1474,6 @@ function formatLegendTable( partyCells ) {
 	};
 	
 	function loadResults( json, districts, loading ) {
-		$('#chkDistricts').prop( 'checked', districts );
 		if( loading )
 			cacheResults.add( districts, json, opt.resultCacheTime );
 		var results = currentData().results = json.table;
@@ -1493,7 +1492,8 @@ function formatLegendTable( partyCells ) {
 			}
 			row.partyMax = partyMax;
 		}
-		geoReady();
+		if( districts == opt.districts )
+			geoReady();
 	}
 	
 	function objToSortedKeys( obj ) {
