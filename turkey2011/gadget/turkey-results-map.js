@@ -327,8 +327,8 @@ function Cache() {
 }
 
 $.extend( Cache.prototype, {
-	add: function( key, data, time ) {
-		this.cache[key] = { data: data, expire: +new Date + time };
+	add: function( key, value, time ) {
+		this.cache[key] = { value: value, expire: +new Date + time };
 		//console.log( 'cache#add', key, this.cache[key].expire );
 	},
 	get: function( key, loader ) {
@@ -344,7 +344,7 @@ $.extend( Cache.prototype, {
 			return null;
 		}
 		//console.log( 'cache#get hit', key );
-		return item.data;
+		return item.value;
 	},
 	remove: function( key ) {
 		//console.log( 'cache#remove', key );
