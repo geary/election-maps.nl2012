@@ -174,7 +174,11 @@ var gm = google.maps, gme = gm.event;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
-var geos = {};
+var data = {
+	districts: { geo:null, results:null },
+	provinces: { geo:null, results:null }
+};
+
 var $map;
 
 var prefs = new _IG_Prefs();
@@ -566,7 +570,7 @@ function contentTable() {
 					'<select id="provinceSelector">',
 						option( '-1', 'nationwideLabel'.T() ),
 						option( '', '', false, true ),
-						sortArrayBy( geos.provinces.features, 'name' )
+						sortArrayBy( data.provinces.geo.features, 'name' )
 							.mapjoin( function( province ) {
 								return provinceOption(
 									province,
@@ -699,7 +703,7 @@ function formatLegendTable( partyCells ) {
 			// TODO: refactor
 			provinces: function() {
 				json.features.index('id').index('abbr');
-				geos.provinces = json;
+				data.provinces.geo = json;
 				if( ! didLoadGeoJSON ) {
 					didLoadGeoJSON = true;
 					$('#outer').html( contentTable() );
@@ -713,7 +717,7 @@ function formatLegendTable( partyCells ) {
 			},
 			districts: function() {
 				json.features.index('id').index('abbr');
-				geos.districts = json;
+				data.districts.geo = json;
 				//setDistricts( true );
 				getResults();
 				analytics( '/districts' );
@@ -829,10 +833,18 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function currentGeos() {
-		geos.provinces.hittest = ! opt.districts;
+		data.provinces.geo.hittest = ! opt.districts;
 		return opt.districts ?
-			[ geos.districts, geos.provinces ] :
-			[ geos.provinces ];
+			[ data.districts.geo, data.provinces.geo ] :
+			[ data.provinces.geo ];
+	}
+	
+	function currentResults() {
+		return currentData().results;
+	}
+	
+	function currentData() {
+		return opt.districts ? data.districts: data.provinces;
 	}
 	
 	function moveToGeo() {
@@ -916,7 +928,7 @@ function formatLegendTable( partyCells ) {
 	
 	function colorize( /* ?? */ ) {
 		if( opt.districts ) {
-			var features = geos.provinces.features;
+			var features = data.provinces.geo.features;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				feature.fillColor = '#000000';
 				feature.fillOpacity = 0;
@@ -926,19 +938,19 @@ function formatLegendTable( partyCells ) {
 			}
 		}
 		if( opt.districts ) {
-			var geo = geos.districts, strokeWidth = 1, strokeColor = '#666666';
+			var source = data.districts, strokeWidth = 1, strokeColor = '#666666';
 		}
 		else {
-			var geo = geos.provinces, strokeWidth = 2, strokeColor = '#222222';
+			var source = data.provinces, strokeWidth = 2, strokeColor = '#222222';
 		}
-		var features = geo.features;
+		var features = source.geo.features, results = source.results;
 		var partyID = $('#partySelector').val();
 		var isMulti = ( partyID < 0 );
 		var isBGMZ = ( partyID == 0 );
 		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
-				var row = curResults.rowsByID[id];
+				var row = results.rowsByID[id];
 				var party = row && parties[row.partyMax];
 				if( party ) {
 					feature.fillColor = party.color;
@@ -954,7 +966,7 @@ function formatLegendTable( partyCells ) {
 			}
 		}
 		else {
-			var rows = curResults.rows;
+			var rows = results.rows;
 			var max = 0;
 			if( isBGMZ ) {
 				var color = '#3366FF';
@@ -965,7 +977,7 @@ function formatLegendTable( partyCells ) {
 			var nCols = parties.length, bgmzCol = col.bgmz;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
-				var row = curResults.rowsByID[id];
+				var row = results.rowsByID[id];
 				var total = 0, value = 0;
 				if( row ) {
 					if( isBGMZ ) {
@@ -991,7 +1003,7 @@ function formatLegendTable( partyCells ) {
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
-				var row = curResults.rowsByID[id];
+				var row = results.rowsByID[id];
 				feature.fillColor = color;
 				feature.fillOpacity = row && max ? row.fract / max : 0;
 				feature.strokeColor = strokeColor;
@@ -1088,7 +1100,7 @@ function formatLegendTable( partyCells ) {
 	
 	function topPartiesByVote( result, max, combineBGMZ ) {
 		if( ! result ) return [];
-		if( result == -1 ) result = totalResults( curResults );
+		if( result == -1 ) result = totalResults( currentResults() );
 		if( combineBGMZ ) {
 			var bgmz = 0;
 			for( var i = col.bgmz;  i < parties.length;  ++i ) {
@@ -1132,7 +1144,7 @@ function formatLegendTable( partyCells ) {
 	function formatLegend() {
 		var nParties = ww < 900 ? 4 : 6;
 		var topParties = topPartiesByVote(
-			totalResults(curResults),
+			totalResults( currentResults() ),
 			nParties, true
 		);
 		return formatLegendTable(
@@ -1196,7 +1208,7 @@ function formatLegendTable( partyCells ) {
 	function formatTip( feature ) {
 		if( ! feature ) return null;
 		var boxColor = '#F2EFE9';
-		var result = curResults.rowsByID[feature.id];
+		var result = currentResults().rowsByID[feature.id];
 		
 		var content = footer = '';
 		if( result ) {
@@ -1219,7 +1231,7 @@ function formatLegendTable( partyCells ) {
 			);
 		}
 		
-		var parent = geos.provinces.features.by.id[feature.parent];
+		var parent = data.provinces.geo.features.by.id[feature.parent];
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1383,8 +1395,8 @@ function formatLegendTable( partyCells ) {
 			if( opt.province == value ) return;
 			opt.province = value;
 			setDistricts( value > 0 );
-			var province = geos.provinces.features.by.id[value];
-			fitBbox( province ? province.bbox : geos.provinces.bbox );
+			var province = data.provinces.geo.features.by.id[value];
+			fitBbox( province ? province.bbox : data.provinces.geo.bbox );
 		});
 		
 		$('#partySelector').bindSelector( 'change keyup mousemove', function() {
@@ -1418,7 +1430,7 @@ function formatLegendTable( partyCells ) {
 		opt.infoType = $select.val();
 		
 		opt.province = +$('#provinceSelector').val();
-		//var province = curProvince = geos.provinces.features.by.abbr[opt.abbr];
+		//var province = curProvince = data.provinces.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		loadRegion();
 	}
@@ -1461,13 +1473,12 @@ function formatLegendTable( partyCells ) {
 	};
 	
 	function loadResults( json, districts, loading ) {
-		opt.district = districts;
 		$('#chkDistricts').prop( 'checked', districts );
 		if( loading )
 			cacheResults.add( districts, json, opt.resultCacheTime );
-		var results = curResults = json.table;
+		var results = currentData().results = json.table;
 		var rowsByID = results.rowsByID = {};
-		var rows = curResults.rows;
+		var rows = results.rows;
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			rowsByID[ row[col.ID] ] = row;
 			var nParties = parties.length;
