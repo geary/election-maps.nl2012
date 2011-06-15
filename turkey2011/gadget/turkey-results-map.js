@@ -1052,7 +1052,7 @@ function formatLegendTable( partyCells ) {
 	
 	var tipOffset = { x:10, y:20 };
 	var $maptip, tipHtml;
-	$('body').bind( 'mousemove', moveTip );
+	$('body').bind( 'click mousemove', moveTip );
 	
 	function showTip( feature ) {
 		if( ! $maptip ) $maptip = $('#maptip');
