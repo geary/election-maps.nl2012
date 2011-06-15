@@ -9,12 +9,13 @@ var strings = {
 	provinceLabel: 'İller:&nbsp;',
 	partyLabel: 'Partiler:&nbsp;',
 	topParty: 'En Fazla Oy Oranı',
+	topPartyShort: 'En Fazla',
 	//secondParty: 'Second',
 	//thirdParty: 'Third',
 	//fourthParty: 'Fourth',
 	//turkey: 'Turkey',
 	districtsCheckbox: 'İlçeleri Göster',
-	legendLabel: 'Türkiye Genelinde Sonuçlar:&nbsp;&nbsp;',
+	legendLabel: 'Türkiye Genelinde Sonuçlar:',
 	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
@@ -303,6 +304,10 @@ function sortArrayBy( array, key, opt ) {
 	return output;
 }
 
+String.prototype.repeat = function( n ) {
+	return new Array( n + 1 ).join( this );
+};
+
 String.prototype.trim = function() {
 	return this.replace( /^\s\s*/, '' ).replace( /\s\s*$/, '' );
 };
@@ -506,8 +511,13 @@ document.write(
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#legend { padding: 6px 6px 6px 6px; background-color:#EAF0FA; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
+		'#legend { background-color:#EAF0FA; }',
+		'div.legend-party, div.legend-label { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
+		'div.legend-party { cursor:pointer; margin-right:6px; }',
+		'div.legend-party.hover, div.legend-party.selected { border:1px solid #6FA8DC; }',
+		'div.legend-party.hover { background-color:#D6E9F8; }',
+		'div.legend-party.selected { background-color:white; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
@@ -615,24 +625,15 @@ function contentTable() {
 }
 
 function formatLegendTable( partyCells ) {
-	partyCells = partyCells || S(
-		'<td>',
-			'<div style="background:transparent; width:1px; height:14px; border:1px transparent">',
-			'</div>',
-		'</td>',
-		'<td style="font-size:16px;">',
-			'&nbsp;',
-		'</td>'
-	);
 	return S(
-		'<table cellspacing="0" cellpadding="0">',
-			'<tr valign="middle">',
-				'<td>',
-					'legendLabel'.T(),
-				'</td>',
-				partyCells,
-			'</tr>',
-		'</table>'
+		'<div style="position:relative; vertical-align: middle;">',
+			'<div class="legend-label">',
+				'legendLabel'.T(),
+			'</div>',
+			partyCells || '&nbsp;',
+			'<div style="clear:left;">',
+			'</div>',
+		'</div>'
 	);
 }
 
@@ -1070,16 +1071,32 @@ function formatLegendTable( partyCells ) {
 		var margin2 = max - size - margin1;
 		return S(
 			'<div style="margin:', margin1, 'px ', margin2, 'px ', margin2, 'px ', margin1, 'px;">',
-				formatColorPatch( party.color, size, size ),
+				formatDivColorPatch( party.color, size, size ),
 			'</div>'
 		);
 	}
 	
-	function formatColorPatch( color, width, height, border ) {
+	function formatDivColorPatch( color, width, height, border ) {
 		border = border || '1px solid #C2C2C2';
 		return S(
 			'<div style="background:', color, '; width:', width, 'px; height:', height, 'px; border:', border, '">',
 			'</div>'
+		);
+	}
+	
+	function formatSpanColorPatch( colors, spaces, border ) {
+		if( ! colors.push ) colors = [ colors ];
+		border = border || '1px solid #C2C2C2';
+		return S(
+			'<span style="border:', border, '; zoom:1;">',
+				colors.mapjoin( function( color ) {
+					return S(
+						'<span style="background:', color, '; zoom:1;">',
+							'&nbsp;'.repeat( spaces || 6 ),
+						'</span>'
+					);
+				}),
+			'</span>'
 		);
 	}
 	
@@ -1143,25 +1160,39 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function formatLegend() {
-		var nParties = ww < 900 ? 4 : 6;
 		var topParties = topPartiesByVote(
 			totalResults( currentResults() ),
-			nParties, true
+			4, true
 		);
 		return formatLegendTable(
+			formatLegendTopParties( topParties.slice( 0, 4 ) ) +
 			topParties.mapjoin( formatLegendParty )
 		);
 	}
 	
-	function formatLegendParty( party ) {
+	function formatLegendTopParties( parties ) {
+		var colors = parties.map( function( party ) {
+			return party.color;
+		});
+		var selected = $('#partySelector').val() < 0 ? ' selected' : '';
 		return S(
-			'<td>',
-				formatColorPatch( party.color, 24, 14 ),
-			'</td>',
-			'<td style="font-size:16px;">',
-				'&nbsp;', party.abbr, '&nbsp;&nbsp;',
-				percent( party.vsAll ), '&nbsp;&nbsp;&nbsp;&nbsp;', 
-			'</td>'
+			'<div class="legend-party', selected, '" id="legend-party-top">',
+				formatSpanColorPatch( colors, 2 ),
+				'&nbsp;', 'topPartyShort'.T(), '&nbsp;',
+			'</div>'
+		);
+	}
+	
+	function formatLegendParty( party ) {
+		var id = $('#partySelector').val();
+		if( id == 0 ) id = partiesBGMZ[0].id;
+		var selected = id == party.id ? ' selected' : '';
+		return S(
+			'<div class="legend-party', selected, '" id="legend-party-', party.id, '">',
+				formatSpanColorPatch( party.color ),
+				'&nbsp;', party.abbr, '&nbsp;',
+				percent( party.vsAll ), '&nbsp;',
+			'</div>'
 		);
 	}
 	
@@ -1410,6 +1441,27 @@ function formatLegendTable( partyCells ) {
 		$('#chkDistricts').click( function() {
 			setDistricts( this.checked );
 		});
+		
+		var $legend = $('#legend');
+		$legend.delegate( 'div.legend-party', {
+			mouseover: function( event ) {
+				$(this).addClass( 'hover' );
+			},
+			mouseout: function( event ) {
+				$(this).removeClass( 'hover' );
+			},
+			click: function( event ) {
+				var id = this.id.split('-')[2];
+				if( id == 'top' ) id = -1;
+				if( id == partiesBGMZ[0].id ) id = 0;
+				setParty( id );
+			}
+		});
+		
+		function setParty( id ) {
+			$('#partySelector').val( id );
+			$('#partySelector').trigger( 'change' );
+		}
 	}
 	
 	function oneshot() {
