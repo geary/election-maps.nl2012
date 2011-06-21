@@ -180,7 +180,7 @@ var data = {
 	provinces: { geo:null, results:null }
 };
 
-var $map;
+var $map, mapPixBounds;
 
 var prefs = new _IG_Prefs();
 var debug = prefs.getBool('debug');
@@ -373,6 +373,16 @@ jQuery.extend( jQuery.fn, {
 				listener.apply( self, args );
 			}, delay || 50 );
 		});
+	},
+	
+	bounds: function() {
+		var offset = this.offset();
+		return {
+			left: offset.left,
+			right: offset.left + this.width(),
+			top: offset.top,
+			bottom: offset.top + this.height()
+		};
 	}
 //	html: function( a ) {
 //		if( a == null ) return this[0] && this[0].innerHTML;
@@ -1062,6 +1072,7 @@ function formatLegendTable( partyCells ) {
 		}
 		else {
 			$maptip.hide();
+			mouseFeature = null;
 		}
 	}
 	
@@ -1289,6 +1300,14 @@ function formatLegendTable( partyCells ) {
 	function moveTip( event ) {
 		if( ! tipHtml ) return;
 		var x = event.pageX, y = event.pageY;
+		if(
+			x < mapPixBounds.left  ||
+			x >= mapPixBounds.right  ||
+			y < mapPixBounds.top  ||
+			y >= mapPixBounds.bottom
+		) {
+			showTip( false );
+		}
 		x += tipOffset.x;
 		y += tipOffset.y;
 		var pad = 2;
@@ -1391,6 +1410,7 @@ function formatLegendTable( partyCells ) {
 	
 	function initMap() {
 		if( map ) return;
+		mapPixBounds = $map.bounds();
 		map = new gm.Map( $map[0],  {
 			mapTypeId: 'simple',
 			streetViewControl: false,
