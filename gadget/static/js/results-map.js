@@ -182,10 +182,8 @@ var data = {
 
 var $map, mapPixBounds;
 
-var prefs = new _IG_Prefs();
 var debug = prefs.getBool('debug');
 
-var opt = window.GoogleElectionMapOptions || {};
 opt.province = -1;
 opt.districts = false;
 opt.fontsize = '15px';
@@ -196,7 +194,6 @@ opt.resultCacheTime = Infinity;  // cache forever
 //opt.reloadTime = 120 * 1000;
 opt.reloadTime = false;  // no auto-reload
 
-opt.codeUrl = opt.codeUrl || 'http://election-results.googlecode.com/hg/turkey2011/';
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
 

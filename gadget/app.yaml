@@ -1,0 +1,10 @@
+application: election-gadgets
+version: iowa2012
+runtime: python
+api_version: 1
+
+handlers:
+  
+- url: /(.*\.html|.*\.xml|css/.*|images/.*|js/.*)
+  static_files: static/\1
+  upload: static/(.*)
