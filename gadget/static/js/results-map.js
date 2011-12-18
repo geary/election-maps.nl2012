@@ -1397,7 +1397,7 @@ function formatLegendTable( candidateCells ) {
 	function loadTestData() {
 		var rows = data.counties.geo.features.map( function( county ) {
 			var nVoters = 0;
-			var nPrecincts = randomInt( 34 );
+			var nPrecincts = randomInt( 33 ) + 1;
 			return candidates.map( function( candidate ) {
 				var n = randomInt( 100000 );
 				nVoters += n;
