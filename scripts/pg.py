@@ -265,7 +265,7 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
-	def makeGeoJSON( self, filename, table, boxGeom, polyGeom, kind, name, gid, jsonp ):
+	def makeGeoJSON( self, filename, table, boxGeom, polyGeom, geoid, name, where, jsonp ):
 		
 		print 'makeGeoJSON', filename
 		srid = self.getSRID( table, polyGeom )
@@ -290,7 +290,7 @@ class Database:
 		#'''
 		
 		# Don't filter
-		filter = ''
+		#filter = ''
 		
 		t1 = time.clock()
 		self.execute('''
@@ -299,14 +299,14 @@ class Database:
 				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 )
 			FROM 
 				%(table)s
-			--WHERE
-			--	%(filter)s
+			WHERE
+				%(where)s
 			;
 		''' % {
 			'table': table,
 			'boxGeom': boxGeom,
 			'polyGeom': polyGeom,
-			'filter': filter,
+			'where': where,
 			'digits': digits,
 		})
 		( extentcentroidjson, extentjson ) = self.cursor.fetchone()
@@ -317,28 +317,27 @@ class Database:
 		
 		self.execute('''
 			SELECT
-				id, %(parent)s, name_tr, 
+				geoid10, namelsad10,
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
-				ST_AsGeoJSON( ST_MakeValid(%(polyGeom)s), %(digits)s, 1 )
+				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
 				%(table)s
 			WHERE
 				ST_IsValid( %(polyGeom)s )
+			AND
+				%(where)s
 			;
 		''' % {
 			'table': table,
 			'polyGeom': polyGeom,
 			'digits': digits,
-			'parent': {
-				'districts': 'parent',
-				'provinces': 'null'
-			}[kind],
+			'where': where,
 		})
 		t3 = time.clock()
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregid, parentgid, featurename, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregeoid, featurename, centroidjson, geomjson in self.cursor.fetchall():
 			#if not centroidjson or not geomjson:
 			#	continue
 			geometry = json.loads( geomjson )
@@ -346,24 +345,18 @@ class Database:
 			feature = {
 				'type': 'Feature',
 				'bbox': geometry['bbox'],
-				#'kind': 'TODO',
-				'id': featuregid,
+				'id': featuregeoid,
 				'name': featurename,
-				#'center': 'TODO',
 				'centroid': centroid['coordinates'],
 				'geometry': geometry,
 			}
-			if parentgid:
-				feature['parent'] = parentgid,
 			features.append( feature )
 			del geometry['bbox']
 		featurecollection = {
 			'type': 'FeatureCollection',
 			'bbox': extent['bbox'],
-			'kind': kind,
-			'id': gid,
+			'id': geoid,
 			'name': name,
-			#'center': 'TODO',
 			'centroid': extentcentroid['coordinates'],
 			'features': features,
 		}
