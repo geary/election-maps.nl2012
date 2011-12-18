@@ -1,164 +1,54 @@
-// turkey-results-map.js
+// results-map.js
 // By Michael Geary - http://mg.to/
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
 // Keep this in sync with ALL_ALL.xml
 var strings = {
-	nationwideLabel: 'Tüm Türkiye',
-	//chooseLabel: 'Choose a province and select a race:',
-	provinceLabel: 'İller:&nbsp;',
-	partyLabel: 'Partiler:&nbsp;',
-	topParty: 'En Fazla Oy Oranı',
-	topPartyShort: 'En Fazla',
-	//secondParty: 'Second',
-	//thirdParty: 'Third',
-	//fourthParty: 'Fourth',
+	//nationwideLabel: 'Tüm Türkiye',
+	//chooseLabel: 'Choose a state and select a race:',
+	//stateLabel: 'İller:&nbsp;',
+	//candidateLabel: 'Partiler:&nbsp;',
+	topCandidate: 'Top Candidates',
+	topCandidateShort: 'Top',
+	//secondCandidate: 'Second',
+	//thirdCandidate: 'Third',
+	//fourthCandidate: 'Fourth',
 	//turkey: 'Turkey',
-	districtsCheckbox: 'İlçeleri Göster',
-	legendLabel: 'Türkiye Genelinde Sonuçlar:',
-	percentReporting: '{{percent}} açıldı ({{counted}}/{{total}})',
+	//countiesCheckbox: 'İlçeleri Göster',
+	//legendLabel: 'Türkiye Genelinde Sonuçlar:',
+	percentReporting: '{{percent}} reporting ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
-	noVotes: 'Oy bilgisi alınmadı'
+	noVotes: 'No votes reported'
 };
 
-var parties1 = [
-	{ id: 22, abbr: 'AKP', color: '#FFFF00', icon: 1, name: 'Adalet ve Kalkınma Partisi' },
-	{ id: 7, abbr: 'BBP', color: '#6666CC', icon: 2, name: 'Büyük Birlik Partisi' },
-	{ id: 23, abbr: 'CHP', color: '#008000', icon: 3, name: 'Cumhuriyet Halk Partisi' },
-	{ id: 8, abbr: 'DP', color: '#800080', icon: 4, name: 'Demokrat Parti' },
-	{ id: 4, abbr: 'DSP', color: '#000080', icon: 5, name: 'Demokratik Sol Parti' },
-	{ id: 35, abbr: 'DYP', color: '#993300', icon: 6, name: 'Doğru Yol Partisi' },
-	{ id: 9, abbr: 'EMEP', color: '#FF00FF', icon: 7, name: 'Emek Partisi' },
-	{ id: 34, abbr: 'HAS', color: '#808080', icon: 8, name: 'Halkın Sesi Partisi' },
-	{ id: 33, abbr: 'HEPAR', color: '#B3D580', icon: 9, name: 'Hak ve Eşitlik Partisi' },
-	{ id: 13, abbr: 'LDP', color: '#FF6600', icon: 10, name: 'Liberal Demokrat Parti' },
-	{ id: 24, abbr: 'MHP', color: '#FF0000', icon: 11, name: 'Milliyetçi Hareket Partisi' },
-	{ id: 36, abbr: 'MMP', color: '#00FF00', icon: 12, name: 'Milliyetçi ve Muhafazakar Parti' },
-	{ id: 14, abbr: 'MP', color: '#CCFFCC', icon: 13, name: 'Millet Partisi' },
-	{ id: 16, abbr: 'SP', color: '#33CCCC', icon: 14, name: 'Saadet Partisi' },
-	{ id: 17, abbr: 'TKP', color: '#993366', icon: 15, name: 'Türkiye Komünist Partisi' }
+var candidates = [
+	{ color: '#FF0000', id: 'bachmann', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
+	{ color: '#00FF00', id: 'gingrich', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+	{ color: '#0000FF', id: 'huntsman', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+	{ color: '#00FFFF', id: 'johnson', lastName: 'Johnson', fullName: 'Gary Johnson' },
+	{ color: '#FF00FF', id: 'paul', lastName: 'Paul', fullName: 'Ron Paul' },
+	{ color: '#FFFF00', id: 'perry', lastName: 'Perry', fullName: 'Rick Perry' },
+	{ color: '#800000', id: 'romney', lastName: 'Romney', fullName: 'Mitt Romney' },
+	{ color: '#008000', id: 'santorum', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
 
-var partiesBGMZ = [
-	{ id: 21, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 20, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 27, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 28, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 29, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 30, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 31, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' },
-	{ id: 32, abbr: 'BGMZ', color: '#3366FF', icon: 0, bgmz: true, name: 'Bağımsız' }
-];
-
-var parties = parties1.concat( partiesBGMZ );
-
-var independents = {
-	'20:1': 'MURAT BOZLAK',
-	'20:2': 'VELİ BÜYÜKŞAHİN',
-	'20:4': 'HALİL AKSOY',
-	'20:6': 'MUSTAFA HULKİ CEVİZOĞLU',
-	'27:6': 'CEYHAN MUMCU',
-	'28:6': 'CERCİŞ UTAŞ',
-	'20:84': 'ERDOGAN KARAKUS',
-	'27:84': 'SADRETTIN GÜVENER',
-	'20:7': 'İHSAN NERGİZ',
-	'20:75': 'YÜKSEL AVŞAR',
-	'20:9': 'MEHMET BAYRAKTAR',
-	'20:10': 'TURAN CENGİZ',
-	'20:72': 'BENGİ YILDIZ',
-	'27:72': 'AYLA AKAT ATA',
-	'20:12': 'İDRİS BALUKEN',
-	'20:13': 'HÜSAMETTİN ZENDERLİOĞLU',
-	'27:13': 'EDİP SAFDER GAYDALI',
-	'20:16': 'MEHMET DENİZ BÜYÜK',
-	'20:20': 'KEMAL BELER',
-	'27:20': 'MUSTAFA GÜLEÇ',
-	'28:20': 'KAZIM GÜRDAL',
-	'20:21': 'LEYLA ZANA',
-	'27:21': 'HATİP DİCLE',
-	'28:21': 'NURSEL AYDOĞAN',
-	'29:21': 'EMİNE AYNA',
-	'30:21': 'ALTAN TAN',
-	'31:21': 'ŞERAFETTİN ELÇİ',
-	'32:21': 'MEHMET SELİM ENSARİOĞLU',
-	'20:25': 'SEBAHATTIN YILMAZ',
-	'20:26': 'HASAN YALÇINKAYA',
-	'20:27': 'AKIN BİRDAL',
-	'20:30': 'ESAT CANAN',
-	'27:30': 'SELAHATTİN DEMİRTAŞ',
-	'28:30': 'ADİL KURT',
-	'20:31': 'MAHMUT AYDINCI',
-	'20:76': 'PERVİN BULDAN',
-	'20:34': 'SEBAHAT TUNCEL',
-	'27:34': 'AHMET TUNCAY ÖZKAN',
-	'20:82': 'SIRRI SÜREYYA ÖNDER',
-	'27:82': 'ÇETİN DOĞAN',
-	'20:83': 'MUSTAFA AVCI',
-	'27:83': 'ABDULLAH LEVENT TÜZEL',
-	'28:83': 'HANİFİ AVCI',
-	'20:35': 'MEHMET TANHAN',
-	'27:35': 'YAŞAR MÜJDECİ',
-	'28:35': 'TUNCER SÜMER',
-	'29:35': 'İSMAİL ALTIKULAÇ',
-	'20:85': 'DOĞU PERİNÇEK',
-	'27:85': 'ERDAL AVCI ',
-	'28:85': 'RAHMİYE KUBİLAY',
-	'29:85': 'TERCAN ÜLÜK',
-	'30:85': 'ALİ ACAR',
-	'20:46': 'MUSTAFA NAMAKLI',
-	'20:36': 'MÜLKİYE BİRTANE',
-	'20:40': 'FAİK KARADAŞ',
-	'20:41': 'EMRULLAH BINGÜL',
-	'20:42': 'HACI MEHMET BOZDAĞ',
-	'20:44': 'KANİ ŞAVATA',
-	'20:45': 'NİZAMETTİN ÖZTÜRK',
-	'20:47': 'SÜLEYMAN BÖLÜNMEZ',
-	'27:47': 'GÜLSEREN YILDIRIM',
-	'28:47': 'EROL DORA',
-	'29:47': 'AHMET TÜRK',
-	'20:33': 'ERTUĞRUL KÜRKÇÜ',
-	'20:48': 'ŞEHBAL ŞENYURT ARINLI',
-	'20:49': 'SIRRI SAKIK',
-	'27:49': 'DEMİR ÇELİK',
-	'20:52': 'MURAT HAZİNEDAR',
-	'20:80': 'KAMURAN BABRAK',
-	'20:54': 'HÜSEYİN TANAS',
-	'20:56': 'GÜLTAN KIŞANAK',
-	'20:58': 'ABDÜLLATİF ŞENER',
-	'20:63': 'İBRAHİM BİNİCİ',
-	'27:63': 'İBRAHİM AYHAN',
-	'28:63': 'AHMET ERSİN BUCAK',
-	'29:63': 'ZÜLFÜKAR İZOL',
-	'20:73': 'HASİP KAPLAN',
-	'27:73': 'FAYSAL SARIYILDIZ',
-	'28:73': 'SELMA IRMAK',
-	'20:59': 'KEREM TOSUN',
-	'20:62': 'FERHAT TUNÇ YOSLUN',
-	'20:65': 'AYSEL TUĞLUK',
-	'27:65': 'KEMAL AKTAŞ',
-	'28:65': 'NAZMİ GÜR',
-	'29:65': 'ÖZDAL ÜÇER',
-	'20:77': 'İHSAN COŞKUN',
-	'20:67': 'ALİ UZUN'
-};
 
 // Voting results column offsets
 var col = {};
-col.parties = 0;
-col.bgmz = parties1.length;
-col.ID = parties.length;
+col.candidates = 0;
+col.ID = candidates.length;
 col.NumVoters = col.ID + 1;
 col.NumBallotBoxes = col.ID + 2;
 col.NumCountedBallotBoxes = col.ID + 3;
 
 function resultsFields() {
 	return S(
-		parties.map( function( party ) {
-			return S( "'VoteCount-", party.id, "'" );
+		candidates.map( function( candidate ) {
+			return S( "'VoteCount-", candidate.id, "'" );
 		}).join( ',' ),
 		',ID,NumVoters',
 		',NumBallotBoxes,NumCountedBallotBoxes'
@@ -176,16 +66,18 @@ var gm = google.maps, gme = gm.event;
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
 var data = {
-	districts: { geo:null, results:null },
-	provinces: { geo:null, results:null }
+	counties: { geo:null, results:null },
+	states: { geo:null, results:null }
 };
 
 var $map, mapPixBounds;
 
 var debug = prefs.getBool('debug');
 
-opt.province = -1;
-opt.districts = false;
+opt.state = prefs.getString('state');
+opt.counties = true;
+opt.candidate = '1';
+//opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
 var sw = 300;
 
@@ -468,7 +360,7 @@ function randomInt( n ) {
 	}
 })( jQuery );
 
-parties.index('id');
+candidates.index('id');
 
 function cacheUrl( url, cache, always ) {
 	if( opt.nocache ) {
@@ -520,17 +412,17 @@ document.write(
 		'#selectors label { font-weight:bold; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:#EAF0FA; }',
-		'div.legend-party, div.legend-label { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
-		'div.legend-party { cursor:pointer; margin-right:6px; }',
-		'div.legend-party.hover, div.legend-party.selected { border:1px solid #6FA8DC; }',
-		'div.legend-party.hover { background-color:#D6E9F8; }',
-		'div.legend-party.selected { background-color:white; }',
+		'div.legend-candidate, div.legend-label { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
+		'div.legend-candidate { cursor:pointer; margin-right:6px; }',
+		'div.legend-candidate.hover, div.legend-candidate.selected { border:1px solid #6FA8DC; }',
+		'div.legend-candidate.hover { background-color:#D6E9F8; }',
+		'div.legend-candidate.selected { background-color:white; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; filter:alpha(opacity=70); opacity:0.70; -moz-opacity:0.70; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
-		'#cihan-logo { display:block; position:absolute; right:6px; top:5px; width:42px; height:28px; background: url(', imgUrl('cihan-logo-42x28.png'), ') no-repeat; }',
+		//'#cihan-logo { display:block; position:absolute; right:6px; top:5px; width:42px; height:28px; background: url(', imgUrl('cihan-logo-42x28.png'), ') no-repeat; }',
 	'</style>'
 );
 
@@ -554,9 +446,9 @@ function optionHTML( value, name, selected, disabled ) {
 	);
 }
 
-function provinceOption( province, selected ) {
-	province.selectorIndex = index;
-	return option( province.id, province.name, selected );
+function stateOption( state, selected ) {
+	state.selectorIndex = index;
+	return option( state.id, state.name, selected );
 }
 
 function raceOption( value, name ) {
@@ -568,8 +460,8 @@ document.write(
 	'</div>',
 	'<div id="maptip">',
 	'</div>',
-	'<a id="cihan-logo" target="_blank" href="http://www.cihan.com.tr/">',
-	'</a>',
+	//'<a id="cihan-logo" target="_blank" href="http://www.cihan.com.tr/">',
+	//'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
 	'<div id="spinner">',
@@ -582,42 +474,37 @@ function contentTable() {
 		'<div>',
 			'<div id="selectors">',
 				'<div style="margin:0; padding:6px;">',
-					'<label for="provinceSelector">',
-						'provinceLabel'.T(),
+					//'<label for="stateSelector">',
+					//	'stateLabel'.T(),
+					//'</label>',
+					//'<select id="stateSelector">',
+					//	option( '-1', 'nationwideLabel'.T() ),
+					//	option( '', '', false, true ),
+					//	sortArrayBy( data.states.geo.features, 'name' )
+					//		.mapjoin( function( state ) {
+					//			return stateOption(
+					//				state,
+					//				state.abbr == opt.state
+					//			);
+					//		}),
+					//'</select>',
+					//'&nbsp;&nbsp;&nbsp;',
+					'<label for="candidateSelector">',
+						'candidateLabel'.T(),
 					'</label>',
-					'<select id="provinceSelector">',
-						option( '-1', 'nationwideLabel'.T() ),
+					'<select id="candidateSelector">',
+						option( '-1', 'topCandidate'.T() ),
+						//option( '-2', 'secondCandidate'.T() ),
+						//option( '-3', 'thirdCandidate'.T() ),
+						//option( '-4', 'fourthCandidate'.T() ),
 						option( '', '', false, true ),
-						sortArrayBy( data.provinces.geo.features, 'name' )
-							.mapjoin( function( province ) {
-								return provinceOption(
-									province,
-									province.abbr == opt.province
-								);
-							}),
-					'</select>',
-					'&nbsp;&nbsp;&nbsp;',
-					'<label for="partySelector">',
-						'partyLabel'.T(),
-					'</label>',
-					'<select id="partySelector">',
-						option( '-1', 'topParty'.T() ),
-						//option( '-2', 'secondParty'.T() ),
-						//option( '-3', 'thirdParty'.T() ),
-						//option( '-4', 'fourthParty'.T() ),
-						option( '', '', false, true ),
-						parties.mapjoin( function( party ) {
-							return party.bgmz ? '' : option(
-								party.id,
-								party.abbr + ' - ' + party.name
-							);
+						candidates.mapjoin( function( candidate ) {
+							return option( candidate.id, candidate.fullName );
 						}),
-						option( '', '', false, true ),
-						option( '0', 'BGMZ - Bağımsız' ),
 					'</select>',
-					'&nbsp;&nbsp;&nbsp;',
-					'<input type="checkbox" id="chkDistricts">',
-					'<label for="chkDistricts">', 'districtsCheckbox'.T(), '</label>',
+					//'&nbsp;&nbsp;&nbsp;',
+					//'<input type="checkbox" id="chkCounties">',
+					//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
 				'</div>',
 			'</div>',
 			'<div id="legend">',
@@ -631,13 +518,13 @@ function contentTable() {
 	);
 }
 
-function formatLegendTable( partyCells ) {
+function formatLegendTable( candidateCells ) {
 	return S(
 		'<div style="position:relative; vertical-align: middle;">',
 			'<div class="legend-label">',
 				'legendLabel'.T(),
 			'</div>',
-			partyCells || '&nbsp;',
+			candidateCells || '&nbsp;',
 			'<div style="clear:left;">',
 			'</div>',
 		'</div>'
@@ -645,13 +532,6 @@ function formatLegendTable( partyCells ) {
 }
 
 (function( $ ) {
-	
-	opt.province = prefs.getString('province');
-	opt.districts = false;
-	
-	opt.party = '1';
-	
-	//opt.zoom = opt.zoom || 3;
 	
 	//function getJSON( type, path, file, cache, callback, retries ) {
 	//	var stamp = +new Date;
@@ -679,14 +559,16 @@ function formatLegendTable( partyCells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = 90;
-		var kind = ( opt.districts ? 'districts' : 'provinces' );
+		var level = 100;
+		//var kind = ( opt.counties ? 'counties' : 'states' );
+		var kind = 'county';  // TEMP
+		var fips = '19';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
 		}
 		else {
-			var file = S( 'turkey-', kind, '-geom_', level, '.jsonp?1' );
+			var file = S( 'c2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
 			getGeoJSON( opt.shapeUrl + file );
 		}
 	}
@@ -706,43 +588,48 @@ function formatLegendTable( partyCells ) {
 	
 	var didLoadGeoJSON;
 	loadGeoJSON = function( json ) {
+		function oneTime() {
+			if( ! didLoadGeoJSON ) {
+				didLoadGeoJSON = true;
+				$('#outer').html( contentTable() );
+				initSelectors();
+				$map = $('#map');
+				$map.height( wh - $map.offset().top );
+			}
+		}
+		json.kind = 'county';  // TEMP
 		jsonRegion[json.kind] = json;
 		//debugger;
 		var loader = {
 			// TODO: refactor
-			provinces: function() {
+			state: function() {
 				json.features.index('id').index('abbr');
-				data.provinces.geo = json;
-				if( ! didLoadGeoJSON ) {
-					didLoadGeoJSON = true;
-					$('#outer').html( contentTable() );
-					initSelectors();
-					$map = $('#map');
-					$map.height( wh - $map.offset().top );
-				}
-				//setDistricts( false );
+				data.states.geo = json;
+				oneTime();
+				//setCounties( false );
 				getResults();
-				analytics( '/provinces' );
+				analytics( '/states' );
 			},
-			districts: function() {
+			county: function() {
 				json.features.index('id').index('abbr');
-				data.districts.geo = json;
-				//setDistricts( true );
+				data.counties.geo = json;
+				oneTime();
+				//setCounties( true );
 				getResults();
-				analytics( '/districts' );
+				analytics( '/counties' );
 			}
 		}[json.kind];
 		loader();
 	};
 	
-	var setDistrictsFirst = true;
-	function setDistricts( districts, force ) {
-		districts = !! districts;
-		if( districts == opt.districts  &&  ! force  &&  ! setDistrictsFirst )
+	var setCountiesFirst = true;
+	function setCounties( counties, force ) {
+		counties = !! counties;
+		if( counties == opt.counties  &&  ! force  &&  ! setCountiesFirst )
 			return;
-		setDistrictsFirst = false;
-		opt.districts = districts;
-		$('#chkDistricts').prop( 'checked', districts );
+		setCountiesFirst = false;
+		opt.counties = counties;
+		$('#chkCounties').prop( 'checked', counties );
 		loadView();
 	}
 	
@@ -760,7 +647,7 @@ function formatLegendTable( partyCells ) {
 		analytics.seen = analytics.seen || {};
 		if( analytics.seen[path] ) return;
 		analytics.seen[path] = true;
-		_IG_Analytics( 'UA-5730550-1', '/turkey2011' + path );
+		_IG_Analytics( 'UA-5730550-1', '/iowa2012' + path );
 	}
 	
 	function htmlEscape( str ) {
@@ -776,26 +663,26 @@ function formatLegendTable( partyCells ) {
 		return p + '%';
 	}
 	
-	NationwideControl = function( show ) {
-		return $.extend( new GControl, {
-			initialize: function( map ) {
-				var $control = $(S(
-					'<div style="color:black; font-family:Arial,sans-serif;">',
-						'<div style="background-color:white; border:1px solid black; cursor:pointer; text-align:center; width:6em;">',
-							'<div style="border-color:white #B0B0B0 #B0B0B0 white; border-style:solid; border-width:1px; font-size:12px;">',
-								'nationwideLabel'.T(),
-							'</div>',
-						'</div>',
-					'</div>'
-				)).click( function() { setProvince(stateUS); } ).appendTo( map.getContainer() );
-				return $control[0];
-			},
-			
-			getDefaultPosition: function() {
-				return new GControlPosition( G_ANCHOR_TOP_LEFT, new GSize( 50, 9 ) );
-			}
-		});
-	};
+	//NationwideControl = function( show ) {
+	//	return $.extend( new GControl, {
+	//		initialize: function( map ) {
+	//			var $control = $(S(
+	//				'<div style="color:black; font-family:Arial,sans-serif;">',
+	//					'<div style="background-color:white; border:1px solid black; cursor:pointer; text-align:center; width:6em;">',
+	//						'<div style="border-color:white #B0B0B0 #B0B0B0 white; border-style:solid; border-width:1px; font-size:12px;">',
+	//							'nationwideLabel'.T(),
+	//						'</div>',
+	//					'</div>',
+	//				'</div>'
+	//			)).click( function() { setState(stateUS); } ).appendTo( map.getContainer() );
+	//			return $control[0];
+	//		},
+	//		
+	//		getDefaultPosition: function() {
+	//			return new GControlPosition( G_ANCHOR_TOP_LEFT, new GSize( 50, 9 ) );
+	//		}
+	//	});
+	//};
 	
 	var map, gonzo;
 	
@@ -804,7 +691,7 @@ function formatLegendTable( partyCells ) {
 		while( overlays.length ) overlays.pop().setMap( null );
 	};
 	
-	//var province = provinces[opt.province];
+	//var state = states[opt.state];
 	
 	function pointLatLng( point ) {
 		return new gm.LatLng( point[1], point[0] );
@@ -842,10 +729,10 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function currentGeos() {
-		data.provinces.geo.hittest = ! opt.districts;
-		return opt.districts ?
-			[ data.districts.geo, data.provinces.geo ] :
-			[ data.provinces.geo ];
+		//data.states.geo.hittest = ! opt.counties;
+		return opt.counties ?
+			[ data.counties.geo, data.states.geo ] :
+			[ data.states.geo ];
 	}
 	
 	function currentResults() {
@@ -853,7 +740,7 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function currentData() {
-		return opt.districts ? data.districts: data.provinces;
+		return opt.counties ? data.counties: data.states;
 	}
 	
 	function moveToGeo() {
@@ -869,6 +756,9 @@ function formatLegendTable( partyCells ) {
 	
 	function fitBbox( bbox ) {
 		if( ! bbox ) return;
+		// TEMP
+		bbox = [ -96.6372, 40.3741, -90.1416, 43.5014 ];
+		// END TEMP
 		map.fitBounds( new gm.LatLngBounds(
 			new gm.LatLng( bbox[1], bbox[0] ),
 			new gm.LatLng( bbox[3], bbox[2] )
@@ -878,13 +768,13 @@ function formatLegendTable( partyCells ) {
 	
 	var  mouseFeature;
 	
-	function getProvinceDistricts( features, province ) {
-		var districts = [];
+	function getStateCounties( features, state ) {
+		var counties = [];
 		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-			if( feature.province.toUpperCase() == curProvince.abbr )
-				districts.push( feature );
+			if( feature.state.toUpperCase() == curState.abbr )
+				counties.push( feature );
 		}
-		return districts;
+		return counties;
 	}
 	
 	function polys() {
@@ -910,8 +800,8 @@ function formatLegendTable( partyCells ) {
 				events.mousemove( event, where );
 				//var feature = getFeature( event, where );
 				//if( ! feature ) return;
-				//if( feature.type == 'province'  || feature.type == 'cd' )
-				//	setProvince( feature.province );
+				//if( feature.type == 'state'  || feature.type == 'cd' )
+				//	setState( feature.state );
 			}
 		};
 		//overlays.clear();
@@ -936,33 +826,32 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function colorize( /* ?? */ ) {
-		if( opt.districts ) {
-			var features = data.provinces.geo.features;
-			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				feature.fillColor = '#000000';
-				feature.fillOpacity = 0;
-				feature.strokeColor = '#666666';
-				feature.strokeOpacity = 1;
-				feature.strokeWidth = 2;
-			}
-		}
-		if( opt.districts ) {
-			var source = data.districts, strokeWidth = 1, strokeColor = '#666666';
+		//if( opt.counties ) {
+		//	var features = data.states.geo.features;
+		//	for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+		//		feature.fillColor = '#000000';
+		//		feature.fillOpacity = 0;
+		//		feature.strokeColor = '#666666';
+		//		feature.strokeOpacity = 1;
+		//		feature.strokeWidth = 2;
+		//	}
+		//}
+		if( opt.counties ) {
+			var source = data.counties, strokeWidth = 1, strokeColor = '#666666';
 		}
 		else {
-			var source = data.provinces, strokeWidth = 2, strokeColor = '#222222';
+			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
 		}
 		var features = source.geo.features, results = source.results;
-		var partyID = $('#partySelector').val();
-		var isMulti = ( partyID < 0 );
-		var isBGMZ = ( partyID == 0 );
+		var candidateID = $('#candidateSelector').val();
+		var isMulti = ( candidateID < 0 );
 		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = results.rowsByID[id];
-				var party = row && parties[row.partyMax];
-				if( party ) {
-					feature.fillColor = party.color;
+				var candidate = row && candidates[row.candidateMax];
+				if( candidate ) {
+					feature.fillColor = candidate.color;
 					feature.fillOpacity = .6;
 				}
 				else {
@@ -977,34 +866,17 @@ function formatLegendTable( partyCells ) {
 		else {
 			var rows = results.rows;
 			var max = 0;
-			if( isBGMZ ) {
-				var color = '#3366FF';
-			}
-			else {
-				var party = parties.by.id[partyID], color = party.color, index = party.index;
-			}
-			var nCols = parties.length, bgmzCol = col.bgmz;
+			var candidate = candidates.by.id[candidateID], color = candidate.color, index = candidate.index;
+			var nCols = candidates.length;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
 				var row = results.rowsByID[id];
 				var total = 0, value = 0;
 				if( row ) {
-					if( isBGMZ ) {
-						for( var iCol = -1;  ++iCol < bgmzCol; )
-							total += row[iCol];
-						while( iCol < nCols )
-							value += row[iCol++];
-						total += value;
-						max = Math.max( max,
-							row.fract = total ? value / total : 0
-						);
-					}
-					else {
-						var total = 0;
-						for( var iCol = -1;  ++iCol < nCols; )
-							total += row[iCol];
-						value = row[index];
-					}
+					var total = 0;
+					for( var iCol = -1;  ++iCol < nCols; )
+						total += row[iCol];
+					value = row[index];
 					max = Math.max( max,
 						row.fract = total ? value / total : 0
 					);
@@ -1033,7 +905,7 @@ function formatLegendTable( partyCells ) {
 		var feat = $.extend( {}, feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
-			strokeWidth: opt.districts ? 3 : 4,
+			strokeWidth: opt.counties ? 3 : 4,
 			strokeColor: '#000000',
 			strokeOpacity: 1
 		});
@@ -1073,13 +945,13 @@ function formatLegendTable( partyCells ) {
 		}
 	}
 	
-	function formatPartyAreaPatch( party, max ) {
-		var size = Math.round( Math.sqrt( party.vsTop ) * max );
+	function formatCandidateAreaPatch( candidate, max ) {
+		var size = Math.round( Math.sqrt( candidate.vsTop ) * max );
 		var margin1 = Math.floor( ( max - size ) / 2 );
 		var margin2 = max - size - margin1;
 		return S(
 			'<div style="margin:', margin1, 'px ', margin2, 'px ', margin2, 'px ', margin1, 'px;">',
-				formatDivColorPatch( party.color, size, size ),
+				formatDivColorPatch( candidate.color, size, size ),
 			'</div>'
 		);
 	}
@@ -1108,9 +980,9 @@ function formatLegendTable( partyCells ) {
 		);
 	}
 	
-	function formatPartyIcon( party, size ) {
+	function formatCandidateIcon( candidate, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('parties-'+size+'.png'), '); background-position:-', party.icon * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+			'<div style="background:url(', imgUrl('candidates-'+size+'.png'), '); background-position:-', candidate.icon * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
@@ -1124,29 +996,19 @@ function formatLegendTable( partyCells ) {
 		return total;
 	}
 	
-	function topPartiesByVote( result, max, combineBGMZ ) {
+	function topCandidatesByVote( result, max ) {
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
-		if( combineBGMZ ) {
-			var bgmz = 0;
-			for( var i = col.bgmz;  i < parties.length;  ++i ) {
-				bgmz += result[i];
-			}
-			var top = parties1.slice().concat( partiesBGMZ[0] );
-			result = result.slice( 0, col.bgmz ).concat( bgmz );
-		}
-		else {
-			var top = parties.slice();
-		}
+		var top = candidates.slice();
 		var total = 0;
 		for( var i = -1;  ++i < top.length; ) {
 			total += result[i];
 		}
 		for( var i = -1;  ++i < top.length; ) {
-			var party = top[i], votes = result[i];
-			party.votes = votes;
-			party.vsAll = votes / total;
-			//party.total = total;
+			var candidate = top[i], votes = result[i];
+			candidate.votes = votes;
+			candidate.vsAll = votes / total;
+			//candidate.total = total;
 		}
 		top = sortArrayBy( top, 'votes', { numeric:true } )
 			.reverse()
@@ -1156,8 +1018,8 @@ function formatLegendTable( partyCells ) {
 		if( top.length ) {
 			var most = top[0].votes;
 			for( var i = -1;  ++i < top.length; ) {
-				var party = top[i];
-				party.vsTop = party.votes / most;
+				var candidate = top[i];
+				candidate.vsTop = candidate.votes / most;
 			}
 		}
 		return top;
@@ -1168,38 +1030,36 @@ function formatLegendTable( partyCells ) {
 	}
 	
 	function formatLegend() {
-		var topParties = topPartiesByVote(
-			totalResults( currentResults() ),
-			4, true
+		var topCandidates = topCandidatesByVote(
+			totalResults( currentResults() ), 4
 		);
 		return formatLegendTable(
-			formatLegendTopParties( topParties.slice( 0, 4 ) ) +
-			topParties.mapjoin( formatLegendParty )
+			formatLegendTopCandidates( topCandidates.slice( 0, 4 ) ) +
+			topCandidates.mapjoin( formatLegendCandidate )
 		);
 	}
 	
-	function formatLegendTopParties( parties ) {
-		var colors = parties.map( function( party ) {
-			return party.color;
+	function formatLegendTopCandidates( candidates ) {
+		var colors = candidates.map( function( candidate ) {
+			return candidate.color;
 		});
-		var selected = $('#partySelector').val() < 0 ? ' selected' : '';
+		var selected = $('#candidateSelector').val() < 0 ? ' selected' : '';
 		return S(
-			'<div class="legend-party', selected, '" id="legend-party-top">',
+			'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
 				formatSpanColorPatch( colors, 2 ),
-				'&nbsp;', 'topPartyShort'.T(), '&nbsp;',
+				'&nbsp;', 'topCandidateShort'.T(), '&nbsp;',
 			'</div>'
 		);
 	}
 	
-	function formatLegendParty( party ) {
-		var id = $('#partySelector').val();
-		if( id == 0 ) id = partiesBGMZ[0].id;
-		var selected = id == party.id ? ' selected' : '';
+	function formatLegendCandidate( candidate ) {
+		var id = $('#candidateSelector').val();
+		var selected = id == candidate.id ? ' selected' : '';
 		return S(
-			'<div class="legend-party', selected, '" id="legend-party-', party.id, '">',
-				formatSpanColorPatch( party.color ),
-				'&nbsp;', party.abbr, '&nbsp;',
-				percent( party.vsAll ), '&nbsp;',
+			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+				formatSpanColorPatch( candidate.color ),
+				'&nbsp;', candidate.lastName, '&nbsp;',
+				percent( candidate.vsAll ), '&nbsp;',
 			'</div>'
 		);
 	}
@@ -1210,33 +1070,29 @@ function formatLegendTable( partyCells ) {
 		}).join(' ');
 	}
 	
-	function formatTipParties( feature, result ) {
-		var topParties = topPartiesByVote( result, 4, false )
-		if( ! topParties.length )
+	function formatTipCandidates( feature, result ) {
+		var topCandidates = topCandidatesByVote( result, 4 )
+		if( ! topCandidates.length )
 			return 'noVotes'.T();
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
-				topParties.mapjoin( function( party ) {
-					var name = party.abbr;
-					if( party.bgmz ) {
-						var id = party.id + ':' + ( feature.parent || feature.id );
-						name = nameCase(independents[id]) || name;
-					}
+				topCandidates.mapjoin( function( candidate ) {
+					var name = candidate.lastName;
 					return S(
 						'<tr>',
 							'<td>',
 								'<div style="margin:4px 10px 4px 0;">',
-									formatPartyIcon( party, 24 ),
+									formatCandidateIcon( candidate, 24 ),
 								'</div>',
 							'</td>',
 							'<td style="">',
 								name,
 							'</td>',
 							'<td style="text-align:right; padding:0 8px 0 12px;">',
-								percent( party.vsAll ),
+								percent( candidate.vsAll ),
 							'</td>',
 							'<td>',
-								formatPartyAreaPatch( party, 24 ),
+								formatCandidateAreaPatch( candidate, 24 ),
 							'</td>',
 						'</tr>'
 					);
@@ -1254,7 +1110,7 @@ function formatLegendTable( partyCells ) {
 		if( result ) {
 			var content = S(
 				'<div class="tipcontent">',
-					formatTipParties( feature, result ),
+					formatTipCandidates( feature, result ),
 				'</div>'
 			);
 			
@@ -1271,7 +1127,8 @@ function formatLegendTable( partyCells ) {
 			);
 		}
 		
-		var parent = data.provinces.geo.features.by.id[feature.parent];
+		var parent = data.states.geo &&
+			data.states.geo.features.by.id[feature.parent];
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1367,18 +1224,18 @@ function formatLegendTable( partyCells ) {
 		return leaders;
 	}
 	
-	function setProvinceByAbbr( abbr ) {
-		setProvince( provinces.by.abbr(abbr) );
+	function setStateByAbbr( abbr ) {
+		setState( states.by.abbr(abbr) );
 	}
 	
-	function setProvince( province ) {
-		if( ! province ) return;
-		if( typeof province == 'string' ) province = provinces.by.abbr( province );
-		var select = $('#provinceSelector')[0];
-		select && ( select.selectedIndex = province.selectorIndex );
-		opt.province = province.abbr.toLowerCase();
+	function setState( state ) {
+		if( ! state ) return;
+		if( typeof state == 'string' ) state = states.by.abbr( state );
+		var select = $('#stateSelector')[0];
+		select && ( select.selectedIndex = state.selectorIndex );
+		opt.state = state.abbr.toLowerCase();
 		geoMoveNext = true;
-		setDistricts( true );
+		setCounties( true );
 	}
 	
 	var mapStyles = [
@@ -1428,39 +1285,39 @@ function formatLegendTable( partyCells ) {
 				var oldZoom = zoom;
 				zoom = map.getZoom();
 				if( zoom > oldZoom  &&  zoom >= 7 )
-					setDistricts( true );
+					setCounties( true );
 				else if( zoom < oldZoom  &&  zoom < 7 )
-					setDistricts( false );
+					setCounties( false );
 			});
 		}
 	}
 	
 	function initSelectors() {
 		
-		//setProvinceByAbbr( opt.province );
+		//setStateByAbbr( opt.state );
 		
-		$('#provinceSelector').bindSelector( 'change keyup', function() {
+		$('#stateSelector').bindSelector( 'change keyup', function() {
 			var value = this.value.replace('!','').toLowerCase();
-			if( opt.province == value ) return;
-			opt.province = value;
-			setDistricts( value > 0 );
-			var province = data.provinces.geo.features.by.id[value];
-			fitBbox( province ? province.bbox : data.provinces.geo.bbox );
+			if( opt.state == value ) return;
+			opt.state = value;
+			setCounties( value > 0 );
+			var state = data.states.geo.features.by.id[value];
+			fitBbox( state ? state.bbox : data.states.geo.bbox );
 		});
 		
-		$('#partySelector').bindSelector( 'change keyup mousemove', function() {
+		$('#candidateSelector').bindSelector( 'change keyup mousemove', function() {
 			var value = this.value;
 			if( opt.infoType == value ) return;
 			opt.infoType = value;
 			loadView();
 		});
 		
-		$('#chkDistricts').click( function() {
-			setDistricts( this.checked );
+		$('#chkCounties').click( function() {
+			setCounties( this.checked );
 		});
 		
 		var $legend = $('#legend');
-		$legend.delegate( 'div.legend-party', {
+		$legend.delegate( 'div.legend-candidate', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
@@ -1470,14 +1327,13 @@ function formatLegendTable( partyCells ) {
 			click: function( event ) {
 				var id = this.id.split('-')[2];
 				if( id == 'top' ) id = -1;
-				if( id == partiesBGMZ[0].id ) id = 0;
-				setParty( id );
+				setCandidate( id );
 			}
 		});
 		
-		function setParty( id ) {
-			$('#partySelector').val( id );
-			$('#partySelector').trigger( 'change' );
+		function setCandidate( id ) {
+			$('#candidateSelector').val( id );
+			$('#candidateSelector').trigger( 'change' );
 		}
 	}
 	
@@ -1495,21 +1351,21 @@ function formatLegendTable( partyCells ) {
 	function loadView() {
 		showTip( false );
 		//overlays.clear();
-		var id = opt.province;
-		var $select = $('#partySelector');
+		var id = opt.state;
+		var $select = $('#candidateSelector');
 		opt.infoType = $select.val();
 		
-		opt.province = +$('#provinceSelector').val();
-		//var province = curProvince = data.provinces.geo.features.by.abbr[opt.abbr];
+		opt.state = +$('#stateSelector').val();
+		//var state = curState = data.states.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		loadRegion();
 	}
 	
-	//function getShapes( province, callback ) {
-	//	if( province.shapes ) callback();
-	//	else getJSON( 'shapes', opt.shapeUrl, province.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
-	//		province.shapes = shapes;
-	//		//if( province == stateUS ) shapes.features.province.index('province');
+	//function getShapes( state, callback ) {
+	//	if( state.shapes ) callback();
+	//	else getJSON( 'shapes', opt.shapeUrl, state.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
+	//		state.shapes = shapes;
+	//		//if( state == stateUS ) shapes.features.state.index('state');
 	//		callback();
 	//	});
 	//}
@@ -1517,51 +1373,77 @@ function formatLegendTable( partyCells ) {
 	var cacheResults = new Cache;
 	
 	function getResults() {
-		var results = cacheResults.get( opt.districts );
+		var results = cacheResults.get( opt.counties );
 		if( results ) {
-			loadResults( results, opt.districts, false );
+			loadResults( results, opt.counties, false );
 			return;
 		}
+		// TEMP
+		loadTestData();
+		return;
+		// END TEMP
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
-			'jsonCallback=', opt.districts ? 'loadDistricts' : 'loadProvinces',
+			'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
 			'&_=', Math.floor( +new Date / opt.resultCacheTime ),
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			opt.districts ? '928540' : '933803'
+			opt.counties ? '928540' : '933803'
 		);
 		getScript( url );
 	}
 	
-	loadProvinces = function( json ) {
+	function loadTestData() {
+		var rows = data.counties.geo.features.map( function( county ) {
+			var nVoters = 0;
+			var nPrecincts = randomInt( 34 );
+			return candidates.map( function( candidate ) {
+				var n = randomInt( 100000 );
+				nVoters += n;
+				return n;
+			}).concat(
+				county.id, nVoters, nPrecincts, randomInt(nPrecincts)
+			);
+		});
+		var json = {
+			table: {
+				rows: rows
+			}
+		};
+		setTimeout( function() {
+			loadCounties( json );
+		}, 100 );
+	}
+	
+	loadStates = function( json ) {
 		loadResults( json, false, true );
 	};
 	
-	loadDistricts = function( json ) {
+	loadCounties = function( json ) {
 		loadResults( json, true, true );
 	};
 	
-	function loadResults( json, districts, loading ) {
+	function loadResults( json, counties, loading ) {
 		if( loading )
-			cacheResults.add( districts, json, opt.resultCacheTime );
+			cacheResults.add( counties, json, opt.resultCacheTime );
 		var results = currentData().results = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			rowsByID[ row[col.ID] ] = row;
-			var nParties = parties.length;
-			var max = 0,  partyMax = -1;
-			for( iCol = -1;  ++iCol < nParties; ) {
+			var nCandidates = candidates.length;
+			var max = 0,  candidateMax = -1;
+			for( iCol = -1;  ++iCol < nCandidates; ) {
 				var count = row[iCol];
 				if( count > max ) {
 					max = count;
-					partyMax = iCol;
+					candidateMax = iCol;
 				}
 			}
-			row.partyMax = partyMax;
+			row.candidateMax = candidateMax;
 		}
-		if( districts == opt.districts )
+		if( counties == opt.counties )
 			geoReady();
 	}
 	
