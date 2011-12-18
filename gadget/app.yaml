@@ -5,6 +5,6 @@ api_version: 1
 
 handlers:
   
-- url: /(.*\.html|.*\.xml|css/.*|images/.*|js/.*)
+- url: /(.*\.html|.*\.xml|css/.*|images/.*|js/.*|shapes/.*)
   static_files: static/\1
   upload: static/(.*)
