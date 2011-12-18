@@ -982,7 +982,7 @@ function formatLegendTable( candidateCells ) {
 	
 	function formatCandidateIcon( candidate, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('candidates-'+size+'.png'), '); background-position:-', candidate.icon * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+			'<div style="background:url(', imgUrl('candidates-'+size+'.png'), '); background-position:-', candidate.index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
@@ -1081,8 +1081,8 @@ function formatLegendTable( candidateCells ) {
 					return S(
 						'<tr>',
 							'<td>',
-								'<div style="margin:4px 10px 4px 0;">',
-									formatCandidateIcon( candidate, 24 ),
+								'<div style="margin:8px 10px 8px 0;">',
+									formatCandidateIcon( candidate, 16 ),
 								'</div>',
 							'</td>',
 							'<td style="">',
