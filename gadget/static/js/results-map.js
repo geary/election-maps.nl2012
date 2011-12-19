@@ -1280,16 +1280,16 @@ function formatLegendTable( candidateCells ) {
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		
-		if( ! PolyGonzo.isVML() ) {
-			gme.addListener( map, 'zoom_changed', function() {
-				var oldZoom = zoom;
-				zoom = map.getZoom();
-				if( zoom > oldZoom  &&  zoom >= 7 )
-					setCounties( true );
-				else if( zoom < oldZoom  &&  zoom < 7 )
-					setCounties( false );
-			});
-		}
+		//if( ! PolyGonzo.isVML() ) {
+		//	gme.addListener( map, 'zoom_changed', function() {
+		//		var oldZoom = zoom;
+		//		zoom = map.getZoom();
+		//		if( zoom > oldZoom  &&  zoom >= 7 )
+		//			setCounties( true );
+		//		else if( zoom < oldZoom  &&  zoom < 7 )
+		//			setCounties( false );
+		//	});
+		//}
 	}
 	
 	function initSelectors() {
