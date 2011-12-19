@@ -26,14 +26,14 @@ var strings = {
 };
 
 var candidates = [
-	{ color: '#FF0000', id: 'bachmann', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
-	{ color: '#00FF00', id: 'gingrich', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-	{ color: '#0000FF', id: 'huntsman', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-	{ color: '#00FFFF', id: 'johnson', lastName: 'Johnson', fullName: 'Gary Johnson' },
-	{ color: '#FF00FF', id: 'paul', lastName: 'Paul', fullName: 'Ron Paul' },
-	{ color: '#FFFF00', id: 'perry', lastName: 'Perry', fullName: 'Rick Perry' },
-	{ color: '#800000', id: 'romney', lastName: 'Romney', fullName: 'Mitt Romney' },
-	{ color: '#008000', id: 'santorum', lastName: 'Santorum', fullName: 'Rick Santorum' }
+	{ color: '#FF0000', id: 'bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
+	{ color: '#00FF00', id: 'gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+	{ color: '#0000FF', id: 'huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+	{ color: '#00FFFF', id: 'johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
+	{ color: '#FF00FF', id: 'paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+	{ color: '#FFFF00', id: 'perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
+	{ color: '#800000', id: 'romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+	{ color: '#008000', id: 'santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
 
 
@@ -982,7 +982,7 @@ function formatLegendTable( candidateCells ) {
 	
 	function formatCandidateIcon( candidate, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('candidates-'+size+'.png'), '); background-position:-', candidate.index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+			'<div style="background:url(', imgUrl('candidate-photos-'+size+'.png'), '); background-position:-', candidate.index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
@@ -1077,16 +1077,22 @@ function formatLegendTable( candidateCells ) {
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
 				topCandidates.mapjoin( function( candidate ) {
-					var name = candidate.lastName;
 					return S(
 						'<tr>',
 							'<td>',
-								'<div style="margin:8px 10px 8px 0;">',
-									formatCandidateIcon( candidate, 16 ),
+								'<div style="margin:4px 6px 4px 0;">',
+									formatCandidateIcon( candidate, 32 ),
 								'</div>',
 							'</td>',
 							'<td style="">',
-								name,
+								'<div style="line-height:1em;">',
+									'<div style="font-size:85%;">',
+										candidate.firstName,
+									'</div>',
+									'<div style="font-weight:bold;">',
+										candidate.lastName,
+									'</div>',
+								'</div>',
 							'</td>',
 							'<td style="text-align:right; padding:0 8px 0 12px;">',
 								percent( candidate.vsAll ),
