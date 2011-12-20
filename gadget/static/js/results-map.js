@@ -2,6 +2,12 @@
 // By Michael Geary - http://mg.to/
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
+function now() { return +new Date; }
+
+var times = {
+	gadgetLoaded: now()
+};
+
 // Keep this in sync with ALL_ALL.xml
 var strings = {
 	//nationwideLabel: 'Tüm Türkiye',
@@ -227,7 +233,7 @@ function Cache() {
 
 $.extend( Cache.prototype, {
 	add: function( key, value, time ) {
-		this.cache[key] = { value: value, expire: +new Date + time };
+		this.cache[key] = { value: value, expire: now() + time };
 		//console.log( 'cache#add', key, this.cache[key].expire );
 	},
 	get: function( key, loader ) {
@@ -236,7 +242,7 @@ $.extend( Cache.prototype, {
 			//console.log( 'cache#get miss', key );
 			return null;
 		}
-		var expired = +new Date > item.expire;
+		var expired = now() > item.expire;
 		if( expired ) {
 			//console.log( 'cache#get expired', key );
 			delete this.cache[key];
@@ -365,7 +371,7 @@ candidates.index('id');
 function cacheUrl( url, cache, always ) {
 	if( opt.nocache ) {
 		if( ! always )
-			return url + '?q=' + new Date().getTime();
+			return url + '?q=' + times.gadgetLoaded;
 		cache = 0;
 	}
 	if( typeof cache != 'number' )
@@ -533,8 +539,9 @@ function formatLegendTable( candidateCells ) {
 
 (function( $ ) {
 	
+	// TODO: Refactor and use this exponential retry logic
 	//function getJSON( type, path, file, cache, callback, retries ) {
-	//	var stamp = +new Date;
+	//	var stamp = now();
 	//	if( ! opt.nocache ) stamp = Math.floor( stamp / cache / 1000 );
 	//	if( retries ) stamp += '-' + retries;
 	//	if( retries == 3 ) showError( type, file );
@@ -1391,7 +1398,7 @@ function formatLegendTable( candidateCells ) {
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
 			'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
-			'&_=', Math.floor( +new Date / opt.resultCacheTime ),
+			'&_=', Math.floor( now() / opt.resultCacheTime ),
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
