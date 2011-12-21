@@ -1395,10 +1395,6 @@ function formatLegendTable( candidateCells ) {
 			loadResults( results, opt.counties, false );
 			return;
 		}
-		// TEMP
-		loadTestData();
-		return;
-		// END TEMP
 		var url = S(
 			'http://www.google.com/fusiontables/api/query?',
 			'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
@@ -1406,7 +1402,7 @@ function formatLegendTable( candidateCells ) {
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			opt.counties ? '928540' : '933803'
+			opt.counties ? '2458834' : 'TODO'
 		);
 		getScript( url );
 	}
@@ -1438,8 +1434,19 @@ function formatLegendTable( candidateCells ) {
 	};
 	
 	loadCounties = function( json ) {
+		fixCountyIDs( json );
 		loadResults( json, true, true );
 	};
+	
+	function fixCountyIDs( json ) {
+		json.table.rows.forEach( function( row ) {
+			var id = row[col.ID];
+			if( id.length < 5 ) {
+				while( id.length < 3 ) id = '0' + id;
+				row[col.ID] = '19' + id;
+			}
+		});
+	}
 	
 	function loadResults( json, counties, loading ) {
 		if( loading )
