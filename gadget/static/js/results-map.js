@@ -1254,8 +1254,12 @@ function formatLegendTable( candidateCells ) {
 	var mapStyles = [
 		{
 			featureType: "road",
-			elementType: "all",
+			elementType: "labels",
 			stylers: [ { visibility: "off" } ]
+		},{
+			featureType: "road",
+			elementType: "geometry",
+			stylers: [ { saturation: -100 }, { lightness: 50 } ]
 		},{
 			featureType: "transit",
 			elementType: "all",
@@ -1263,7 +1267,7 @@ function formatLegendTable( candidateCells ) {
 		},{
 			featureType: "landscape",
 			elementType: "all",
-			stylers: [ { saturation: -100 }, { lightness: 30 } ]
+			stylers: [ { saturation: -100 }, { lightness: 100 } ]
 		},{
 			featureType: "administrative",
 			elementType: "all",
