@@ -511,6 +511,8 @@ function contentTable() {
 					//'&nbsp;&nbsp;&nbsp;',
 					//'<input type="checkbox" id="chkCounties">',
 					//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
+					'&nbsp;&nbsp;&nbsp;',
+					'<button type="button" onclick="loadTestData()">Randomize</button>',
 				'</div>',
 			'</div>',
 			'<div id="legend">',
@@ -1407,7 +1409,7 @@ function formatLegendTable( candidateCells ) {
 		getScript( url );
 	}
 	
-	function loadTestData() {
+	loadTestData = function() {
 		var rows = data.counties.geo.features.map( function( county ) {
 			var nVoters = 0;
 			var nPrecincts = randomInt( 33 ) + 1;
