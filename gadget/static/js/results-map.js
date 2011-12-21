@@ -32,14 +32,14 @@ var strings = {
 };
 
 var candidates = [
-	{ color: '#FF0000', id: 'bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
-	{ color: '#00FF00', id: 'gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-	{ color: '#0000FF', id: 'huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-	{ color: '#00FFFF', id: 'johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
-	{ color: '#FF00FF', id: 'paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-	{ color: '#FFFF00', id: 'perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
-	{ color: '#800000', id: 'romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
-	{ color: '#008000', id: 'santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
+	{ color: '#6F9D65', id: 'bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
+	{ color: '#E2B15C', id: 'gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+	{ color: '#96CB92', id: 'huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+	{ color: '#CEE9D3', id: 'johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
+	{ color: '#688CE1', id: 'paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+	{ color: '#D59FB5', id: 'perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
+	{ color: '#F4E58E', id: 'romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+	{ color: '#BDDDE5', id: 'santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
 
 
