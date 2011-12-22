@@ -32,7 +32,7 @@
 <script type="text/javascript">
 	var prefs = new _IG_Prefs();
 	var opt = {
-		appUrl: 'http://iowa2012.election-gadgets.appspot.com/',
+		appUrl: 'http://iowa2012.election-maps.appspot.com/',
 		
 		writeScript: function( url, nocache ) {
 			document.write(

@@ -1,4 +1,4 @@
-application: election-gadgets
+application: election-maps
 version: iowa2012
 runtime: python
 api_version: 1
