@@ -44,6 +44,10 @@ var candidates = [
 	{ color: '#BDDDE5', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
 
+// Analytics
+var _gaq = _gaq || [];
+_gaq.push([ '_setAccount', 'UA-27854559-1' ]);
+_gaq.push([ '_setDomainName', 'election-gadgets.appspot.com' ]);
 
 // Voting results column offsets
 var col = {};
@@ -658,7 +662,7 @@ function formatLegendTable( candidateCells ) {
 		analytics.seen = analytics.seen || {};
 		if( analytics.seen[path] ) return;
 		analytics.seen[path] = true;
-		_IG_Analytics( 'UA-5730550-1', '/iowa2012' + path );
+		_gaq.push([ '_trackPageview', '/results' + path ]);
 	}
 	
 	function htmlEscape( str ) {
@@ -1486,5 +1490,18 @@ function formatLegendTable( candidateCells ) {
 	$window.bind( 'load', function() {
 		loadView();
 	});
+	
+	// TODO: this should work, but the standard GA script below
+	// doesn't seem to work either -  __utm.gif does not get loaded
+	//getScript( S(
+	//	location.protocol == 'https:' ? 'https://ssl' : 'http://www',
+	//	'.google-analytics.com/ga.js'
+	//) );
 
 })( jQuery );
+
+(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/u/ga_debug.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
