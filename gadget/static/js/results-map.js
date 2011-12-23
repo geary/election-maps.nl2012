@@ -93,10 +93,12 @@ opt.candidate = '1';
 opt.fontsize = '15px';
 var sw = 300;
 
-//opt.resultCacheTime = 60 * 1000;
-opt.resultCacheTime = Infinity;  // cache forever
-//opt.reloadTime = 120 * 1000;
-opt.reloadTime = false;  // no auto-reload
+opt.resultCacheTime = 60 * 1000;
+opt.reloadTime = 120 * 1000;
+
+// Non-auto-refresh settings to use after results are final
+//opt.resultCacheTime = Infinity;  // cache forever
+//opt.reloadTime = false;  // no auto-reload
 
 opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
 opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
