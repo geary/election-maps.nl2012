@@ -376,18 +376,8 @@ function randomInt( n ) {
 
 candidates.index('id');
 
-function cacheUrl( url, cache, always ) {
-	if( opt.nocache ) {
-		if( ! always )
-			return url + '?q=' + times.gadgetLoaded;
-		cache = 0;
-	}
-	if( typeof cache != 'number' )
-		cache = 3600;
-	url = _IG_GetCachedUrl( url, { refreshInterval:cache } );
-	if( ! url.match(/^http:/) )
-		url = 'http://' + location.host + url;
-	return url;
+function cacheUrl( url ) {
+	return opt.nocache ? S( url, '?q=', times.gadgetLoaded ) : url;
 }
 
 function imgUrl( name ) {
