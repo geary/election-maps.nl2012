@@ -840,7 +840,7 @@ function formatLegendTable( candidateCells ) {
 		//	}
 		//}
 		if( opt.counties ) {
-			var source = data.counties, strokeWidth = 1, strokeColor = '#666666';
+			var source = data.counties, strokeWidth = 1.33, strokeColor = '#222222';
 		}
 		else {
 			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
