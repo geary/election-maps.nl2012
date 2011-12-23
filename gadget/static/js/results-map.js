@@ -402,7 +402,7 @@ document.write(
 		'.content .contentreporting * { xfont-size:20px; }',
 		'.content {}',
 		'#content-scroll { overflow:scroll; overflow-x:hidden; }',
-		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:#f7f5d1; color:#333; white-space: nowrap; display:none; }',
+		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; }',
 		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
 		'.tipcontent { padding:4px 8px 8px 8px; }',
