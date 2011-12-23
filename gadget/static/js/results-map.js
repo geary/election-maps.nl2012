@@ -1418,6 +1418,8 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	loadTestData = function() {
+		opt.reloadTime = false;
+		clearInterval( reloadTimer );
 		var rows = data.counties.geo.features.map( function( county ) {
 			var nVoters = 0;
 			var nPrecincts = randomInt( 33 ) + 1;
