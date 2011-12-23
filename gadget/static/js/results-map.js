@@ -84,9 +84,8 @@ var data = {
 
 var $map, mapPixBounds;
 
-var debug = prefs.getBool('debug');
-
-opt.state = prefs.getString('state');
+var debug = params.debug;
+opt.state = params.state || '';
 opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
@@ -99,9 +98,6 @@ opt.reloadTime = 120 * 1000;
 // Non-auto-refresh settings to use after results are final
 //opt.resultCacheTime = Infinity;  // cache forever
 //opt.reloadTime = false;  // no auto-reload
-
-opt.imgUrl = opt.imgUrl || opt.codeUrl + 'images/';
-opt.shapeUrl = opt.shapeUrl || opt.codeUrl + 'shapes/json/';
 
 var zoom;
 
@@ -220,7 +216,7 @@ String.prototype.words = function( fun ) {
 };
 
 String.prototype.T = function( args ) {
-	return ( prefs.getMsg(this) || strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,
+	return ( /*prefs.getMsg(this) ||*/ strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,
 		function( match, name ) {
 			var value = args[name];
 			return value != null ? value : match;
@@ -381,7 +377,7 @@ function cacheUrl( url ) {
 }
 
 function imgUrl( name ) {
-	return cacheUrl( opt.imgUrl + name );
+	return cacheUrl( 'images/' + name );
 }
 
 document.body.scroll = 'no';
@@ -576,7 +572,7 @@ function formatLegendTable( candidateCells ) {
 		}
 		else {
 			var file = S( 'c2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
-			getGeoJSON( opt.shapeUrl + file );
+			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
 	
