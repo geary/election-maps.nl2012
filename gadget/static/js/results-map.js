@@ -1112,7 +1112,6 @@ function formatLegendTable( candidateCells ) {
 	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
-		var boxColor = '#F2EFE9';
 		var result = currentResults().rowsByID[feature.id];
 		
 		var content = footer = '';
