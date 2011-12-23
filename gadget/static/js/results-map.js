@@ -32,16 +32,16 @@ var strings = {
 };
 
 var candidates = [
-	{ color: '#6F9D65', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
-	{ color: '#ECD8D1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
-	{ color: '#E2B15C', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-	{ color: '#96CB92', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-	{ color: '#CEE9D3', id: 'Johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
-	{ color: '#688CE1', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-	{ color: '#D59FB5', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
-	{ color: '#D5854F', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
-	{ color: '#F4E58E', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
-	{ color: '#BDDDE5', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
+	{ color: '#DE6310', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
+	{ color: '#54F1F1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
+	{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+	{ color: '#666666', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+	{ color: '#84DD6C', id: 'Johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
+	{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+	{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
+	{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
+	{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+	{ color: '#AA0C76', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
 
 // Analytics
