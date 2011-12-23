@@ -14,8 +14,8 @@ var strings = {
 	//chooseLabel: 'Choose a state and select a race:',
 	//stateLabel: 'İller:&nbsp;',
 	//candidateLabel: 'Partiler:&nbsp;',
-	topCandidate: 'Top Candidates',
-	topCandidateShort: 'Top',
+	allCandidates: 'All Candidates',
+	allCandidatesShort: 'All',
 	//secondCandidate: 'Second',
 	//thirdCandidate: 'Third',
 	//fourthCandidate: 'Fourth',
@@ -493,7 +493,7 @@ function contentTable() {
 						'candidateLabel'.T(),
 					'</label>',
 					'<select id="candidateSelector">',
-						option( '-1', 'topCandidate'.T() ),
+						option( '-1', 'allCandidates'.T() ),
 						//option( '-2', 'secondCandidate'.T() ),
 						//option( '-3', 'thirdCandidate'.T() ),
 						//option( '-4', 'fourthCandidate'.T() ),
@@ -1050,7 +1050,7 @@ function formatLegendTable( candidateCells ) {
 		return S(
 			'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
 				formatSpanColorPatch( colors, 2 ),
-				'&nbsp;', 'topCandidateShort'.T(), '&nbsp;',
+				'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
 			'</div>'
 		);
 	}
