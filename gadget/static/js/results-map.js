@@ -384,7 +384,7 @@ document.body.scroll = 'no';
 
 document.write(
 	'<style type="text/css">',
-		'html, body { width:', ww, 'px; height:', wh, 'px; overflow:hidden; }',
+		'html, body { width:', ww, 'px; height:', wh, 'px; margin:0; padding:0; overflow:hidden; }',
 		'* { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
@@ -412,7 +412,8 @@ document.write(
 		'#selectors label { font-weight:bold; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:#EAF0FA; }',
-		'div.legend-candidate, div.legend-label { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
+		'div.legend-candidate, div.legend-label, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
+		'div.legend-filler { float:left; border-color:transparent; padding:6px 4px 5px 5px; }',
 		'div.legend-candidate { cursor:pointer; margin-right:6px; }',
 		'div.legend-candidate.hover, div.legend-candidate.selected { border:1px solid #6FA8DC; }',
 		'div.legend-candidate.hover { background-color:#D6E9F8; }',
@@ -526,7 +527,7 @@ function formatLegendTable( candidateCells ) {
 			'<div class="legend-label">',
 				'legendLabel'.T(),
 			'</div>',
-			candidateCells || '&nbsp;',
+			candidateCells || '<div class="legend-filler">&nbsp;</div>',
 			'<div style="clear:left;">',
 			'</div>',
 		'</div>'
