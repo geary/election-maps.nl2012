@@ -39,7 +39,7 @@ opt.writeScript = function( url, nocache ) {
 		'<\/script>' );
 };
 
-opt.writeScript( 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
+opt.writeScript( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
 opt.writeScript( 'http://maps.google.com/maps/api/js?v=3.5&sensor=false' );
 
