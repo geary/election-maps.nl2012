@@ -1396,7 +1396,7 @@ function formatLegendTable( candidateCells ) {
 			return;
 		}
 		var url = S(
-			'http://www.google.com/fusiontables/api/query?',
+			'http://fusiontables.googleusercontent.com/fusiontables/api/query?',
 			'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
 			'&_=', Math.floor( now() / opt.resultCacheTime ),
 			'&sql=SELECT+',
