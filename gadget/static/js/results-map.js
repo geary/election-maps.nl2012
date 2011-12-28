@@ -767,10 +767,17 @@ function formatLegendTable( candidateCells ) {
 		bbox = [ -96.6372, 40.3741, -90.1416, 43.5014 ];
 		// END TEMP
 		//bbox = shrinkBbox( bbox, .10 );
-		map.fitBounds( new gm.LatLngBounds(
+		var bounds = new gm.LatLngBounds(
 			new gm.LatLng( bbox[1], bbox[0] ),
 			new gm.LatLng( bbox[3], bbox[2] )
-		) );
+		);
+		if( params.zoom ) {
+			map.setCenter( bounds.getCenter() );
+			map.setZoom( +params.zoom );
+		}
+		else {
+			map.fitBounds( bounds );
+		}
 		zoom = map.getZoom();
 	}
 	
