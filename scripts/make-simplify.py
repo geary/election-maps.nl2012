@@ -22,7 +22,7 @@ def process():
 		filename = '%s/%s-%s-%s.json' %(
 			private.GEOJSON_PATH, table, geoid, simpleGeom
 		)
-		db.makeGeoJSON( filename, table, boxGeom, simpleGeom, geoid, name, where, 'jsonp' )
+		db.makeGeoJSON( filename, table, boxGeom, simpleGeom, geoid, name, where, 'loadGeoJSON' )
 
 
 def main():
