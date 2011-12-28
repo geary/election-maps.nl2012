@@ -844,7 +844,7 @@ function formatLegendTable( candidateCells ) {
 		//	}
 		//}
 		if( opt.counties ) {
-			var source = data.counties, strokeWidth = 1, strokeWidthAll = 3, strokeColor = '#222222';
+			var source = data.counties, strokeWidth = 1.33, strokeColor = '#222222';
 		}
 		else {
 			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
@@ -869,7 +869,7 @@ function formatLegendTable( candidateCells ) {
 					row[col.NumCountedBallotBoxes] == row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
-				feature.strokeWidth = complete ? strokeWidthAll : strokeWidth;
+				feature.strokeWidth = strokeWidth;
 			}
 		}
 		else {
@@ -900,7 +900,7 @@ function formatLegendTable( candidateCells ) {
 					row[col.NumCountedBallotBoxes] == row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
-				feature.strokeWidth = complete ? strokeWidthAll : strokeWidth;
+				feature.strokeWidth = strokeWidth;
 			}
 		}
 	}
@@ -916,7 +916,7 @@ function formatLegendTable( candidateCells ) {
 		var feat = $.extend( {}, feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
-			strokeWidth: 4, // opt.counties ? 3 : 4,
+			strokeWidth: opt.counties ? 3 : 4,
 			strokeColor: '#000000',
 			strokeOpacity: 1
 		});
