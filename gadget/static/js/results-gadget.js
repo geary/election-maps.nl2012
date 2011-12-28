@@ -18,8 +18,8 @@ function parseQuery( query ) {
 		var array = query.replace( /^[#?]/, '' ).split( '&' );
 		for( var i = 0, n = array.length;  i < n;  ++i ) {
 			var p = array[i].split( '=' ),
-				key = this.decode( p[0] ),
-				value = this.decode( p[1] );
+				key = decodeURIComponent( p[0] ),
+				value = decodeURIComponent( p[1] );
 			if( key ) params[key] = value;
 		}
 	}
