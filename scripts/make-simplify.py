@@ -10,8 +10,7 @@ def process():
 	boxGeom = googGeom
 	#db.addGoogleGeometry( table, fullGeom, googGeom )
 	
-	#for tolerance in ( 10, 100, 1000, 10000, 100000, ):
-	for tolerance in ( 100, 1000, 10000, 100000, ):
+	for tolerance in ( 10, 100, 1000, 10000, 100000, ):
 		simpleGeom = '%s_%d' %( googGeom, tolerance )
 		
 		#db.simplifyGeometry( table, googGeom, simpleGeom, tolerance )
