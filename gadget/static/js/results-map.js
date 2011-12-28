@@ -36,7 +36,6 @@ var candidates = [
 	{ color: '#54F1F1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
 	{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
 	{ color: '#666666', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-	{ color: '#84DD6C', id: 'Johnson', firstName: 'Gary', lastName: 'Johnson', fullName: 'Gary Johnson' },
 	{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
 	{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
 	{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
