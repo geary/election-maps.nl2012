@@ -509,8 +509,6 @@ function contentTable() {
 					//'&nbsp;&nbsp;&nbsp;',
 					//'<input type="checkbox" id="chkCounties">',
 					//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
-					'&nbsp;&nbsp;&nbsp;',
-					'<button type="button" onclick="loadTestData()">Randomize</button>',
 				'</div>',
 			'</div>',
 			'<div id="legend">',
@@ -731,7 +729,7 @@ function formatLegendTable( candidateCells ) {
 		}
 		polys();
 		$('#spinner').hide();
-		if( opt.reloadTime  &&  ! reloadTimer )
+		if( ! params.randomize  &&   opt.reloadTime  &&  ! reloadTimer )
 			reloadTimer = setInterval( loadView, opt.reloadTime );
 	}
 	
@@ -1429,29 +1427,17 @@ function formatLegendTable( candidateCells ) {
 		getScript( url );
 	}
 	
-	loadTestData = function() {
+	function randomizeData( rows) {
 		opt.reloadTime = false;
 		clearInterval( reloadTimer );
-		var rows = data.counties.geo.features.map( function( county ) {
+		rows.forEach( function( row ) {
 			var nVoters = 0;
-			var nPrecincts = randomInt( 33 ) + 1;
-			var nReporting = Math.min( nPrecincts, randomInt( nPrecincts * 1.5 ) );
-			return candidates.map( function( candidate ) {
-				var n = randomInt( 100000 );
-				nVoters += n;
-				return n;
-			}).concat(
-				county.id, nVoters, nPrecincts, nReporting
-			);
+			var nPrecincts = row[col.NumBallotBoxes];
+			row[col.NumCountedBallotBoxes] =
+				Math.min( nPrecincts, randomInt( nPrecincts * 1.5 ) );
+			for( iCol = -1;  ++iCol < candidates.length; )
+				row[iCol] = randomInt( 100000 );
 		});
-		var json = {
-			table: {
-				rows: rows
-			}
-		};
-		setTimeout( function() {
-			loadCounties( json );
-		}, 100 );
 	}
 	
 	loadStates = function( json ) {
@@ -1479,6 +1465,8 @@ function formatLegendTable( candidateCells ) {
 		var results = currentData().results = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
+		if( params.randomize )
+			randomizeData( rows );
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			rowsByID[ row[col.ID] ] = row;
 			var nCandidates = candidates.length;
