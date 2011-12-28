@@ -766,12 +766,24 @@ function formatLegendTable( candidateCells ) {
 		// TEMP
 		bbox = [ -96.6372, 40.3741, -90.1416, 43.5014 ];
 		// END TEMP
+		//bbox = shrinkBbox( bbox, .10 );
 		map.fitBounds( new gm.LatLngBounds(
 			new gm.LatLng( bbox[1], bbox[0] ),
 			new gm.LatLng( bbox[3], bbox[2] )
 		) );
 		zoom = map.getZoom();
 	}
+	
+	//function shrinkBbox( bbox, amount ) {
+	//	var dx = ( bbox[2] - bbox[0] ) * amount / 2;
+	//	var dy = ( bbox[3] - bbox[1] ) * amount / 2;
+	//	return [
+	//		bbox[0] + dx,
+	//		bbox[1] + dy,
+	//		bbox[2] - dx,
+	//		bbox[3] - dy
+	//	];
+	//}
 	
 	var  mouseFeature;
 	
