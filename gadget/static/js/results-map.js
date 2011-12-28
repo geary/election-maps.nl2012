@@ -1412,12 +1412,13 @@ function formatLegendTable( candidateCells ) {
 		var rows = data.counties.geo.features.map( function( county ) {
 			var nVoters = 0;
 			var nPrecincts = randomInt( 33 ) + 1;
+			var nReporting = Math.min( nPrecincts, randomInt( nPrecincts * 1.5 ) );
 			return candidates.map( function( candidate ) {
 				var n = randomInt( 100000 );
 				nVoters += n;
 				return n;
 			}).concat(
-				county.id, nVoters, nPrecincts, randomInt(nPrecincts)
+				county.id, nVoters, nPrecincts, nReporting
 			);
 		});
 		var json = {
