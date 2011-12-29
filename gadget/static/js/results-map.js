@@ -659,13 +659,15 @@ function formatLegendTable( candidateCells ) {
 				features.playOrder = sortArrayBy( features, 'name' );
 			},
 			tick: function() {
-				var features = data.counties.geo.features;
+				var features = data.counties.geo.features,
+					rowsByID = data.counties.results.rowsByID;
 				var order = features.playOrder,
 					next = order.next, length = order.length;
 				if( ! next  ||  next >= length ) next = 0;
 				while( next < length ) {
 					var feature = order[next++], id = feature.id;
-					var use = true;  // temp
+					var row = rowsByID[id];
+					var use = row && row[col.NumCountedBallotBoxes];
 					if( use ) {
 						outlineFeature( feature );
 						showTip( feature );
