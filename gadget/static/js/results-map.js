@@ -1049,6 +1049,7 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function topCandidatesByVote( result, max ) {
+		max = max || Infinity;
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
 		var top = candidates.slice();
@@ -1083,7 +1084,7 @@ function formatLegendTable( candidateCells ) {
 	
 	function formatLegend() {
 		var topCandidates = topCandidatesByVote(
-			totalResults( currentResults() ), 4
+			totalResults( currentResults() )
 		);
 		return formatLegendTable(
 			formatLegendTopCandidates( topCandidates.slice( 0, 4 ) ) +
@@ -1091,8 +1092,8 @@ function formatLegendTable( candidateCells ) {
 		);
 	}
 	
-	function formatLegendTopCandidates( candidates ) {
-		var colors = candidates.map( function( candidate ) {
+	function formatLegendTopCandidates( topCandidates ) {
+		var colors = topCandidates.map( function( candidate ) {
 			return candidate.color;
 		});
 		var selected = candidates.current < 0 ? ' selected' : '';
@@ -1384,7 +1385,7 @@ function formatLegendTable( candidateCells ) {
 			}
 		});
 		
-		function setCandidate( index ) {
+		setCandidate = function( index ) {
 			candidates.current = index;
 			loadView();
 		}
