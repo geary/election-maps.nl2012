@@ -8,20 +8,9 @@ var times = {
 	gadgetLoaded: now()
 };
 
-// Keep this in sync with ALL_ALL.xml
 var strings = {
-	//nationwideLabel: 'Tüm Türkiye',
-	//chooseLabel: 'Choose a state and select a race:',
-	//stateLabel: 'İller:&nbsp;',
-	//candidateLabel: 'Partiler:&nbsp;',
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
-	//secondCandidate: 'Second',
-	//thirdCandidate: 'Third',
-	//fourthCandidate: 'Fourth',
-	//turkey: 'Turkey',
-	//countiesCheckbox: 'İlçeleri Göster',
-	//legendLabel: 'Türkiye Genelinde Sonuçlar:',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}})',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
