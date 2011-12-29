@@ -1428,8 +1428,6 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function randomizeData( rows) {
-		opt.reloadTime = false;
-		clearInterval( reloadTimer );
 		rows.forEach( function( row ) {
 			var nVoters = 0;
 			var nPrecincts = row[col.NumBallotBoxes];
@@ -1460,13 +1458,20 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function loadResults( json, counties, loading ) {
+		if( params.randomize ) {
+			opt.resultCacheTime = Infinity;
+			opt.reloadTime = false;
+			clearInterval( reloadTimer );
+		}
 		if( loading )
 			cacheResults.add( counties, json, opt.resultCacheTime );
 		var results = currentData().results = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
-		if( params.randomize )
+		if( params.randomize ) {
 			randomizeData( rows );
+			delete params.randomize;
+		}
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			rowsByID[ row[col.ID] ] = row;
 			var nCandidates = candidates.length;
