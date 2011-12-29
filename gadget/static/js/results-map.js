@@ -1481,10 +1481,15 @@ function formatLegendTable( candidateCells ) {
 		rows.forEach( function( row ) {
 			var nVoters = 0;
 			var nPrecincts = row[col.NumBallotBoxes];
-			row[col.NumCountedBallotBoxes] =
-				Math.min( nPrecincts, randomInt( nPrecincts * 1.5 ) );
+			var nCounted = row[col.NumCountedBallotBoxes] =
+				Math.max( 0,
+					Math.min( nPrecincts,
+						randomInt( nPrecincts * 2 ) -
+						Math.floor( nPrecincts / 2 )
+					)
+				);
 			for( iCol = -1;  ++iCol < candidates.length; )
-				row[iCol] = randomInt( 100000 );
+				row[iCol] = nCounted ? randomInt(100000) : 0;
 		});
 	}
 	
