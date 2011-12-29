@@ -31,6 +31,7 @@ var candidates = [
 	{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
 	{ color: '#AA0C76', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 ];
+candidates.current = -1;
 
 // Analytics
 var _gaq = _gaq || [];
@@ -442,10 +443,6 @@ function stateOption( state, selected ) {
 	return option( state.id, state.name, selected );
 }
 
-function raceOption( value, name ) {
-	return option( value, name, value == opt.infoType );
-}
-
 document.write(
 	'<div id="outer">',
 	'</div>',
@@ -465,41 +462,28 @@ document.write(
 function contentTable() {
 	return S(
 		'<div>',
-			'<div id="selectors">',
-				'<div style="margin:0; padding:6px;">',
-					//'<label for="stateSelector">',
-					//	'stateLabel'.T(),
-					//'</label>',
-					//'<select id="stateSelector">',
-					//	option( '-1', 'nationwideLabel'.T() ),
-					//	option( '', '', false, true ),
-					//	sortArrayBy( data.states.geo.features, 'name' )
-					//		.mapjoin( function( state ) {
-					//			return stateOption(
-					//				state,
-					//				state.abbr == opt.state
-					//			);
-					//		}),
-					//'</select>',
-					//'&nbsp;&nbsp;&nbsp;',
-					'<label for="candidateSelector">',
-						'candidateLabel'.T(),
-					'</label>',
-					'<select id="candidateSelector">',
-						option( '-1', 'allCandidates'.T() ),
-						//option( '-2', 'secondCandidate'.T() ),
-						//option( '-3', 'thirdCandidate'.T() ),
-						//option( '-4', 'fourthCandidate'.T() ),
-						option( '', '', false, true ),
-						candidates.mapjoin( function( candidate ) {
-							return option( candidate.id, candidate.fullName );
-						}),
-					'</select>',
-					//'&nbsp;&nbsp;&nbsp;',
-					//'<input type="checkbox" id="chkCounties">',
-					//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
-				'</div>',
-			'</div>',
+			//'<div id="selectors">',
+			//	'<div style="margin:0; padding:6px;">',
+			//		//'<label for="stateSelector">',
+			//		//	'stateLabel'.T(),
+			//		//'</label>',
+			//		//'<select id="stateSelector">',
+			//		//	option( '-1', 'nationwideLabel'.T() ),
+			//		//	option( '', '', false, true ),
+			//		//	sortArrayBy( data.states.geo.features, 'name' )
+			//		//		.mapjoin( function( state ) {
+			//		//			return stateOption(
+			//		//				state,
+			//		//				state.abbr == opt.state
+			//		//			);
+			//		//		}),
+			//		//'</select>',
+			//		//'&nbsp;&nbsp;&nbsp;',
+			//		//'&nbsp;&nbsp;&nbsp;',
+			//		//'<input type="checkbox" id="chkCounties">',
+			//		//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
+			//	'</div>',
+			//'</div>',
 			'<div id="legend">',
 				formatLegendTable(),
 			'</div>',
@@ -908,8 +892,7 @@ function formatLegendTable( candidateCells ) {
 			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
 		}
 		var features = source.geo.features, results = source.results;
-		var candidateID = $('#candidateSelector').val();
-		var isMulti = ( candidateID < 0 );
+		var isMulti = ( candidates.current < 0 );
 		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
@@ -933,7 +916,7 @@ function formatLegendTable( candidateCells ) {
 		else {
 			var rows = results.rows;
 			var max = 0;
-			var candidate = candidates.by.id[candidateID], color = candidate.color, index = candidate.index;
+			var candidate = candidates[candidates.current], color = candidate.color, index = candidate.index;
 			var nCols = candidates.length;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
@@ -1112,7 +1095,7 @@ function formatLegendTable( candidateCells ) {
 		var colors = candidates.map( function( candidate ) {
 			return candidate.color;
 		});
-		var selected = $('#candidateSelector').val() < 0 ? ' selected' : '';
+		var selected = candidates.current < 0 ? ' selected' : '';
 		return S(
 			'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
 				formatSpanColorPatch( colors, 2 ),
@@ -1122,10 +1105,9 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function formatLegendCandidate( candidate ) {
-		var id = $('#candidateSelector').val();
-		var selected = id == candidate.id ? ' selected' : '';
+		var selected = ( candidate.index == candidates.current ) ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.index, '">',
 				formatSpanColorPatch( candidate.color ),
 				'&nbsp;', candidate.lastName, '&nbsp;',
 				percent( candidate.vsAll ), '&nbsp;',
@@ -1383,13 +1365,6 @@ function formatLegendTable( candidateCells ) {
 			fitBbox( state ? state.bbox : data.states.geo.bbox );
 		});
 		
-		$('#candidateSelector').bindSelector( 'change keyup mousemove', function() {
-			var value = this.value;
-			if( opt.infoType == value ) return;
-			opt.infoType = value;
-			loadView();
-		});
-		
 		$('#chkCounties').click( function() {
 			setCounties( this.checked );
 		});
@@ -1403,15 +1378,15 @@ function formatLegendTable( candidateCells ) {
 				$(this).removeClass( 'hover' );
 			},
 			click: function( event ) {
-				var id = this.id.split('-')[2];
-				if( id == 'top' ) id = -1;
-				setCandidate( id );
+				var index = this.id.split('-')[2];
+				if( index == 'top' ) index = -1;
+				setCandidate( +index );
 			}
 		});
 		
-		function setCandidate( id ) {
-			$('#candidateSelector').val( id );
-			$('#candidateSelector').trigger( 'change' );
+		function setCandidate( index ) {
+			candidates.current = index;
+			loadView();
 		}
 	}
 	
@@ -1429,10 +1404,6 @@ function formatLegendTable( candidateCells ) {
 	function loadView() {
 		showTip( false );
 		//overlays.clear();
-		var id = opt.state;
-		var $select = $('#candidateSelector');
-		opt.infoType = $select.val();
-		
 		opt.state = +$('#stateSelector').val();
 		//var state = curState = data.states.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
