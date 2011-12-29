@@ -401,7 +401,7 @@ document.write(
 		'#selectors label { font-weight:bold; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:#EAF0FA; }',
-		'div.legend-candidate, div.legend-label, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
+		'div.legend-candidate, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
 		'div.legend-filler { float:left; border-color:transparent; padding:6px 4px 5px 5px; }',
 		'div.legend-candidate { cursor:pointer; margin-right:6px; }',
 		'div.legend-candidate.hover, div.legend-candidate.selected { border:1px solid #6FA8DC; }',
@@ -498,9 +498,6 @@ function contentTable() {
 function formatLegendTable( candidateCells ) {
 	return S(
 		'<div style="position:relative; vertical-align: middle;">',
-			'<div class="legend-label">',
-				'legendLabel'.T(),
-			'</div>',
 			candidateCells || '<div class="legend-filler">&nbsp;</div>',
 			'<div style="clear:left;">',
 			'</div>',
