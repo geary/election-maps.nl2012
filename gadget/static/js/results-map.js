@@ -403,7 +403,8 @@ document.write(
 		'#legend { background-color:#EAF0FA; }',
 		'div.legend-candidate, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
 		'div.legend-filler { float:left; border-color:transparent; padding:6px 4px 5px 5px; }',
-		'div.legend-candidate { cursor:pointer; margin-right:6px; }',
+		'div.legend-candidate { width:18%; }',
+		'div.legend-candidate { cursor:pointer; }',
 		'div.legend-candidate.hover, div.legend-candidate.selected { border:1px solid #6FA8DC; }',
 		'div.legend-candidate.hover { background-color:#D6E9F8; }',
 		'div.legend-candidate.selected { background-color:white; }',
@@ -569,7 +570,6 @@ function formatLegendTable( candidateCells ) {
 				$('#outer').html( contentTable() );
 				initSelectors();
 				$map = $('#map');
-				$map.height( wh - $map.offset().top );
 				setPlayback();
 			}
 		}
@@ -761,6 +761,7 @@ function formatLegendTable( candidateCells ) {
 	
 	function geoReady() {
 		setLegend();
+		$map.height( wh - $map.offset().top );
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
