@@ -892,7 +892,7 @@ function formatLegendTable( candidateCells ) {
 			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
 		}
 		var features = source.geo.features, results = source.results;
-		var isMulti = ( candidates.current < 0 );
+		var isMulti = ( candidates.current  == -1 );
 		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
@@ -916,7 +916,7 @@ function formatLegendTable( candidateCells ) {
 		else {
 			var rows = results.rows;
 			var max = 0;
-			var candidate = candidates[candidates.current], color = candidate.color, index = candidate.index;
+			var candidate = candidates.by.id[candidates.current], color = candidate.color, index = candidate.index;
 			var nCols = candidates.length;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
@@ -1096,7 +1096,7 @@ function formatLegendTable( candidateCells ) {
 		var colors = topCandidates.map( function( candidate ) {
 			return candidate.color;
 		});
-		var selected = candidates.current < 0 ? ' selected' : '';
+		var selected = candidates.current == -1 ? ' selected' : '';
 		return S(
 			'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
 				formatSpanColorPatch( colors, 2 ),
@@ -1106,9 +1106,9 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function formatLegendCandidate( candidate ) {
-		var selected = ( candidate.index == candidates.current ) ? ' selected' : '';
+		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.index, '">',
+			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
 				formatSpanColorPatch( candidate.color ),
 				'&nbsp;', candidate.lastName, '&nbsp;',
 				percent( candidate.vsAll ), '&nbsp;',
@@ -1379,14 +1379,14 @@ function formatLegendTable( candidateCells ) {
 				$(this).removeClass( 'hover' );
 			},
 			click: function( event ) {
-				var index = this.id.split('-')[2];
-				if( index == 'top' ) index = -1;
-				setCandidate( +index );
+				var id = this.id.split('-')[2];
+				if( id == 'top' ) id = -1;
+				setCandidate( id );
 			}
 		});
 		
-		setCandidate = function( index ) {
-			candidates.current = index;
+		setCandidate = function( id ) {
+			candidates.current = id;
 			loadView();
 		}
 	}
