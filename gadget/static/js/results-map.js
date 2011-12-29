@@ -615,10 +615,26 @@ function formatLegendTable( candidateCells ) {
 	var players = {
 		candidates: {
 			setup: function() {
-				//debugger;
 			},
 			tick: function() {
-				//debugger;
+				var topCandidates = topCandidatesByVote(
+					totalResults( currentResults() )
+				);
+				if( candidates.current == -1 ) {
+					i = 0;
+				}
+				else {
+					for( var i = 0;  i < topCandidates.length;  ++i ) {
+						if( topCandidates[i].id == candidates.current ) {
+							++i;
+							if( i >= topCandidates.length )
+								i = -1;
+							break;
+						}
+					}
+				}
+				candidates.current = ( i == -1 ? i : topCandidates[i].id );
+				setCandidate( candidates.current );
 			}
 		},
 		counties: {
