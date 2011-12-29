@@ -600,6 +600,7 @@ function formatLegendTable( candidateCells ) {
 				initSelectors();
 				$map = $('#map');
 				$map.height( wh - $map.offset().top );
+				setPlayback();
 			}
 		}
 		json.kind = 'county';  // TEMP
@@ -625,6 +626,55 @@ function formatLegendTable( candidateCells ) {
 			}
 		}[json.kind];
 		loader();
+	};
+	
+	function setPlayback() {
+		var play = params.play;
+		if( ! play ) return;
+		play = play.split( ',' );
+		var time = Math.max( play[1] || 5000, 1000 );
+		var player = players[ play[0] ];
+		if( ! player ) return;
+		player.setup();
+		setInterval( player.tick, time );
+	}
+	
+	var players = {
+		candidates: {
+			setup: function() {
+				//debugger;
+			},
+			tick: function() {
+				//debugger;
+			}
+		},
+		counties: {
+			setup: function() {
+				var features = data.counties.geo.features;
+				//features.playOrder = sortArrayBy( features, function( feature ) {
+				//	return(
+				//		-feature.centroid[1] * 1000000000 + feature.centroid[0]
+				//	);
+				//});
+				features.playOrder = sortArrayBy( features, 'name' );
+			},
+			tick: function() {
+				var features = data.counties.geo.features;
+				var order = features.playOrder,
+					next = order.next, length = order.length;
+				if( ! next  ||  next >= length ) next = 0;
+				while( next < length ) {
+					var feature = order[next++], id = feature.id;
+					var use = true;  // temp
+					if( use ) {
+						outlineFeature( feature );
+						showTip( feature );
+						break;
+					}
+				}
+				order.next = next;
+			}
+		}
 	};
 	
 	var setCountiesFirst = true;
