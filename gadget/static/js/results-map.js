@@ -79,7 +79,7 @@ opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
-var sw = 300;
+var sidebarWidth = 220;
 
 opt.resultCacheTime = 60 * 1000;
 opt.reloadTime = 120 * 1000;
@@ -392,6 +392,8 @@ document.write(
 		'.content {}',
 		'#content-scroll { overflow:scroll; overflow-x:hidden; }',
 		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; }',
+		'body.sidebar #maptip { border:none; }',
+		'body.sidebar #map { border-left:1px solid #333; }',
 		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
 		'.tipcontent { padding:4px 8px 8px 8px; }',
@@ -487,6 +489,8 @@ function contentTable() {
 			//'</div>',
 			'<div id="legend">',
 				formatLegendTable(),
+			'</div>',
+			'<div id="sidebar">',
 			'</div>',
 			'<div style="width:100%;">',
 				'<div id="map" style="width:100%; height:100%;">',
@@ -599,14 +603,42 @@ function formatLegendTable( candidateCells ) {
 	};
 	
 	function setPlayback() {
-		var play = params.play;
+		var play = getPlaybackParams();
 		if( ! play ) return;
+		play.player.setup();
+		setInterval( play.player.tick, play.time );
+	}
+	
+	function getPlaybackParams() {
+		var play = params.play;
+		if( ! play ) return false;
 		play = play.split( ',' );
 		var time = Math.max( play[1] || 5000, 1000 );
-		var player = players[ play[0] ];
-		if( ! player ) return;
-		player.setup();
-		setInterval( player.tick, time );
+		var type = play[0];
+		var player = players[type];
+		if( ! player ) return false;
+		return {
+			player: player,
+			type: type,
+			time: time
+		};
+	}
+	
+	function playType() {
+		var play = getPlaybackParams();
+		return play && play.type;
+	}
+	
+	function playCandidates() {
+		return playType() == 'candidates';
+	}
+	
+	function playCounties() {
+		return playType() == 'counties';
+	}
+	
+	function useSidebar() {
+		return !! playCounties();
 	}
 	
 	var players = {
@@ -761,7 +793,25 @@ function formatLegendTable( candidateCells ) {
 	
 	function geoReady() {
 		setLegend();
-		$map.height( wh - $map.offset().top );
+		var mapTop = $map.offset().top;
+		$map.height( wh - mapTop );
+		if( useSidebar() ) {
+			$('body').addClass( 'sidebar' );
+			var $sidebar = $('#sidebar');
+			$sidebar.css({
+				position: 'absolute',
+				left: 0,
+				top: mapTop,
+				width: sidebarWidth
+			});
+			$map.css({
+				position: 'absolute',
+				left: sidebarWidth,
+				top: mapTop,
+				width: ww - sidebarWidth
+			});
+			$maptip.remove().appendTo( $sidebar ).css({ width:'100%' });
+		}
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
@@ -846,7 +896,7 @@ function formatLegendTable( candidateCells ) {
 		function getFeature( event, where ) {
 			return where && where.feature;
 		}
-		var events = {
+		var events = playType() ? {} : {
 			mousedown: function( event, where ) {
 			},
 			mouseup: function( event, where ) {
@@ -971,7 +1021,7 @@ function formatLegendTable( candidateCells ) {
 		var feat = $.extend( {}, feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
-			strokeWidth: opt.counties ? 3 : 4,
+			strokeWidth: playCounties() ? 5 : opt.counties ? 3 : 4,
 			strokeColor: '#000000',
 			strokeOpacity: 1
 		});
@@ -997,7 +1047,8 @@ function formatLegendTable( candidateCells ) {
 	
 	var tipOffset = { x:10, y:20 };
 	var $maptip, tipHtml;
-	$('body').bind( 'click mousemove', moveTip );
+	if( ! playType() )
+		$('body').bind( 'click mousemove', moveTip );
 	
 	function showTip( feature ) {
 		if( ! $maptip ) $maptip = $('#maptip');
@@ -1137,7 +1188,7 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function formatTipCandidates( feature, result ) {
-		var topCandidates = topCandidatesByVote( result, 4 )
+		var topCandidates = topCandidatesByVote( result, useSidebar ? 0 : 4 );
 		if( ! topCandidates.length )
 			return 'noVotes'.T();
 		return S(
