@@ -41,7 +41,7 @@ opt.writeScript = function( url, nocache ) {
 
 opt.writeScript( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
-opt.writeScript( 'http://maps.google.com/maps/api/js?v=3.5&sensor=false' );
+opt.writeScript( 'http://maps.google.com/maps/api/js?v=3.5&sensor=false&key=AIzaSyBbwxmNf1Sz3ORtmt4SFy5ltFqIFGd2QQg' );
 
 opt.writeScript( 'js/polygonzo.js', opt.nocache );
 opt.writeScript( 'js/results-map.js', opt.nocache );
