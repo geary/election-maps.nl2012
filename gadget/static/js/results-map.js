@@ -1341,18 +1341,24 @@ function formatLegendTable( candidateCells ) {
 		if( map ) return;
 		gm = google.maps, gme = gm.event;
 		mapPixBounds = $map.bounds();
-		map = new gm.Map( $map[0],  {
+		var mapopt = $.extend({
 			mapTypeId: 'simple',
 			streetViewControl: false,
+			panControl: false,
+			rotateControl: false
+		},
+		params.play ? {
+			mapTypeControl: false,
+			zoomControl: false
+		} : {
 			mapTypeControlOptions: {
 				mapTypeIds: []
 			},
-			panControl: false,
-			rotateControl: false,
 			zoomControlOptions: {
 				style: gm.ZoomControlStyle.SMALL
 			}
 		});
+		map = new gm.Map( $map[0],  mapopt );
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		
