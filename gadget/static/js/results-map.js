@@ -62,7 +62,7 @@ document.write(
 	'</style>'
 );
 
-var gm = google.maps, gme = gm.event;
+var gm, gme;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
@@ -1339,6 +1339,7 @@ function formatLegendTable( candidateCells ) {
 	
 	function initMap() {
 		if( map ) return;
+		gm = google.maps, gme = gm.event;
 		mapPixBounds = $map.bounds();
 		map = new gm.Map( $map[0],  {
 			mapTypeId: 'simple',
