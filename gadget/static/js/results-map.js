@@ -1192,7 +1192,7 @@ function formatLegendTable( candidateCells ) {
 	}
 	
 	function formatTipCandidates( feature, result ) {
-		var topCandidates = topCandidatesByVote( result, useSidebar ? 0 : 4 );
+		var topCandidates = topCandidatesByVote( result, useSidebar() ? 0 : 4 );
 		if( ! topCandidates.length )
 			return 'noVotes'.T();
 		return S(
