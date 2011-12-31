@@ -574,7 +574,6 @@ function formatLegendTable( candidateCells ) {
 				$('#outer').html( contentTable() );
 				initSelectors();
 				$map = $('#map');
-				setPlayback();
 			}
 		}
 		json.kind = 'county';  // TEMP
@@ -791,6 +790,7 @@ function formatLegendTable( candidateCells ) {
 	var geoMoveNext = true;
 	var polyTimeNext = 250;
 	
+	var didGeoReady;
 	function geoReady() {
 		setLegend();
 		var mapTop = $map.offset().top;
@@ -820,6 +820,10 @@ function formatLegendTable( candidateCells ) {
 		$('#spinner').hide();
 		if( ! params.randomize  &&   opt.reloadTime  &&  ! reloadTimer )
 			reloadTimer = setInterval( loadView, opt.reloadTime );
+		if( ! didGeoReady ) {
+			setPlayback();
+			didGeoReady = true;
+		}
 	}
 	
 	function currentGeos() {
