@@ -641,6 +641,14 @@ function formatLegendTable( candidateCells ) {
 		return !! playCounties();
 	}
 	
+	function autoplay() {
+		return !! playType();
+	}
+	
+	function interactive() {
+		return ! autoplay();
+	}
+	
 	var players = {
 		candidates: {
 			setup: function() {
@@ -759,6 +767,9 @@ function formatLegendTable( candidateCells ) {
 	//	});
 	//};
 	
+	$('body').addClass( autoplay() ? 'autoplay' : 'interactive' );
+	if( useSidebar() ) $('body').addClass( 'sidebar' );
+
 	var map, gonzo;
 	
 	var overlays = [];
@@ -797,7 +808,6 @@ function formatLegendTable( candidateCells ) {
 		var mapTop = $map.offset().top;
 		$map.height( wh - mapTop );
 		if( useSidebar() ) {
-			$('body').addClass( 'sidebar' );
 			var $sidebar = $('#sidebar');
 			$sidebar.css({
 				position: 'absolute',
