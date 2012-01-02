@@ -404,13 +404,16 @@ document.write(
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:white; }',
 		'td.legend-candidate, td.legend-filler { border:1px solid white; }',
-		'div.legend-candidate, div.legend-filler { padding:6px 4px 5px 5px; }',
+		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
+		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
+		'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:21px; font-weight:bold; }',
 		'td.legend-filler { border-color:transparent; }',
-		'td.legend-candidate { font-weight:bold; }',
 		'td.legend-candidate { width:20%; }',
 		'td.legend-candidate { cursor:pointer; }',
 		'td.legend-candidate.hover { background-color:#F5F5F5; border:1px solid #D9D9D9; }',
 		'td.legend-candidate.selected { background-color:#E7E7E7; border:1px solid #CCCCCC; }',
+		'span.legend-candidate-color { font-size:15px; }',
+		'body.tv span.legend-candidate-color { font-size:18px; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
@@ -1124,10 +1127,10 @@ function formatLegendTable( cells ) {
 		if( ! colors.push ) colors = [ colors ];
 		border = border || '1px solid #C2C2C2';
 		return S(
-			'<span style="border:', border, '; zoom:1;">',
+			'<span class="legend-candidate-color" style="border:', border, '; zoom:1;">',
 				colors.mapjoin( function( color ) {
 					return S(
-						'<span style="background:', color, '; zoom:1;">',
+						'<span class="legend-candidate-color" style="background:', color, '; zoom:1;">',
 							'&nbsp;'.repeat( spaces || 6 ),
 						'</span>'
 					);
