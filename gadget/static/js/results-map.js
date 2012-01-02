@@ -403,14 +403,14 @@ document.write(
 		'#selectors label { font-weight:bold; }',
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:white; }',
-		'div.legend-candidate, div.legend-filler { float:left; border:1px solid white; padding:6px 4px 5px 5px; }',
-		'div.legend-filler { border-color:transparent; }',
-		'div.legend-candidate { font-weight:bold; }',
-		'div.legend-candidate-cell { float:left; width:20%; }',
-		'div.legend-candidate { width:90%; }',
-		'div.legend-candidate { cursor:pointer; }',
-		'div.legend-candidate.hover { background-color:#F5F5F5; border:1px solid #D9D9D9; }',
-		'div.legend-candidate.selected { background-color:#E7E7E7; border:1px solid #CCCCCC; }',
+		'td.legend-candidate, td.legend-filler { border:1px solid white; }',
+		'div.legend-candidate, div.legend-filler { padding:6px 4px 5px 5px; }',
+		'td.legend-filler { border-color:transparent; }',
+		'td.legend-candidate { font-weight:bold; }',
+		'td.legend-candidate { width:20%; }',
+		'td.legend-candidate { cursor:pointer; }',
+		'td.legend-candidate.hover { background-color:#F5F5F5; border:1px solid #D9D9D9; }',
+		'td.legend-candidate.selected { background-color:#E7E7E7; border:1px solid #CCCCCC; }',
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
@@ -489,7 +489,7 @@ function contentTable() {
 			//	'</div>',
 			//'</div>',
 			'<div id="legend">',
-				formatLegendTable(),
+				formatLegendTable( [] ),
 			'</div>',
 			'<div id="sidebar">',
 			'</div>',
@@ -501,13 +501,28 @@ function contentTable() {
 	);
 }
 
-function formatLegendTable( candidateCells ) {
+function formatLegendTable( cells ) {
+	function filler() {
+		return S(
+			'<td class="legend-filler">',
+				'<div class="legend-filler">',
+					'&nbsp;',
+				'</div>',
+			'</td>'
+		);
+	}
+	function row( cells ) {
+		return S(
+			'<tr>',
+				cells.length ? cells.join('') : filler(),
+			'</tr>'
+		);
+	}
 	return S(
-		'<div style="position:relative; vertical-align: middle;">',
-			candidateCells || '<div class="legend-filler">&nbsp;</div>',
-			'<div style="clear:left;">',
-			'</div>',
-		'</div>'
+		'<table cellpadding="0" cellspacing="0" style="width:100%; vertical-align:middle;">',
+			row( cells.slice( 0, 5 ) ),
+			row( cells.slice( 5 ) ),
+		'</table>'
 	);
 }
 
@@ -1175,10 +1190,9 @@ function formatLegendTable( candidateCells ) {
 		var topCandidates = topCandidatesByVote(
 			totalResults( currentResults() )
 		);
-		return formatLegendTable(
-			formatLegendTopCandidates( topCandidates.slice( 0, 4 ) ) +
-			topCandidates.mapjoin( formatLegendCandidate )
-		);
+		var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
+		var candidates = topCandidates.map( formatLegendCandidate );
+		return formatLegendTable( [ top ].concat( candidates ) );
 	}
 	
 	function formatLegendTopCandidates( topCandidates ) {
@@ -1187,25 +1201,25 @@ function formatLegendTable( candidateCells ) {
 		});
 		var selected = candidates.current == -1 ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate-cell">',
-				'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
+			'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
+				'<div class="legend-candidate">',
 					formatSpanColorPatch( colors, 2 ),
 					'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
 				'</div>',
-			'</div>'
+			'</td>'
 		);
 	}
 	
 	function formatLegendCandidate( candidate ) {
 		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate-cell">',
-				'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+			'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+				'<div class="legend-candidate">',
 					formatSpanColorPatch( candidate.color, 8 ),
 					'&nbsp;', candidate.lastName, '&nbsp;',
 					percent( candidate.vsAll ), '&nbsp;',
 				'</div>',
-			'</div>'
+			'</td>'
 		);
 	}
 	
@@ -1468,7 +1482,7 @@ function formatLegendTable( candidateCells ) {
 		});
 		
 		var $legend = $('#legend');
-		$legend.delegate( 'div.legend-candidate', {
+		$legend.delegate( 'td.legend-candidate', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
