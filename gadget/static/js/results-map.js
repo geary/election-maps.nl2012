@@ -414,7 +414,7 @@ document.write(
 		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
 		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
-		'#spinner { z-index:999999; filter:alpha(opacity=70); opacity:0.70; -moz-opacity:0.70; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
+		'#spinner { z-index:999999; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
 		'a.logo { display:none; position:absolute; bottom:24px; width:48px; height:48px;}',
 		'#party-logo { right:62px; background: url(', imgUrl('gop-iowa-48.png'), ') no-repeat; }',
@@ -1602,8 +1602,9 @@ function formatLegendTable( candidateCells ) {
 	
 	var blank = imgUrl( 'blank.gif' );
 	
-	$('a.logo')
-		.css({ opacity:.5, display:'block' })
+	$('a.logo').css({ display: 'block' });
+	$('body.interactive a.logo')
+		.css({ opacity: .5 })
 		.mouseover( function() {
 			$(this).stop().fadeTo( 250, 1 );
 		})
