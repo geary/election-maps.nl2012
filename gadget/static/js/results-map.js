@@ -649,6 +649,14 @@ function formatLegendTable( candidateCells ) {
 		return ! autoplay();
 	}
 	
+	function tv() {
+		return autoplay();
+	}
+	
+	function web() {
+		return autoplay();
+	}
+	
 	var players = {
 		candidates: {
 			setup: function() {
@@ -768,6 +776,7 @@ function formatLegendTable( candidateCells ) {
 	//};
 	
 	$('body').addClass( autoplay() ? 'autoplay' : 'interactive' );
+	$('body').addClass( tv() ? 'tv' : 'web' );
 	if( useSidebar() ) $('body').addClass( 'sidebar' );
 
 	var map, gonzo;
