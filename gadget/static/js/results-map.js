@@ -406,7 +406,8 @@ document.write(
 		'div.legend-candidate, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
 		'div.legend-filler { border-color:transparent; }',
 		'div.legend-candidate { font-weight:bold; }',
-		'div.legend-candidate { width:18%; }',
+		'div.legend-candidate-cell { float:left; width:20%; }',
+		'div.legend-candidate { width:90%; }',
 		'div.legend-candidate { cursor:pointer; }',
 		'div.legend-candidate.hover, div.legend-candidate.selected { border:1px solid #6FA8DC; }',
 		'div.legend-candidate.hover { background-color:#D6E9F8; }',
@@ -1178,9 +1179,11 @@ function formatLegendTable( candidateCells ) {
 		});
 		var selected = candidates.current == -1 ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
-				formatSpanColorPatch( colors, 2 ),
-				'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
+			'<div class="legend-candidate-cell">',
+				'<div class="legend-candidate', selected, '" id="legend-candidate-top">',
+					formatSpanColorPatch( colors, 2 ),
+					'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
+				'</div>',
 			'</div>'
 		);
 	}
@@ -1188,10 +1191,12 @@ function formatLegendTable( candidateCells ) {
 	function formatLegendCandidate( candidate ) {
 		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
 		return S(
-			'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-				formatSpanColorPatch( candidate.color ),
-				'&nbsp;', candidate.lastName, '&nbsp;',
-				percent( candidate.vsAll ), '&nbsp;',
+			'<div class="legend-candidate-cell">',
+				'<div class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+					formatSpanColorPatch( candidate.color, 8 ),
+					'&nbsp;', candidate.lastName, '&nbsp;',
+					percent( candidate.vsAll ), '&nbsp;',
+				'</div>',
 			'</div>'
 		);
 	}
