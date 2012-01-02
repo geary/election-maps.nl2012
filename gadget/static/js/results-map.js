@@ -396,8 +396,8 @@ document.write(
 		'body.sidebar #map { border-left:1px solid #333; }',
 		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
-		'.tipcontent { padding:4px 8px 8px 8px; }',
-		'.tipreporting { font-size:80%; padding:4px 8px; border-top:1px solid #AAA; }',
+		'.tipcontent { padding:4px 8px 8px 8px; border-bottom:1px solid #AAA; }',
+		'.tipreporting { font-size:80%; padding:2px 0; }',
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
@@ -1243,7 +1243,7 @@ function formatLegendTable( candidateCells ) {
 		if( ! feature ) return null;
 		var result = currentResults().rowsByID[feature.id];
 		
-		var content = footer = '';
+		var content;
 		if( result ) {
 			var content = S(
 				'<div class="tipcontent">',
@@ -1253,15 +1253,6 @@ function formatLegendTable( candidateCells ) {
 			
 			var boxes = result[col.NumBallotBoxes];
 			var counted = result[col.NumCountedBallotBoxes];
-			var footer = S(
-				'<div class="tipreporting">',
-					'percentReporting'.T({
-						percent: percent( counted / boxes ),
-						counted: counted,
-						total: boxes
-					}),
-				'</div>'
-			);
 		}
 		
 		var parent = data.states.geo &&
@@ -1280,9 +1271,15 @@ function formatLegendTable( candidateCells ) {
 				'</div>',
 				parent ? ' ' + parent.name : '',
 				parent && debug ? ' (#' + parent.id + ')' : '',
+				'<div class="tipreporting">',
+					'percentReporting'.T({
+						percent: percent( counted / boxes ),
+						counted: counted,
+						total: boxes
+					}),
+				'</div>',
 			'</div>',
-			content,
-			footer
+			content
 		);
 	}
 	
