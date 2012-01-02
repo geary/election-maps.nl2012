@@ -1523,7 +1523,8 @@ function formatLegendTable( candidateCells ) {
 			'&sql=SELECT+',
 			resultsFields(),
 			'+FROM+',
-			opt.counties ? '2458834' : 'TODO'
+			//opt.counties ? '2458834' : 'TODO'
+			params.tableid || '2458834'
 		);
 		getScript( url );
 	}
