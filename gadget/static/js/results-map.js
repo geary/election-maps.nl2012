@@ -404,7 +404,7 @@ document.write(
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:#EAF0FA; }',
 		'div.legend-candidate, div.legend-filler { float:left; border:1px solid #EAF0FA; padding:6px 4px 5px 5px; }',
-		'div.legend-filler { float:left; border-color:transparent; padding:6px 4px 5px 5px; }',
+		'div.legend-filler { border-color:transparent; }',
 		'div.legend-candidate { font-weight:bold; }',
 		'div.legend-candidate { width:18%; }',
 		'div.legend-candidate { cursor:pointer; }',
