@@ -673,7 +673,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function web() {
-		return autoplay();
+		return ! tv();
 	}
 	
 	var players = {
