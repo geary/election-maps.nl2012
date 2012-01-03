@@ -1240,6 +1240,7 @@ function formatLegendTable( cells ) {
 		return S(
 			'<table class="candidates" cellpadding="0" cellspacing="0">',
 				topCandidates.mapjoin( function( candidate, i ) {
+					var pct = percent( candidate.vsAll );
 					return S(
 						'<tr class="', i ? '' : 'first', '">',
 							'<td>',
@@ -1247,7 +1248,7 @@ function formatLegendTable( cells ) {
 									formatCandidateIcon( candidate, 32 ),
 								'</div>',
 							'</td>',
-							'<td style="padding-right:20px;">',
+							'<td style="padding-right:16px;">',
 								'<div style="line-height:1em;">',
 									'<div style="font-size:85%;">',
 										candidate.firstName,
@@ -1257,16 +1258,16 @@ function formatLegendTable( cells ) {
 									'</div>',
 								'</div>',
 							'</td>',
-							web() ? S(
-								'<td style="text-align:right; padding:0 6px 0 4px;">',
-									formatNumber( candidate.votes ),
-								'</td>'
-							) : '',
 							'<td>',
 								formatCandidateAreaPatch( candidate, 24 ),
 							'</td>',
-							'<td style="text-align:right; padding-left:6px; font-size:115%;">',
-								percent( candidate.vsAll ),
+							web() ? S(
+								'<td style="text-align:right; padding-left:6px;">',
+									formatNumber( candidate.votes ),
+								'</td>'
+							) : '',
+							'<td style="text-align:right; padding-left:6px;">',
+								web() ? S( '(', pct, ')' ) : pct,
 							'</td>',
 						'</tr>'
 					);
