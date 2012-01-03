@@ -415,8 +415,8 @@ document.write(
 		'td.legend-candidate.selected { background-color:#E7E7E7; border:1px solid #CCCCCC; }',
 		'span.legend-candidate-color { font-size:15px; }',
 		'body.tv span.legend-candidate-color { font-size:18px; }',
-		'.candidate, .candidate * { font-size:18px; font-weight:bold; }',
-		'.candidate-small, .candidate-small * { font-size:14px; font-weight:bold; }',
+		'table.candidates td { border-top:1px solid #E7E7E7; }',
+		'table.candidates tr.first td { border-top:none; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
@@ -1238,12 +1238,12 @@ function formatLegendTable( cells ) {
 		if( ! topCandidates.length )
 			return 'noVotes'.T();
 		return S(
-			'<table cellpadding="0" cellspacing="0">',
-				topCandidates.mapjoin( function( candidate ) {
+			'<table class="candidates" cellpadding="0" cellspacing="0">',
+				topCandidates.mapjoin( function( candidate, i ) {
 					return S(
-						'<tr>',
+						'<tr class="', i ? '' : 'first', '">',
 							'<td>',
-								'<div style="margin:4px 6px 4px 0;">',
+								'<div style="margin:6px 6px 6px 0;">',
 									formatCandidateIcon( candidate, 32 ),
 								'</div>',
 							'</td>',
