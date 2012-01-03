@@ -1161,14 +1161,10 @@ function formatLegendTable( cells ) {
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
 		var top = candidates.slice();
-		var total = 0;
-		for( var i = -1;  ++i < top.length; ) {
-			total += result[i];
-		}
 		for( var i = -1;  ++i < top.length; ) {
 			var candidate = top[i], votes = result[i];
 			candidate.votes = votes;
-			candidate.vsAll = votes / total;
+			candidate.vsAll = votes / result[col.NumVoters];
 			//candidate.total = total;
 		}
 		top = sortArrayBy( top, 'votes', { numeric:true } )
@@ -1573,8 +1569,10 @@ function formatLegendTable( cells ) {
 						Math.floor( nPrecincts / 2 )
 					)
 				);
+			var total = 0;
 			for( iCol = -1;  ++iCol < candidates.length; )
-				row[iCol] = nCounted ? randomInt(100000) : 0;
+				total += row[iCol] = nCounted ? randomInt(100000) : 0;
+			row[col.NumVoters] = total + randomInt(total*2);
 		});
 	}
 	
