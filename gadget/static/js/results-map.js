@@ -406,6 +406,7 @@ document.write(
 		'td.legend-candidate, td.legend-filler { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
+		'body.web div.legend-candidate { color:#333; }',
 		'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:21px; font-weight:bold; }',
 		'td.legend-filler { border-color:transparent; }',
 		'td.legend-candidate { width:20%; }',
