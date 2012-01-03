@@ -79,7 +79,7 @@ opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
-var sidebarWidth = 220;
+var sidebarWidth = 320;
 
 opt.resultCacheTime = 60 * 1000;
 opt.reloadTime = 120 * 1000;
@@ -392,8 +392,18 @@ document.write(
 		'.content {}',
 		'#content-scroll { overflow:scroll; overflow-x:hidden; }',
 		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; }',
-		'body.sidebar #maptip { border:none; }',
-		'body.sidebar #map { border-left:1px solid #333; }',
+		'div.candidate-name { line-height:1em; }',
+		'div.first-name { font-size:85%; }',
+		'body.tv div.candidate-name { margin-right:20px; }',
+		'body.tv div.candidate-name div { line-height:1.1em; }',
+		'body.tv div.first-name { font-size:20px; }',
+		'body.tv div.last-name { font-size:24px; font-weight:bold; }',
+		'body.tv td.candidate-percent { font-size:20px; font-weight:bold; }',
+		'body.tv #maptip { border:none; }',
+		'body.tv #map { border-left:1px solid #333; }',
+		'body.tv span.tiptitletext { font-size:28px; }',
+		'body.tv div.tipreporting { font-size:20px; }',
+		'body.tv table.candidates td { padding:4px 0; }',
 		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
 		'.tipcontent { padding:4px 8px 8px 8px; border-bottom:1px solid #AAA; }',
@@ -1246,11 +1256,11 @@ function formatLegendTable( cells ) {
 								'</div>',
 							'</td>',
 							'<td style="padding-right:16px;">',
-								'<div style="line-height:1em;">',
-									'<div style="font-size:85%;">',
+								'<div class="candidate-name">',
+									'<div class="first-name">',
 										candidate.firstName,
 									'</div>',
-									'<div style="font-weight:bold;">',
+									'<div class="last-name" style="font-weight:bold;">',
 										candidate.lastName,
 									'</div>',
 								'</div>',
@@ -1259,11 +1269,11 @@ function formatLegendTable( cells ) {
 								formatCandidateAreaPatch( candidate, 24 ),
 							'</td>',
 							web() ? S(
-								'<td style="text-align:right; padding-left:6px;">',
+								'<td class="candidate-votes" style="text-align:right; padding-left:6px;">',
 									formatNumber( candidate.votes ),
 								'</td>'
 							) : '',
-							'<td style="text-align:right; padding-left:6px;">',
+							'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
 								web() ? S( '(', pct, ')' ) : pct,
 							'</td>',
 						'</tr>'
