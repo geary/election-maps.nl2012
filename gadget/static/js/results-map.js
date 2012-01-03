@@ -901,7 +901,8 @@ function formatLegendTable( cells ) {
 			new gm.LatLng( bbox[1], bbox[0] ),
 			new gm.LatLng( bbox[3], bbox[2] )
 		);
-		if( params.zoom ) {
+		if( params.zoom != 'auto' ) {
+			params.zoom = params.zoom || 7;
 			map.setCenter( bounds.getCenter() );
 			map.setZoom( +params.zoom );
 		}
