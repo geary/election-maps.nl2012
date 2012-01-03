@@ -1247,7 +1247,7 @@ function formatLegendTable( cells ) {
 									formatCandidateIcon( candidate, 32 ),
 								'</div>',
 							'</td>',
-							'<td style="">',
+							'<td style="padding-right:20px;">',
 								'<div style="line-height:1em;">',
 									'<div style="font-size:85%;">',
 										candidate.firstName,
@@ -1257,11 +1257,16 @@ function formatLegendTable( cells ) {
 									'</div>',
 								'</div>',
 							'</td>',
-							'<td style="text-align:right; padding:0 8px 0 12px;">',
-								percent( candidate.vsAll ),
-							'</td>',
+							web() ? S(
+								'<td style="text-align:right; padding:0 6px 0 4px;">',
+									formatNumber( candidate.votes ),
+								'</td>'
+							) : '',
 							'<td>',
 								formatCandidateAreaPatch( candidate, 24 ),
+							'</td>',
+							'<td style="text-align:right; padding-left:6px; font-size:115%;">',
+								percent( candidate.vsAll ),
 							'</td>',
 						'</tr>'
 					);
