@@ -20,17 +20,60 @@ var strings = {
 	noVotes: 'Waiting for results&hellip;'
 };
 
-var candidates = [
-	{ color: '#DE6310', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
-	{ color: '#54F1F1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
-	{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-	{ color: '#666666', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-	{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-	{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
-	{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
-	{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
-	{ color: '#AA0C76', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
-];
+
+var elections = {
+	2008: {
+		dem: {
+			tableid: 'TODO',
+			candidates: [
+				{ color: '#20FF1F', id: 'Biden', firstName: 'Joe', lastName: 'Biden', fullName: 'Joe Biden' },
+				{ color: '#FFFA00', id: 'Clinton', firstName: 'Hillary', lastName: 'Clinton', fullName: 'Hillary Clinton' },
+				{ color: '#E4Af95', id: 'Dodd', firstName: 'Chris', lastName: 'Dodd', fullName: 'Chris Dodd' },
+				{ color: '#FF1300', id: 'Edwards', firstName: 'John', lastName: 'Edwards', fullName: 'John Edwards' },
+				{ color: '#8A5C2E', id: 'Gravel', firstName: 'Mike', lastName: 'Gravel', fullName: 'Mike Gravel' },
+				{ color: '#EE00B5', id: 'Kucinich', firstName: 'Dennis', lastName: 'Kucinich', fullName: 'Dennis Kucinich' },
+				{ color: '#1700E8', id: 'Obama', firstName: 'Barack', lastName: 'Obama', fullName: 'Barack Obama' },
+				{ color: '#336633', id: 'Richardson', firstName: 'Bill', lastName: 'Richardson', fullName: 'Bill Richardson' }
+			]
+		},
+		gop: {
+			tableid: '2549421',
+			candidates: [
+				{ color: '#336633', id: 'Giuliani', firstName: 'Rudy', lastName: 'Giuliani', fullName: 'Rudy Giuliani' },
+				{ color: '#1700E8', id: 'Huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
+				{ color: '#8A5C2E', id: 'Hunter', firstName: 'Duncan', lastName: 'Hunter', fullName: 'Duncan Hunter' },
+				{ color: '#FFFA00', id: 'McCain', firstName: 'John', lastName: 'McCain', fullName: 'John McCain' },
+				{ color: '#E4Af95', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+				{ color: '#FF1300', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+				{ color: '#EE00B5', id: 'Tancredo', firstName: 'Tom', lastName: 'Tancredo', fullName: 'Tom Tancredo' },
+				{ color: '#20FF1F', id: 'Thompson', firstName: 'Fred', lastName: 'Thompson', fullName: 'Fred Thompson' }
+			]
+		}
+	},
+	2012: {
+		gop: {
+			tableid: '2458834',
+			photos: true,
+			candidates: [
+				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
+				{ color: '#54F1F1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
+				{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+				{ color: '#666666', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+				{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
+				{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
+				{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+				{ color: '#AA0C76', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
+			]
+		}
+	}
+};
+
+var year = params.year in elections ? +params.year : 2008;
+var parties = elections[year];
+var party = params.party in parties ? params.party : 'gop';
+var election = parties[party];
+var candidates = election.candidates;
 candidates.current = -1;
 
 // Analytics
@@ -1154,7 +1197,9 @@ function formatLegendTable( cells ) {
 	
 	function formatCandidateIcon( candidate, size ) {
 		return S(
-			'<div style="background:url(', imgUrl('candidate-photos-'+size+'.png'), '); background-position:-', candidate.index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+			'<div style="background:url(',
+					imgUrl( S( 'candidate-photos-', year, '-', size, '.png' ) ),
+				'); background-position:-', candidate.index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
 			'</div>'
 		);
 	}
@@ -1252,12 +1297,16 @@ function formatLegendTable( cells ) {
 					return S(
 						'<tr class="', i ? '' : 'first', '">',
 							'<td>',
-								'<div style="margin:6px 6px 6px 0;">',
-									formatCandidateIcon( candidate, 32 ),
-								'</div>',
+								election.photos ? S(
+									'<div style="margin:6px 6px 6px 0;">',
+										formatCandidateIcon( candidate, 32 ),
+									'</div>'
+								) : '',
 							'</td>',
 							'<td style="padding-right:16px;">',
-								'<div class="candidate-name">',
+								'<div class="candidate-name" style="',
+											election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
+										'">',
 									'<div class="first-name">',
 										candidate.firstName,
 									'</div>',
@@ -1565,7 +1614,7 @@ function formatLegendTable( cells ) {
 			resultsFields(),
 			'+FROM+',
 			//opt.counties ? '2458834' : 'TODO'
-			params.tableid || '2458834'
+			params.tableid || election.tableid
 		);
 		getScript( url );
 	}
