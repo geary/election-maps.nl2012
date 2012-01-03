@@ -17,7 +17,7 @@ var strings = {
 	//countdownHour: '1 hour',
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
-	noVotes: ''
+	noVotes: 'Waiting for results&hellip;'
 };
 
 var candidates = [
@@ -1236,7 +1236,7 @@ function formatLegendTable( cells ) {
 	function formatTipCandidates( feature, result ) {
 		var topCandidates = topCandidatesByVote( result, useSidebar() ? 0 : 4 );
 		if( ! topCandidates.length )
-			return '';
+			return 'noVotes'.T();
 		return S(
 			'<table cellpadding="0" cellspacing="0">',
 				topCandidates.mapjoin( function( candidate ) {
