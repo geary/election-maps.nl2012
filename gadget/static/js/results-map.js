@@ -40,11 +40,11 @@ var elections = {
 			tableid: '2549421',
 			candidates: [
 				{ color: '#336633', id: 'Giuliani', firstName: 'Rudy', lastName: 'Giuliani', fullName: 'Rudy Giuliani' },
-				{ color: '#1700E8', id: 'Huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
+				{ color: '#D50F25', id: 'Huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
 				{ color: '#8A5C2E', id: 'Hunter', firstName: 'Duncan', lastName: 'Hunter', fullName: 'Duncan Hunter' },
-				{ color: '#FFFA00', id: 'McCain', firstName: 'John', lastName: 'McCain', fullName: 'John McCain' },
-				{ color: '#E4Af95', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-				{ color: '#FF1300', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+				{ color: '#3369E8', id: 'McCain', firstName: 'John', lastName: 'McCain', fullName: 'John McCain' },
+				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+				{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
 				{ color: '#EE00B5', id: 'Tancredo', firstName: 'Tom', lastName: 'Tancredo', fullName: 'Tom Tancredo' },
 				{ color: '#20FF1F', id: 'Thompson', firstName: 'Fred', lastName: 'Thompson', fullName: 'Fred Thompson' }
 			]
