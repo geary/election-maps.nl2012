@@ -70,7 +70,7 @@ class Database:
 		shpname = basename + '.shp'
 		sqlname = basename + '.sql'
 		unzipdir = tempfile.mkdtemp( dir=tempdir )
-		if ext.lower() == 'zip':
+		if ext.lower() == '.zip':
 			print 'Unzipping %s to %s' %( zipname, unzipdir )
 			ZipFile( zipfile, 'r' ).extractall( unzipdir )
 			shpfile = os.path.join( unzipdir, shpname )
@@ -84,7 +84,7 @@ class Database:
 		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
-		command = 'psql -q -U postgres -d turkey -f %s' %(
+		command = 'psql -q -U postgres -d usageo -f %s' %(
 			sqlfile
 		)
 		print 'Running psql:\n%s' % command
@@ -318,6 +318,7 @@ class Database:
 		self.execute('''
 			SELECT
 				geoid10, namelsad10,
+				intptlat10, intptlon10, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
@@ -337,7 +338,7 @@ class Database:
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregeoid, featurename, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregeoid, featurename, lat, lng, centroidjson, geomjson in self.cursor.fetchall():
 			#if not centroidjson or not geomjson:
 			#	continue
 			geometry = json.loads( geomjson )

@@ -7,143 +7,44 @@ import pg
 import private
 
 
-# TODO:
-'''
-CREATE DATABASE turkey
-  WITH ENCODING='UTF8'
-       TEMPLATE=template_postgis
-       CONNECTION LIMIT=-1;
-'''
-
-def loadFT( db, schema, name, create, query ):
-	table = '%s.%s' %( schema, name )
-	print 'Loading %s' % table
-	db.execute( create )
-	query = 'http://www.google.com/fusiontables/api/query?sql=' + query
-	reader = csv.reader( urllib2.urlopen(query) )
-	header = reader.next()
-	for row in reader:
-		yield row
-	db.connection.commit()
-	db.analyzeTable( table )
-
-	
-def loadSHP( db, schema, name, level ):
-	#suffix = ''  # hack
-	suffix = '-edited'  # hack
-	table = '%s.%s' %( schema, name )
-	tableSHP = '%s%s' %( table, level )
-	db.loadShapefile(
-		'../shapes/shp/%s-%s%s/%s.shp' %( name, level, suffix, name ),
-		private.TEMP_PATH, tableSHP, True
+def cartoFileName( state, type ):
+	return os.path.join(
+		private.SHAPEFILE_PATH,
+		'gz_2010_%s_%s_00_500k.zip' %( state, type )
 	)
-	db.connection.commit()
-	geom = 'geom_' + str(level)
-	#db.addGeometryColumn( table, geom, 3857 )
-	db.addGeometryColumn( table, geom, 4269 )
-	db.connection.commit()
-	db.execute('''
-		UPDATE
-			%(table)s
-		SET
-			-- %(geom)s = ST_Multi( ST_Transform( ST_MakeValid( ST_Force_2D( ST_MakeValid(shp.full_geom) ) ), 3857 ) ST_Multi( 
-			%(geom)s = ST_Multi( ST_Buffer(  ST_Force_2D(shp.full_geom), 0.0 ) )
-		FROM
-			%(tableSHP)s shp
-		WHERE
-			%(table)s.id = shp.name::INTEGER
-		;
-	''' % {
-		'table': table,
-		'tableSHP': tableSHP,
-		'geom': geom,
-	})
-	
-	geom = 'geom_' + level
-	db.mergeGeometry(
-		't2011.districts', 'parent', geom,
-		't2011.provinces', 'id', geom
-	)
-	
-	db.execute( 'DROP TABLE IF EXISTS %s;' % tableSHP )
-	
-	db.connection.commit()
-
-
-# TODO: refactor!
-def loadProvinceFT( db, schema ):
-	for row in loadFT(
-		db, schema, 'provinces',
-		'CREATE TABLE t2011.provinces (' +
-			'id integer, ' +
-			'name_tr varchar, ' +
-			'CONSTRAINT provinces_pkey PRIMARY KEY (id)' +
-		');',
-		'SELECT+' +
-			"ID,'DistrictName-tr'" +
-			'+FROM+934719'
-	):
-		db.execute('''
-			INSERT INTO t2011.provinces
-			VALUES ( '%s', '%s' )
-		''' % (
-			row[0], row[1]
-		) )
-
-
-def loadDistrictFT( db, schema ):
-	for row in loadFT(
-		db, schema, 'districts',
-		'CREATE TABLE t2011.districts (' +
-			'id integer, ' +
-			'parent integer, ' +
-			'name_tr varchar, ' +
-			'CONSTRAINT districts_pkey PRIMARY KEY (id)' +
-		');',
-		'SELECT+' +
-			"ID,ParentID,'DistrictName-tr'" +
-			'+FROM+928147'
-	):
-		db.execute('''
-			INSERT INTO t2011.districts
-			VALUES ( '%s', '%s', '%s' )
-		''' % (
-			row[0], row[1], row[2]
-		) )
 
 
 def process():
-	#db = pg.Database( database='postgres' )
-	#db.createGeoDatabase( 'turkey' )
-	#db.connection.close()
+	database = 'usageo'
+	schema = 'carto2010'
 	
-	db = pg.Database( database='turkey' )
+	print 'Creating database %s' % database
+	db = pg.Database( database='postgres' )
+	db.createGeoDatabase( database )
+	db.connection.close()
 	
-	#db.createGeoDatabase( 'turkey' )
+	print 'Opening database %s' % database
+	db = pg.Database( database=database )
 	
-	schema = 't2011'
+	print 'Creating schema %s' % schema
 	db.createSchema( schema )
 	db.connection.commit()
 	
-	loadProvinceFT( db, schema )
-	loadDistrictFT( db, schema )
+	zipfile = cartoFileName( 'us', '040' )
+	print 'Loading %s' % zipfile
+	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.state', True )
 	
-	#for level in '00 50 60 70 80 90'.split(' '):
-	for level in '90'.split(' '):
-		loadSHP( db, schema, 'districts', level )
-		for tbl in ( 'provinces', 'districts', ):
-		#for tbl in ( 'provinces', ):
-			name = tbl # 'Turkey'
-			table = '%s.%s' %( schema, tbl )
-			gid = '-1'
-			targetGeom = 'geom_' + level
-			#boxGeom = 'geom_00'
-			boxGeom = targetGeom
-			#db.addGoogleGeometry( table, geom, googGeom )
-			filename = '%s/turkey-%s-%s.jsonp' %(
-				private.GEOJSON_PATH, tbl, targetGeom
-			)
-			db.makeGeoJSON( filename, table, boxGeom, targetGeom, tbl, name, gid, 'loadGeoJSON' )
+	zipfile = cartoFileName( 'us', '050' )
+	print 'Loading %s' % zipfile
+	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.county', True )
+	
+	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
+	create = True
+	for state, in db.cursor.fetchall():
+		zipfile = cartoFileName( state, '060' )
+		print 'Loading %s' % zipfile
+		db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.cousub', create )
+		create = False
 	
 	db.connection.commit()
 	db.connection.close()

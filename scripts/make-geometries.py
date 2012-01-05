@@ -18,7 +18,7 @@ def process():
 
 def main():
 	global db
-	db = pg.Database( database='turkey' )
+	db = pg.Database( database='usageo' )
 	process()
 	db.connection.close()
 	print 'Done!'
