@@ -24,8 +24,9 @@ def process():
 	createSchema( db )
 	loadStates( db )
 	loadCounties( db )
-	loadCountySubdivisions( db )
-	createCountyCousub( db )
+	#loadCountySubdivisions( db )
+	#createCountyCousub( db )
+	loadNH( db )
 	closeDatabase( db )
 
 
@@ -72,6 +73,12 @@ def loadCountySubdivisions( db ):
 		print 'Loading %s' % zipfile
 		db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.cousub', create )
 		create = False
+
+
+def loadNH( db ):
+	zipfile = cartoFileName( '33', '060' )
+	print 'Loading %s' % zipfile
+	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.coucou', True )
 
 	
 def createCountyCousub( db ):
