@@ -177,7 +177,16 @@ class Database:
 			UPDATE
 				%(table)s
 			SET
-				%(googeom)s = ST_Multi( ST_Transform( ST_Force_2D( ST_MakeValid(%(llgeom)s) ), 3857 ) )
+				%(googeom)s = ST_Multi(
+					ST_Transform(
+						ST_Force_2D(
+							-- ST_MakeValid(
+								%(llgeom)s
+							-- )
+						),
+						3857
+					)
+				)
 			;
 		''' % {
 			'table': table,
@@ -205,7 +214,13 @@ class Database:
 			SET
 				%(targetGeom)s = (
 					SELECT
-						ST_Multi( ST_MakeValid( ST_Union(%(sourceGeom)s) ) )
+						ST_Multi(
+							-- ST_MakeValid(
+								ST_Union(
+									%(sourceGeom)s
+								)
+							-- )
+						)
 					FROM
 						%(sourceTable)s
 					WHERE
@@ -245,12 +260,12 @@ class Database:
 			SET
 				%(targetGeom)s =
 					ST_Multi(
-						ST_MakeValid(
+						-- ST_MakeValid(
 							ST_SimplifyPreserveTopology(
 								%(sourceGeom)s,
 								%(tolerance)f
 							)
-						)
+						-- )
 					)
 			;
 			
