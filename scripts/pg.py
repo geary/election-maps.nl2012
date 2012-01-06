@@ -39,12 +39,11 @@ class Database:
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		if drop:
-			self.execute('''
-				DROP DATABASE IF EXISTS %(database)s;
-			''' % {
-				'database': database,
-			})
+		self.execute('''
+			DROP DATABASE IF EXISTS %(database)s;
+		''' % {
+			'database': database,
+		})
 		self.execute('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
