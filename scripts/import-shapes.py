@@ -9,7 +9,7 @@ import private
 
 database = 'usageo'
 schema = 'carto2010'
-	
+
 
 def cartoFileName( state, type ):
 	return os.path.join(
@@ -53,34 +53,33 @@ def createSchema( db ):
 	db.connection.commit()
 
 
-def loadStates( db ):
-	zipfile = cartoFileName( 'us', '040' )
+def loadShapefile( db, state, kind, table, create=True ):
+	zipfile = cartoFileName( state, kind )
+	table = schema + '.' + table
 	print 'Loading %s' % zipfile
-	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.state', True )
+	db.loadShapefile( zipfile, private.TEMP_PATH, table, create )
+
+
+def loadStates( db ):
+	loadShapefile( db, 'us', '040', 'state' )
 
 
 def loadCounties( db ):
-	zipfile = cartoFileName( 'us', '050' )
-	print 'Loading %s' % zipfile
-	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.county', True )
+	loadShapefile( db, 'us', '050', 'county' )
 
 
 def loadCountySubdivisions( db ):
 	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
 	create = True
 	for state, in db.cursor.fetchall():
-		zipfile = cartoFileName( state, '060' )
-		print 'Loading %s' % zipfile
-		db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.cousub', create )
+		loadShapefile( db, state, '060', 'cousub', create )
 		create = False
 
 
 def loadNH( db ):
-	zipfile = cartoFileName( '33', '060' )
-	print 'Loading %s' % zipfile
-	db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.coucou', True )
+	loadShapefile( db, '33', '060', 'coucou' )
 
-	
+
 def createCountyCousub( db ):
 	# CT, MA, NH, VT report votes by county subdivision ("town")
 	whereCousub = '''
