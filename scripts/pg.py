@@ -332,8 +332,7 @@ class Database:
 		
 		self.execute('''
 			SELECT
-				geoid10, namelsad10,
-				intptlat10, intptlon10, 
+				geo_id, name, lsad,
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
@@ -353,7 +352,7 @@ class Database:
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregeoid, featurename, lat, lng, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregeoid, featurename, lsad, centroidjson, geomjson in self.cursor.fetchall():
 			#if not centroidjson or not geomjson:
 			#	continue
 			geometry = json.loads( geomjson )
