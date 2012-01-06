@@ -10,6 +10,9 @@ import private
 database = 'usageo'
 schema = 'carto2010'
 
+fullGeom = 'full_geom'
+googGeom = 'goog_geom'
+
 
 def cartoFileName( state, type ):
 	return os.path.join(
@@ -58,6 +61,7 @@ def loadShapefile( db, state, kind, table, create=True ):
 	table = schema + '.' + table
 	print 'Loading %s' % zipfile
 	db.loadShapefile( zipfile, private.TEMP_PATH, table, create )
+	db.addGoogleGeometry( table, fullGeom, googGeom )
 
 
 def loadStates( db ):
@@ -98,13 +102,13 @@ def createCountyCousub( db ):
 		INSERT INTO %(schema)s.coucou
 			SELECT nextval('%(schema)s.coucou_gid_seq'),
 				geo_id, state, county, '' AS cousub,
-				name, lsad, censusarea, full_geom
+				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.county
 			WHERE NOT %(whereCousub)s;
 		INSERT INTO %(schema)s.coucou
 			SELECT nextval('%(schema)s.coucou_gid_seq'),
 				geo_id, state, county, cousub,
-				name, lsad, censusarea, full_geom
+				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.cousub
 			WHERE %(whereCousub)s;
 	''' %({
