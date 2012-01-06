@@ -352,7 +352,7 @@ class Database:
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregeoid, featurename, lsad, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregeoid, featurename, featurelsad, centroidjson, geomjson in self.cursor.fetchall():
 			#if not centroidjson or not geomjson:
 			#	continue
 			geometry = json.loads( geomjson )
@@ -362,6 +362,7 @@ class Database:
 				'bbox': geometry['bbox'],
 				'id': featuregeoid,
 				'name': featurename,
+				'lsad': featurelsad,
 				'centroid': centroid['coordinates'],
 				'geometry': geometry,
 			}
