@@ -46,6 +46,37 @@ def process():
 		db.loadShapefile( zipfile, private.TEMP_PATH, schema+'.cousub', create )
 		create = False
 	
+	# CT, MA, NH, VT report votes by county subdivision ("town")
+	whereCousub = '''
+		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
+	'''
+	db.execute( '''
+		DROP TABLE IF EXISTS %(schema)s.coucou;
+		CREATE TABLE %(schema)s.coucou (
+			LIKE %(schema)s.cousub
+				INCLUDING DEFAULTS
+				INCLUDING CONSTRAINTS
+				INCLUDING INDEXES
+		);
+		DROP SEQUENCE IF EXISTS %(schema)s.coucou_gid_seq;
+		CREATE SEQUENCE %(schema)s.coucou_gid_seq;
+		INSERT INTO %(schema)s.coucou
+			SELECT nextval('%(schema)s.coucou_gid_seq'),
+				geo_id, state, county, '' AS cousub,
+				name, lsad, censusarea, full_geom
+			FROM %(schema)s.county
+			WHERE NOT %(whereCousub)s;
+		INSERT INTO %(schema)s.coucou
+			SELECT nextval('%(schema)s.coucou_gid_seq'),
+				geo_id, state, county, cousub,
+				name, lsad, censusarea, full_geom
+			FROM %(schema)s.cousub
+			WHERE %(whereCousub)s;
+	''' %({
+		'schema': schema,
+		'whereCousub': whereCousub
+	}) )
+	
 	db.connection.commit()
 	db.connection.close()
 
