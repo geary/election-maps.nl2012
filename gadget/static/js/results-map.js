@@ -430,6 +430,9 @@ document.write(
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
+		'div.sidebar-header { padding-bottom:6px; }',
+		'div.election-title { font-size:20px; margin:6px; }',
+		'div.percent-reporting { font-size:16px; margin:6px; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -1208,6 +1211,20 @@ function formatLegendTable( cells ) {
 		return total;
 	}
 	
+	function totalReporting( results ) {
+		var rows = results.rows;
+		var counted = 0, total = 0;
+		for( var row, i = -1;  row = rows[++i]; ) {
+			counted += row[col.NumCountedBallotBoxes];
+			total += row[col.NumBallotBoxes];
+		}
+		return {
+			counted: counted,
+			total: total,
+			percent: percent( counted / total )
+		};
+	}
+	
 	function topCandidatesByVote( result, max ) {
 		max = max || Infinity;
 		if( ! result ) return [];
@@ -1290,11 +1307,21 @@ function formatLegendTable( cells ) {
 		);
 		var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 		var candidates = topCandidates.map( formatSidebarCandidate );
-		return formatCandidateList(
-			[ top ].concat( candidates ),
-			function( candidate ) {
-				return S( '<tr>', candidate, '</tr>' );
-			}
+		return S(
+			'<div class="sidebar-header">',
+				'<div class="election-title">',
+					'New Hampshire Primary',  // TODO: make election-specific
+				'</div>',
+				'<div class="percent-reporting">',
+					'percentReporting'.T( totalReporting( currentResults() ) ),
+				'</div>',
+			'</div>',
+			formatCandidateList(
+				[ top ].concat( candidates ),
+				function( candidate ) {
+					return S( '<tr>', candidate, '</tr>' );
+				}
+			)
 		);
 	}
 	
