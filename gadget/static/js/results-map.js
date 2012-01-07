@@ -8,6 +8,9 @@ var times = {
 	gadgetLoaded: now()
 };
 
+// Default params for NH
+params.sidebar = ( params.sidebar !== 'false' );
+
 var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
@@ -463,6 +466,7 @@ document.write(
 		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
 		'#legend { background-color:white; }',
 		'body.tv #legend { margin-top:8px; }',
+		'body.sidebar #legend { width:', sidebarWidth, 'px; }',
 		'td.legend-candidate, td.legend-filler { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
@@ -554,8 +558,6 @@ function contentTable() {
 			//'</div>',
 			'<div id="legend">',
 				formatLegendTable( [] ),
-			'</div>',
-			'<div id="sidebar">',
 			'</div>',
 			'<div style="width:100%;">',
 				'<div id="map" style="width:100%; height:100%;">',
@@ -717,10 +719,6 @@ function formatLegendTable( cells ) {
 		return playType() == 'counties';
 	}
 	
-	function useSidebar() {
-		return !! playCounties();
-	}
-	
 	function autoplay() {
 		return !! playType();
 	}
@@ -857,7 +855,7 @@ function formatLegendTable( cells ) {
 	
 	$('body').addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$('body').addClass( tv() ? 'tv' : 'web' );
-	if( useSidebar() ) $('body').addClass( 'sidebar' );
+	if( params.sidebar ) $('body').addClass( 'sidebar' );
 
 	var map, gonzo;
 	
@@ -895,23 +893,17 @@ function formatLegendTable( cells ) {
 	function geoReady() {
 		setLegend();
 		var mapTop = $map.offset().top;
-		$map.height( wh - mapTop );
-		if( useSidebar() ) {
-			var $sidebar = $('#sidebar');
-			$sidebar.css({
-				position: 'absolute',
-				left: 0,
-				top: mapTop,
-				width: sidebarWidth
-			});
+		if( params.sidebar ) {
+			mapTop = 0;
 			$map.css({
 				position: 'absolute',
 				left: sidebarWidth,
 				top: mapTop,
-				width: ww - sidebarWidth
+				width: ww - sidebarWidth,
+				height: wh
 			});
-			$maptip.remove().appendTo( $sidebar ).css({ width:'100%' });
 		}
+		$map.height( wh - mapTop );
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
@@ -1247,6 +1239,8 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatLegend() {
+		if( params.sidebar ) return formatSidebar();
+		
 		var topCandidates = topCandidatesByVote(
 			totalResults( currentResults() )
 		);
@@ -1289,50 +1283,101 @@ function formatLegendTable( cells ) {
 		}).join(' ');
 	}
 	
-	function formatTipCandidates( feature, result ) {
-		var topCandidates = topCandidatesByVote( result, useSidebar() ? 0 : 4 );
+	function formatSidebar() {
+		// TODO: refactor with formatLegend()
+		var topCandidates = topCandidatesByVote(
+			totalResults( currentResults() )
+		);
+		var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
+		var candidates = topCandidates.map( formatSidebarCandidate );
+		return formatCandidateList(
+			[ top ].concat( candidates ),
+			function( candidate ) {
+				return S( '<tr>', candidate, '</tr>' );
+			}
+		);
+	}
+	
+	function formatSidebarTopCandidates( topCandidates ) {
+		var colors = topCandidates.map( function( candidate ) {
+			return candidate.color;
+		});
+		var selected = candidates.current == -1 ? ' selected' : '';
+		return S(
+			'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
+				'<div class="legend-candidate">',
+					formatSpanColorPatch( colors, 2 ),
+					'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
+				'</div>',
+			'</td>'
+		);
+	}
+	
+	function formatSidebarCandidate( candidate ) {
+		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
+		return S(
+			'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+				'<div class="legend-candidate">',
+					formatSpanColorPatch( candidate.color, 8 ),
+					'&nbsp;', candidate.lastName, '&nbsp;',
+					percent( candidate.vsAll ), '&nbsp;',
+				'</div>',
+			'</td>'
+		);
+	}
+	
+	function formatTipCandidates( result ) {
+		return formatCandidateList(
+			topCandidatesByVote( result, /*params.sidebar ? 0 :*/ 4 ),
+			formatListCandidate
+		);
+	}
+	
+	function formatCandidateList( topCandidates, formatter ) {
 		if( ! topCandidates.length )
 			return 'noVotes'.T();
 		return S(
 			'<table class="candidates" cellpadding="0" cellspacing="0">',
-				topCandidates.mapjoin( function( candidate, i ) {
-					var pct = percent( candidate.vsAll );
-					return S(
-						'<tr class="', i ? '' : 'first', '">',
-							'<td>',
-								election.photos ? S(
-									'<div style="margin:6px 6px 6px 0;">',
-										formatCandidateIcon( candidate, 32 ),
-									'</div>'
-								) : '',
-							'</td>',
-							'<td style="padding-right:16px;">',
-								'<div class="candidate-name" style="',
-											election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
-										'">',
-									'<div class="first-name">',
-										candidate.firstName,
-									'</div>',
-									'<div class="last-name" style="font-weight:bold;">',
-										candidate.lastName,
-									'</div>',
-								'</div>',
-							'</td>',
-							'<td>',
-								formatCandidateAreaPatch( candidate, 24 ),
-							'</td>',
-							web() ? S(
-								'<td class="candidate-votes" style="text-align:right; padding-left:6px;">',
-									formatNumber( candidate.votes ),
-								'</td>'
-							) : '',
-							'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
-								web() ? S( '(', pct, ')' ) : pct,
-							'</td>',
-						'</tr>'
-					);
-				}),
+				topCandidates.mapjoin( formatter ),
 			'</table>'
+		);
+	}
+	
+	function formatListCandidate( candidate, i ) {
+		var pct = percent( candidate.vsAll );
+		return S(
+			'<tr class="', i !== 0 ? '' : 'first', '">',
+				'<td>',
+					election.photos ? S(
+						'<div style="margin:6px 6px 6px 0;">',
+							formatCandidateIcon( candidate, 32 ),
+						'</div>'
+					) : '',
+				'</td>',
+				'<td style="padding-right:16px;">',
+					'<div class="candidate-name" style="',
+								election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
+							'">',
+						'<div class="first-name">',
+							candidate.firstName,
+						'</div>',
+						'<div class="last-name" style="font-weight:bold;">',
+							candidate.lastName,
+						'</div>',
+					'</div>',
+				'</td>',
+				'<td>',
+					formatCandidateAreaPatch( candidate, 24 ),
+				'</td>',
+				web() ? S(
+					'<td class="candidate-votes" style="text-align:right; padding-left:6px;">',
+						formatNumber( candidate.votes ),
+					'</td>'
+				) : '',
+				'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
+					web() ? S( '(', pct, ')' ) : pct,
+				'</td>',
+			'</tr>'
 		);
 	}
 	
@@ -1345,7 +1390,7 @@ function formatLegendTable( cells ) {
 		if( row ) {
 			var content = S(
 				'<div class="tipcontent">',
-					formatTipCandidates( feature, row ),
+					formatTipCandidates( row ),
 				'</div>'
 			);
 			
