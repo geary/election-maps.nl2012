@@ -1050,10 +1050,10 @@ function formatLegendTable( cells ) {
 		//	}
 		//}
 		if( opt.counties ) {
-			var source = data.counties, strokeWidth = 1.33, strokeColor = '#222222';
+			var source = data.counties, strokeWidth = 1, strokeColor = '#666666';
 		}
 		else {
-			var source = data.states, strokeWidth = 2, strokeColor = '#222222';
+			var source = data.states, strokeWidth = 1, strokeColor = '#666666';
 		}
 		var features = source.geo.features, results = source.results;
 		var isMulti = ( candidates.current  == -1 );
