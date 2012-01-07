@@ -280,7 +280,7 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
-	def makeGeoJSON( self, filename, table, boxGeom, polyGeom, geoid, name, where, jsonp ):
+	def makeGeoJSON( self, filename, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where, jsonp ):
 		
 		print 'makeGeoJSON', filename
 		srid = self.getSRID( table, polyGeom )
@@ -311,7 +311,8 @@ class Database:
 		self.execute('''
 			SELECT
 				ST_AsGeoJSON( ST_Centroid( ST_Extent( %(polyGeom)s ) ), %(digits)s ),
-				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 )
+				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 ),
+				ST_AsGeoJSON( ST_Extent( %(boxGeomLL)s ), 6, 1 )
 			FROM 
 				%(table)s
 			WHERE
@@ -320,13 +321,15 @@ class Database:
 		''' % {
 			'table': table,
 			'boxGeom': boxGeom,
+			'boxGeomLL': boxGeomLL,
 			'polyGeom': polyGeom,
 			'where': where,
 			'digits': digits,
 		})
-		( extentcentroidjson, extentjson ) = self.cursor.fetchone()
+		( extentcentroidjson, extentjson, extentjsonll ) = self.cursor.fetchone()
 		extentcentroid = json.loads( extentcentroidjson )
 		extent = json.loads( extentjson )
+		extentLL = json.loads( extentjsonll )
 		t2 = time.clock()
 		print 'ST_Extent %.1f seconds' %( t2 - t1 )
 		
@@ -371,6 +374,7 @@ class Database:
 		featurecollection = {
 			'type': 'FeatureCollection',
 			'bbox': extent['bbox'],
+			'bboxLL': extentLL['bbox'],
 			'id': geoid,
 			'name': name,
 			'centroid': extentcentroid['coordinates'],

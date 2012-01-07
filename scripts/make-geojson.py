@@ -10,6 +10,7 @@ def process():
 	fullGeom = 'full_geom'
 	googGeom = 'goog_geom'
 	boxGeom = googGeom
+	boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 	
 	#db.addGoogleGeometry( table, fullGeom, googGeom )
 	
@@ -28,7 +29,7 @@ def process():
 		filename = '%s/%s-%s-%s.jsonp' %(
 			private.GEOJSON_PATH, table, geoid, simpleGeom
 		)
-		db.makeGeoJSON( filename, table, boxGeom, simpleGeom, geoid, name, where, 'loadGeoJSON' )
+		db.makeGeoJSON( filename, table, boxGeom, boxGeomLL, simpleGeom, geoid, name, where, 'loadGeoJSON' )
 
 
 def main():
