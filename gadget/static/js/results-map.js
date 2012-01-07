@@ -494,7 +494,7 @@ document.write(
 		'#spinner { z-index:999999; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
 		'a.logo { display:none; position:absolute; bottom:24px; width:48px; height:48px;}',
-		'#party-logo { right:62px; background: url(', imgUrl('gop-iowa-48.png'), ') no-repeat; }',
+		//'#party-logo { right:62px; background: url(', imgUrl('gop-iowa-48.png'), ') no-repeat; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
 	'</style>'
 );
@@ -529,8 +529,8 @@ document.write(
 	'</div>',
 	'<div id="maptip">',
 	'</div>',
-	'<a id="party-logo" class="logo" target="_blank" href="http://www.iowagop.org/" title="Iowa GOP">',
-	'</a>',
+	//'<a id="party-logo" class="logo" target="_blank" href="http://www.iowagop.org/" title="Iowa GOP">',
+	//'</a>',
 	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections" title="Google Election News">',
 	'</a>',
 	'<div id="error" style="display:none;">',
