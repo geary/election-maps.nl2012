@@ -11,11 +11,16 @@ var times = {
 // Default params for NH
 params.sidebar = ( params.sidebar !== 'false' );
 
+opt.randomized = params.randomize;
+
 var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}})',
 	noVotesHere: 'This location does not report voting results',
+	nextUpdate: 'Next update in {{seconds}} seconds',
+	updating: 'Updating&hellip;',
+	randomized: 'Displaying random test data',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -430,9 +435,10 @@ document.write(
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
-		'div.sidebar-header { padding-bottom:6px; }',
-		'div.election-title { font-size:20px; margin:6px; }',
-		'div.percent-reporting { font-size:16px; margin:6px; }',
+		'div.sidebar-header { padding:8px; }',
+		'div.election-title { font-size:20px; padding-bottom:8px; }',
+		'div.percent-reporting { font-size:16px; padding-bottom:6px; }',
+		'#next-update { font-size:13px; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -648,6 +654,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function getGeoJSON( url ) {
+		clearInterval( reloadTimer );
 		$('#spinner').show();
 		getScript( cacheUrl( url ) );
 	}
@@ -921,8 +928,10 @@ function formatLegendTable( cells ) {
 		}
 		polys();
 		$('#spinner').hide();
-		if( ! params.randomize  &&   opt.reloadTime  &&  ! reloadTimer )
-			reloadTimer = setInterval( loadView, opt.reloadTime );
+		if( ! opt.randomized  &&   opt.reloadTime ) {
+			opt.nextReload = now() + opt.reloadTime;
+			reloadTimer = setInterval( updateReload, 1000 );
+		}
 		if( ! didGeoReady ) {
 			setPlayback();
 			didGeoReady = true;
@@ -1323,6 +1332,13 @@ function formatLegendTable( cells ) {
 				'<div class="percent-reporting">',
 					'percentReporting'.T( totalReporting( currentResults() ) ),
 				'</div>',
+				'<div id="next-update">',
+					opt.randomized ?
+						'randomized'.T() :
+					opt.reloadTime ?
+						'nextUpdate'.T({ seconds: opt.reloadTime / 1000 }) :
+						'',
+				'</div>',
 			'</div>',
 			formatCandidateList(
 				[ top ].concat( candidates ),
@@ -1664,12 +1680,27 @@ function formatLegendTable( cells ) {
 	function hittest( latlng ) {
 	}
 	
+	function updateReload() {
+		var time = opt.nextReload - now();
+		if( time > 0 ) {
+			var round =
+				time >= 10000 ? 10000 : time >= 5000 ? 5000 : 1000;
+			var seconds = Math.ceil( time / round ) * ( round / 1000 );
+			$('#next-update').html( 'nextUpdate'.T({ seconds:seconds }) );
+		}
+		else {
+			$('#next-update').html( 'updating'.T() );
+			loadView();
+		}
+	}
+	
 	function loadView() {
 		showTip( false );
 		//overlays.clear();
 		//opt.state = +$('#stateSelector').val();
 		//var state = curState = data.states.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
+		clearInterval( reloadTimer );
 		loadRegion();
 	}
 	
