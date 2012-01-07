@@ -24,7 +24,7 @@ var strings = {
 var elections = {
 	2008: {
 		dem: {
-			tableid: 'TODO',
+			tableids: 'TODO',
 			candidates: [
 				{ color: '#20FF1F', id: 'Biden', firstName: 'Joe', lastName: 'Biden', fullName: 'Joe Biden' },
 				{ color: '#FFFA00', id: 'Clinton', firstName: 'Hillary', lastName: 'Clinton', fullName: 'Hillary Clinton' },
@@ -37,7 +37,9 @@ var elections = {
 			]
 		},
 		gop: {
-			tableid: '2549421',
+			tableids: {
+				IA: '2549421'
+			},
 			candidates: [
 				{ color: '#336633', id: 'Giuliani', firstName: 'Rudy', lastName: 'Giuliani', fullName: 'Rudy Giuliani' },
 				{ color: '#D50F25', id: 'Huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
@@ -52,7 +54,10 @@ var elections = {
 	},
 	2012: {
 		gop: {
-			tableid: '2458834',
+			tableids: {
+				IA: '2458834',
+				NH: '2568627'
+			},
 			photos: true,
 			candidates: [
 				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
@@ -69,7 +74,7 @@ var elections = {
 	}
 };
 
-var year = params.year in elections ? +params.year : 2008;
+var year = params.year in elections ? +params.year : 2012;
 var parties = elections[year];
 var party = params.party in parties ? params.party : 'gop';
 var election = parties[party];
@@ -117,7 +122,7 @@ var data = {
 var $map, mapPixBounds;
 
 var debug = params.debug;
-opt.state = params.state || '';
+opt.state = params.state || 'NH';
 opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
@@ -615,14 +620,15 @@ function formatLegendTable( cells ) {
 	function loadRegion() {
 		var level = 100;
 		//var kind = ( opt.counties ? 'counties' : 'states' );
-		var kind = 'county';  // TEMP
-		var fips = '19';  // TEMP
+		var kind = 'cousub';  // TEMP
+		var fips = '33';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
 		}
 		else {
-			var file = S( 'c2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
+			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
+			var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', '.jsonp' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
@@ -773,7 +779,7 @@ function formatLegendTable( cells ) {
 				if( ! next  ||  next >= length ) next = 0;
 				while( next < length ) {
 					var feature = order[next++], id = feature.id;
-					var row = rowsByID[id];
+					var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 					var use = row && row[col.NumCountedBallotBoxes];
 					if( use ) {
 						outlineFeature( feature );
@@ -942,14 +948,11 @@ function formatLegendTable( cells ) {
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
-		fitBbox( json.bbox );
+		fitBbox( json.bboxLL );
 	}
 	
 	function fitBbox( bbox ) {
 		if( ! bbox ) return;
-		// TEMP
-		bbox = [ -96.6372, 40.3741, -90.1416, 43.5014 ];
-		// END TEMP
 		//bbox = shrinkBbox( bbox, .10 );
 		var bounds = new gm.LatLngBounds(
 			new gm.LatLng( bbox[1], bbox[0] ),
@@ -1057,8 +1060,7 @@ function formatLegendTable( cells ) {
 		var isMulti = ( candidates.current  == -1 );
 		if( isMulti ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				var id = feature.id;
-				var row = results.rowsByID[id];
+				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 				var candidate = row && candidates[row.candidateMax];
 				if( candidate ) {
 					feature.fillColor = candidate.color;
@@ -1068,8 +1070,9 @@ function formatLegendTable( cells ) {
 					feature.fillColor = '#FFFFFF';
 					feature.fillOpacity = 0;
 				}
-				var complete =
-					row[col.NumCountedBallotBoxes] == row[col.NumBallotBoxes];
+				var complete = row &&
+					row[col.NumCountedBallotBoxes] ==
+					row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
@@ -1081,8 +1084,7 @@ function formatLegendTable( cells ) {
 			var candidate = candidates.by.id[candidates.current], color = candidate.color, index = candidate.index;
 			var nCols = candidates.length;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				var id = feature.id;
-				var row = results.rowsByID[id];
+				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 				var total = 0, value = 0;
 				if( row ) {
 					var total = 0;
@@ -1096,11 +1098,12 @@ function formatLegendTable( cells ) {
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var id = feature.id;
-				var row = results.rowsByID[id];
+				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 				feature.fillColor = color;
 				feature.fillOpacity = row && max ? row.fract / max : 0;
-				var complete =
-					row[col.NumCountedBallotBoxes] == row[col.NumBallotBoxes];
+				var complete = row &&
+					row[col.NumCountedBallotBoxes] ==
+					row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = 1;
 				feature.strokeWidth = strokeWidth;
@@ -1335,18 +1338,19 @@ function formatLegendTable( cells ) {
 	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
-		var result = currentResults().rowsByID[feature.id];
+		var results = currentResults();
+		var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 		
 		var content;
-		if( result ) {
+		if( row ) {
 			var content = S(
 				'<div class="tipcontent">',
-					formatTipCandidates( feature, result ),
+					formatTipCandidates( feature, row ),
 				'</div>'
 			);
 			
-			var boxes = result[col.NumBallotBoxes];
-			var counted = result[col.NumCountedBallotBoxes];
+			var boxes = row[col.NumBallotBoxes];
+			var counted = row[col.NumCountedBallotBoxes];
 		}
 		
 		var parent = data.states.geo &&
@@ -1583,7 +1587,7 @@ function formatLegendTable( cells ) {
 	function loadView() {
 		showTip( false );
 		//overlays.clear();
-		opt.state = +$('#stateSelector').val();
+		//opt.state = +$('#stateSelector').val();
 		//var state = curState = data.states.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		loadRegion();
@@ -1614,7 +1618,7 @@ function formatLegendTable( cells ) {
 			resultsFields(),
 			'+FROM+',
 			//opt.counties ? '2458834' : 'TODO'
-			params.tableid || election.tableid
+			params.tableid || election.tableids[opt.state]
 		);
 		getScript( url );
 	}
