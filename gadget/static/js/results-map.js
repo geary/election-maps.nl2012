@@ -1421,14 +1421,14 @@ function formatLegendTable( cells ) {
 				'<td>',
 					formatCandidateAreaPatch( candidate, 24 ),
 				'</td>',
+				'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
+					pct,
+				'</td>',
 				web() ? S(
 					'<td class="candidate-votes" style="text-align:right; padding-left:6px;">',
-						formatNumber( candidate.votes ),
+						'(', formatNumber( candidate.votes ), ')',
 					'</td>'
 				) : '',
-				'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
-					web() ? S( '(', pct, ')' ) : pct,
-				'</td>',
 			'</tr>'
 		);
 	}
