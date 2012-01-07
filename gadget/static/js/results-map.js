@@ -12,6 +12,7 @@ var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}})',
+	noVotesHere: 'This location does not report voting results',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -1369,7 +1370,7 @@ function formatLegendTable( cells ) {
 				parent ? ' ' + parent.name : '',
 				parent && debug ? ' (#' + parent.id + ')' : '',
 				'<div class="tipreporting">',
-					'percentReporting'.T({
+					! boxes ? 'noVotesHere'.T() : 'percentReporting'.T({
 						percent: percent( counted / boxes ),
 						counted: counted,
 						total: boxes
