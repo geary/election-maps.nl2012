@@ -1372,6 +1372,7 @@ function formatLegendTable( cells ) {
 					formatSpanColorPatch( candidate.color, 8 ),
 					'&nbsp;', candidate.lastName, '&nbsp;',
 					percent1( candidate.vsAll ), '&nbsp;',
+					'(', formatNumber( candidate.votes ), ')',
 				'</div>',
 			'</td>'
 		);
