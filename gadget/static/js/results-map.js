@@ -1454,7 +1454,10 @@ function formatLegendTable( cells ) {
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
 						feature.name,
-						debug ? ' (#' + feature.id + ')' : '',
+						debug ? S(
+							'<br>geo id: ', feature.id,
+							'<br>ft id: ', row[col.ID]
+						) : '',
 						' ',
 					'</span>',
 				'</div>',
