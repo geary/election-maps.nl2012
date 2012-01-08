@@ -1748,14 +1748,31 @@ function formatLegendTable( cells ) {
 	};
 	
 	function fixCountyIDs( json ) {
-		json.table.rows.forEach( function( row ) {
-			var id = row[col.ID];
-			if( id.length < 5 ) {
-				while( id.length < 3 ) id = '0' + id;
-				row[col.ID] = '19' + id;
-			}
-		});
+		idFixers[opt.state] && idFixers[opt.state]( json );
 	}
+	
+	var idFixers = {
+		IA: function( json ) {
+			json.table.rows.forEach( function( row ) {
+				var id = row[col.ID];
+				if( id.length < 5 ) {
+					while( id.length < 3 ) id = '0' + id;
+					row[col.ID] = '19' + id;
+				}
+			});
+		},
+		NH: function( json ) {
+			json.table.rows.forEach( function( row ) {
+				var id = fixersNH[ row[col.ID] ];
+				if( id ) row[col.ID] = id;
+			});
+		}
+	};
+	
+	var fixersNH = {
+		'Waterville': 'Waterville Valley',
+		'Harts Location': "Hart's Location"
+	};
 	
 	function loadResults( json, counties, loading ) {
 		if( params.randomize ) {
