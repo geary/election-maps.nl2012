@@ -1569,29 +1569,31 @@ function formatLegendTable( cells ) {
 	
 	var mapStyles = [
 		{
+			stylers: [ { saturation: -100 } ]
+		},{
 			featureType: "road",
 			elementType: "labels",
 			stylers: [ { visibility: "off" } ]
 		},{
 			featureType: "road",
 			elementType: "geometry",
-			stylers: [ { saturation: -100 }, { lightness: 50 } ]
+			stylers: [ { lightness: 25 }, { visibility: "simplified" } ]
 		},{
 			featureType: "transit",
-			elementType: "all",
 			stylers: [ { visibility: "off" } ]
 		},{
 			featureType: "landscape",
-			elementType: "all",
-			stylers: [ { saturation: -100 }, { lightness: 100 } ]
+			stylers: [ { lightness: 100 } ]
+		//},{
+		//	featureType: "administrative",
+		//	stylers: [ { visibility: "off" } ]
+		//},{
+		//	featureType: "administrative.locality",
+		//	stylers: [ { visibility: "on" } ]
 		},{
-			featureType: "administrative",
-			elementType: "all",
-			stylers: [ { visibility: "off" } ]
-		},{
-			featureType: "administrative.locality",
-			elementType: "labels",
-			stylers: [ { visibility: "on" } ]
+			featureType: "poi.park",
+			elementType: "geometry",
+			stylers: [{ lightness: 60 }]
 		}
 	];
 	
