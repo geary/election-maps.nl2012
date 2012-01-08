@@ -531,7 +531,7 @@ document.write(
 	'</div>',
 	//'<a id="party-logo" class="logo" target="_blank" href="http://www.iowagop.org/" title="Iowa GOP">',
 	//'</a>',
-	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections" title="Google Election News">',
+	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections" title="Google Politics & Elections">',
 	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
