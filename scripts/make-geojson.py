@@ -4,9 +4,7 @@ import pg, private
 
 
 def process():
-	kind = 'cousub'
 	schema = 'carto2010'
-	table = schema + '.' + kind
 	fullGeom = 'full_geom'
 	googGeom = 'goog_geom'
 	boxGeom = googGeom
@@ -26,10 +24,21 @@ def process():
 		geoid = '33'
 		name = 'New Hampshire'
 		where = "( state = '%s' )" %( geoid )
+		
+		geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, simpleGeom, '00', 'United States', where )
+		geoCounty = db.makeFeatureCollection( schema+'.county', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+		geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+		
+		geo = {
+			'state': geoState,
+			'county': geoCounty,
+			'town': geoTown
+		};
+		
 		filename = '%s/%s-%s-%s.jsonp' %(
-			private.GEOJSON_PATH, table, geoid, simpleGeom
+			private.GEOJSON_PATH, schema, geoid, simpleGeom
 		)
-		db.makeGeoJSON( filename, table, boxGeom, boxGeomLL, simpleGeom, geoid, name, where, 'loadGeoJSON' )
+		db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
 
 def main():
