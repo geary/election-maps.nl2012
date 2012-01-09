@@ -138,7 +138,7 @@ opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
-var sidebarWidth = 320;
+var sidebarWidth = 280;
 
 opt.resultCacheTime = 60 * 1000;
 opt.reloadTime = 120 * 1000;
@@ -478,9 +478,10 @@ document.write(
 		'#legend { background-color:white; }',
 		'body.tv #legend { margin-top:8px; }',
 		'body.sidebar #legend { width:', sidebarWidth, 'px; }',
+		'#sidebar table.candidates { width:100%; }',
 		'table.candidates td { border-top:1px solid #E7E7E7; }',
-		'table.candidates tr.first td { border-top:none; }',
-		'#sidebar-scroll { padding:0 8px; }',
+		'#maptip table.candidates tr.first td { border-top:none; }',
+		'#sidebar-scroll { padding:0 4px; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
@@ -946,8 +947,8 @@ function formatLegendTable( cells ) {
 				width: ww - sidebarWidth,
 				height: wh
 			});
-			var $sidebarScroll = $('#sidebar-scroll');
-			$sidebarScroll.height( wh - $sidebarScroll.offset().top );
+			//var $sidebarScroll = $('#sidebar-scroll');
+			//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
 		}
 		$map.height( wh - mapTop );
 		if( geoMoveNext ) {
@@ -1391,7 +1392,7 @@ function formatLegendTable( cells ) {
 						opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
 					'</div>',
 				'</div>',
-				'<div class="scroller" id="sidebar-scroll">',
+				'<div xclass="scroller" id="sidebar-scroll">',
 					formatCandidateList(
 						[ top ].concat( candidates ),
 						function( candidate ) {
@@ -1408,71 +1409,54 @@ function formatLegendTable( cells ) {
 			return candidate.color;
 		});
 		var selected = candidates.current == -1 ? ' selected' : '';
-		if( 0 ) {
-			return S(
-				'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
-					'<td>',
-						'<div class="legend-candidate">',
-							formatSpanColorPatch( colors, 2 ),
-							'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
-						'</div>',
-					'</td>',
-				'</tr>'
-			);
-		}
-		else {
-			return S(
-				'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
-					'<td class="left">',
-						'<div style="margin:13px 0 13px 0;">',
-							formatSpanColorPatch( colors, 2 ),
-						'</div>',
-					'</td>',
-					'<td>',
-						'<div class="candidate-name" style="',
-									election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
-								'">',
-							'<div class="last-name" style="font-weight:bold;">',
-								'allCandidates'.T(),
-							'</div>',
-						'</div>',
-					'</td>',
-					'<td>',
-					'</td>',
-					'<td>',
-					'</td>',
-					'<td class="right">',
-					'</td>',
-				'</tr>'
-			);
-		}
+		return S(
+			'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
+				'<td class="left">',
+					'<div class="legend-candidate">',
+						formatSpanColorPatch( colors, 2 ),
+					'</div>',
+				'</td>',
+				'<td colspan="3" class="right">',
+					'<div class="legend-candidate">',
+						'allCandidates'.T(),
+					'</div>',
+				'</td>',
+			'</tr>'
+		);
 	}
 	
 	function formatSidebarCandidate( candidate ) {
 		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
-		if( 0 ) {
-			return S(
-				'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-					'<td>',
-						'<div class="legend-candidate">',
-							formatSpanColorPatch( candidate.color, 8 ),
-							'&nbsp;', candidate.lastName, '&nbsp;',
-							percent1( candidate.vsAll ), '&nbsp;',
-							'(', formatNumber( candidate.votes ), ')',
-						'</div>',
-					'</td>',
-				'</tr>'
-			);
-		}
-		else {
-			return formatListCandidate( candidate, -1, true );
-		}
+		return S(
+			'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+				'<td class="left">',
+					'<div class="legend-candidate">',
+						formatSpanColorPatch( candidate.color, 8 ),
+					'</div>',
+				'</td>',
+				'<td>',
+					'<div class="legend-candidate">',
+						candidate.lastName,
+					'</div>',
+				'</td>',
+				'<td>',
+					'<div class="legend-candidate">',
+						percent1( candidate.vsAll ),
+					'</div>',
+				'</td>',
+				'<td class="right">',
+					'<div class="legend-candidate">',
+						formatNumber( candidate.votes ),
+					'</div>',
+				'</td>',
+			'</tr>'
+		);
 	}
 	
 	function formatTipCandidates( result ) {
 		return formatCandidateList(
 			topCandidatesByVote( result, /*params.sidebar ? 0 :*/ 4 ),
-			function( candidate, i ) { return formatListCandidate( candidate, i ); }
+			formatListCandidate
 		);
 	}
 	
@@ -1486,9 +1470,9 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
-	function formatListCandidate( candidate, i, sidebar ) {
+	function formatListCandidate( candidate, i ) {
 		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
-		var cls = sidebar ? selected : i === 0 ? ' first' : '';
+		var cls = i === 0 ? ' first' : '';
 		var pct = percent1( candidate.vsAll );
 		return S(
 			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
