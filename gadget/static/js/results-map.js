@@ -893,7 +893,7 @@ function formatLegendTable( cells ) {
 	$('body').addClass( tv() ? 'tv' : 'web' );
 	if( params.sidebar ) $('body').addClass( 'sidebar' );
 
-	var map, gonzo;
+	var map;
 	
 	var overlays = [];
 	overlays.clear = function() {
