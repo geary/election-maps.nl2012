@@ -452,7 +452,7 @@ document.write(
 		'.content .contentreporting { margin-bottom:8px; }',
 		'.content .contentreporting * { xfont-size:20px; }',
 		'.content {}',
-		'#content-scroll { overflow:scroll; overflow-x:hidden; }',
+		'div.scroller { overflow:scroll; overflow-x:hidden; }',
 		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; }',
 		'div.candidate-name { line-height:1em; }',
 		'div.first-name { font-size:85%; }',
@@ -477,20 +477,26 @@ document.write(
 		'#legend { background-color:white; }',
 		'body.tv #legend { margin-top:8px; }',
 		'body.sidebar #legend { width:', sidebarWidth, 'px; }',
-		'td.legend-candidate, td.legend-filler { border:1px solid white; }',
+		'table.candidates td { border-top:1px solid #E7E7E7; }',
+		'table.candidates tr.first td { border-top:none; }',
+		'#sidebar-scroll { padding:0 8px; }',
+		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
 		'body.web div.legend-candidate { color:#333; }',
 		'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:21px; font-weight:bold; }',
 		'td.legend-filler { border-color:transparent; }',
-		'td.legend-candidate { width:20%; }',
-		'td.legend-candidate { cursor:pointer; }',
-		'td.legend-candidate.hover { background-color:#F5F5F5; border:1px solid #D9D9D9; }',
-		'td.legend-candidate.selected { background-color:#E7E7E7; border:1px solid #CCCCCC; }',
+		//'tr.legend-candidate td { width:20%; }',
+		'tr.legend-candidate td { cursor:pointer; }',
+		'tr.legend-candidate.hover td { background-color:#F5F5F5; border:1px solid #F5F5F5; border-top:1px solid #D9D9D9; border-bottom:1px solid #D9D9D9; }',
+		'tr.legend-candidate.hover td.left { border-left:1px solid #D9D9D9; }',
+		'tr.legend-candidate.hover td.right { border-right:1px solid #D9D9D9; }',
+		'tr.legend-candidate.selected td { background-color:#E7E7E7; border:1px solid #E7E7E7; border-top:1px solid #CCCCCC; border-bottom:1px solid #CCCCCC; }',
+		'tr.legend-candidate.selected td.left { border-left:1px solid #CCCCCC; }',
+		'tr.legend-candidate.selected td.right { border-right:1px solid #CCCCCC; }',
 		'span.legend-candidate-color { font-size:15px; }',
+		'#sidebar span.legend-candidate-color { font-size:16px; }',
 		'body.tv span.legend-candidate-color { font-size:18px; }',
-		'table.candidates td { border-top:1px solid #E7E7E7; }',
-		'table.candidates tr.first td { border-top:none; }',
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
@@ -938,6 +944,8 @@ function formatLegendTable( cells ) {
 				width: ww - sidebarWidth,
 				height: wh
 			});
+			var $sidebarScroll = $('#sidebar-scroll');
+			$sidebarScroll.height( wh - $sidebarScroll.offset().top );
 		}
 		$map.height( wh - mapTop );
 		if( geoMoveNext ) {
@@ -1313,43 +1321,43 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatLegend() {
-		if( params.sidebar ) return formatSidebar();
+		/*if( params.sidebar )*/ return formatSidebar();
 		
-		var topCandidates = topCandidatesByVote(
-			totalResults( currentResults() )
-		);
-		var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
-		var candidates = topCandidates.map( formatLegendCandidate );
-		return formatLegendTable( [ top ].concat( candidates ) );
+		//var topCandidates = topCandidatesByVote(
+		//	totalResults( currentResults() )
+		//);
+		//var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
+		//var candidates = topCandidates.map( formatLegendCandidate );
+		//return formatLegendTable( [ top ].concat( candidates ) );
 	}
 	
-	function formatLegendTopCandidates( topCandidates ) {
-		var colors = topCandidates.map( function( candidate ) {
-			return candidate.color;
-		});
-		var selected = candidates.current == -1 ? ' selected' : '';
-		return S(
-			'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
-				'<div class="legend-candidate">',
-					formatSpanColorPatch( colors, 2 ),
-					'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
-				'</div>',
-			'</td>'
-		);
-	}
+	//function formatLegendTopCandidates( topCandidates ) {
+	//	var colors = topCandidates.map( function( candidate ) {
+	//		return candidate.color;
+	//	});
+	//	var selected = candidates.current == -1 ? ' selected' : '';
+	//	return S(
+	//		'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
+	//			'<div class="legend-candidate">',
+	//				formatSpanColorPatch( colors, 2 ),
+	//				'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
+	//			'</div>',
+	//		'</td>'
+	//	);
+	//}
 	
-	function formatLegendCandidate( candidate ) {
-		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
-		return S(
-			'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-				'<div class="legend-candidate">',
-					formatSpanColorPatch( candidate.color, 8 ),
-					'&nbsp;', candidate.lastName, '&nbsp;',
-					percent1( candidate.vsAll ), '&nbsp;',
-				'</div>',
-			'</td>'
-		);
-	}
+	//function formatLegendCandidate( candidate ) {
+	//	var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
+	//	return S(
+	//		'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+	//			'<div class="legend-candidate">',
+	//				formatSpanColorPatch( candidate.color, 8 ),
+	//				'&nbsp;', candidate.lastName, '&nbsp;',
+	//				percent1( candidate.vsAll ), '&nbsp;',
+	//			'</div>',
+	//		'</td>'
+	//	);
+	//}
 	
 	function nameCase( name ) {
 		return name && name.split(' ').map( function( word ) {
@@ -1365,23 +1373,27 @@ function formatLegendTable( cells ) {
 		var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 		var candidates = topCandidates.map( formatSidebarCandidate );
 		return S(
-			'<div class="sidebar-header">',
-				'<div class="election-title">',
-					'electionTitle'.T(),
+			'<div id="sidebar">',
+				'<div class="sidebar-header">',
+					'<div class="election-title">',
+						'electionTitle'.T(),
+					'</div>',
+					'<div class="election-date">',
+						opt.randomized ? 'randomized'.T() : 'electionDate'.T(),
+					'</div>',
+					'<div class="percent-reporting">',
+						'percentReporting'.T( totalReporting( currentResults() ) ),
+					'</div>',
 				'</div>',
-				'<div class="election-date">',
-					opt.randomized ? 'randomized'.T() : 'electionDate'.T(),
+				'<div class="scroller" id="sidebar-scroll">',
+					formatCandidateList(
+						[ top ].concat( candidates ),
+						function( candidate ) {
+							return candidate;
+						}
+					),
 				'</div>',
-				'<div class="percent-reporting">',
-					'percentReporting'.T( totalReporting( currentResults() ) ),
-				'</div>',
-			'</div>',
-			formatCandidateList(
-				[ top ].concat( candidates ),
-				function( candidate ) {
-					return S( '<tr>', candidate, '</tr>' );
-				}
-			)
+			'</div>'
 		);
 	}
 	
@@ -1390,34 +1402,71 @@ function formatLegendTable( cells ) {
 			return candidate.color;
 		});
 		var selected = candidates.current == -1 ? ' selected' : '';
-		return S(
-			'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
-				'<div class="legend-candidate">',
-					formatSpanColorPatch( colors, 2 ),
-					'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
-				'</div>',
-			'</td>'
-		);
+		if( 0 ) {
+			return S(
+				'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
+					'<td>',
+						'<div class="legend-candidate">',
+							formatSpanColorPatch( colors, 2 ),
+							'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
+						'</div>',
+					'</td>',
+				'</tr>'
+			);
+		}
+		else {
+			return S(
+				'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
+					'<td class="left">',
+						'<div style="margin:13px 0 13px 0;">',
+							formatSpanColorPatch( colors, 2 ),
+						'</div>',
+					'</td>',
+					'<td>',
+						'<div class="candidate-name" style="',
+									election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
+								'">',
+							'<div class="last-name" style="font-weight:bold;">',
+								'allCandidates'.T(),
+							'</div>',
+						'</div>',
+					'</td>',
+					'<td>',
+					'</td>',
+					'<td>',
+					'</td>',
+					'<td class="right">',
+					'</td>',
+				'</tr>'
+			);
+		}
 	}
 	
 	function formatSidebarCandidate( candidate ) {
 		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
-		return S(
-			'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-				'<div class="legend-candidate">',
-					formatSpanColorPatch( candidate.color, 8 ),
-					'&nbsp;', candidate.lastName, '&nbsp;',
-					percent1( candidate.vsAll ), '&nbsp;',
-					'(', formatNumber( candidate.votes ), ')',
-				'</div>',
-			'</td>'
-		);
+		if( 0 ) {
+			return S(
+				'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+					'<td>',
+						'<div class="legend-candidate">',
+							formatSpanColorPatch( candidate.color, 8 ),
+							'&nbsp;', candidate.lastName, '&nbsp;',
+							percent1( candidate.vsAll ), '&nbsp;',
+							'(', formatNumber( candidate.votes ), ')',
+						'</div>',
+					'</td>',
+				'</tr>'
+			);
+		}
+		else {
+			return formatListCandidate( candidate, -1, true );
+		}
 	}
 	
 	function formatTipCandidates( result ) {
 		return formatCandidateList(
 			topCandidatesByVote( result, /*params.sidebar ? 0 :*/ 4 ),
-			formatListCandidate
+			function( candidate, i ) { return formatListCandidate( candidate, i ); }
 		);
 	}
 	
@@ -1431,11 +1480,13 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
-	function formatListCandidate( candidate, i ) {
+	function formatListCandidate( candidate, i, sidebar ) {
+		var selected = ( candidate.id == candidates.current ) ? ' selected' : '';
+		var cls = sidebar ? selected : i === 0 ? ' first' : '';
 		var pct = percent1( candidate.vsAll );
 		return S(
-			'<tr class="', i !== 0 ? '' : 'first', '">',
-				'<td>',
+			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
+				'<td class="left">',
 					election.photos ? S(
 						'<div style="margin:6px 6px 6px 0;">',
 							formatCandidateIcon( candidate, 32 ),
@@ -1461,8 +1512,8 @@ function formatLegendTable( cells ) {
 					pct,
 				'</td>',
 				web() ? S(
-					'<td class="candidate-votes" style="text-align:right; padding-left:6px;">',
-						'(', formatNumber( candidate.votes ), ')',
+					'<td class="candidate-votes right" style="text-align:right; padding-left:10px;">',
+						formatNumber( candidate.votes ),
 					'</td>'
 				) : '',
 			'</tr>'
@@ -1691,7 +1742,7 @@ function formatLegendTable( cells ) {
 		});
 		
 		var $legend = $('#legend');
-		$legend.delegate( 'td.legend-candidate', {
+		$legend.delegate( 'tr.legend-candidate', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
