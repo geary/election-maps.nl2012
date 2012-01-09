@@ -283,6 +283,19 @@ class Database:
 	def makeGeoJSON( self, filename, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where, jsonp ):
 		
 		print 'makeGeoJSON', filename
+		t1 = time.clock()
+		featurecollection = self.makeFeatureCollection( table, boxGeom, boxGeomLL, polyGeom, geoid, name, where )
+		fcjson = json.dumps( featurecollection )
+		if jsonp:
+			fcjson = jsonp + '(' + fcjson + ')'
+		file( filename, 'wb' ).write( fcjson )
+		t2 = time.clock()
+		print 'makeGeoJSON %.1f seconds' %( t2 - t1 )
+
+
+	def makeFeatureCollection( self, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where ):
+		
+		print 'makeFeatureCollection'
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
@@ -367,13 +380,8 @@ class Database:
 				},
 			}
 		t4 = time.clock()
-		print 'Make featurecollection %.1f seconds' %( t4 - t3 )
-		fcjson = json.dumps( featurecollection )
-		if jsonp:
-			fcjson = jsonp + '(' + fcjson + ')'
-		file( filename, 'wb' ).write( fcjson )
-		t5 = time.clock()
-		print 'Write JSON %.1f seconds' %( t5 - t4 )
+		print 'makeFeatureCollection %.1f seconds' %( t4 - t3 )
+		return featurecollection
 
 
 if __name__ == "__main__":
