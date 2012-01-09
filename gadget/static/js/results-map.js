@@ -868,6 +868,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function percent1( n ) {
+		if( n == 1 ) return '100%';
 		var p = Math.round( n * 1000 );
 		if( p == 1000  &&  n < 1 ) p = 999;
 		if( p == 0  && n > 0 ) return '&lt;0.1%';
