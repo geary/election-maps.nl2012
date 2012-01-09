@@ -286,27 +286,6 @@ class Database:
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
-		## Temp filter for NYC test
-		#filter = '''
-		#	(
-		#		countyfp10 = '005' OR
-		#		countyfp10 = '047' OR
-		#		countyfp10 = '061' OR
-		#		countyfp10 = '081' OR
-		#		countyfp10 = '085'
-		#	)
-		#'''
-		
-		## Test for the simplify error
-		#filter = '''
-		#	(
-		#		geoid10 = '360050504000'
-		#	)
-		#'''
-		
-		# Don't filter
-		#filter = ''
-		
 		t1 = time.clock()
 		self.execute('''
 			SELECT
