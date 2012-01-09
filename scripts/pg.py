@@ -375,6 +375,7 @@ class Database:
 			'name': name,
 			'centroid': extentcentroid['coordinates'],
 			'features': features,
+			'table': table,
 		}
 		if srid != -1:
 			featurecollection['crs'] = {
