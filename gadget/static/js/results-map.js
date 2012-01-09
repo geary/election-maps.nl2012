@@ -16,7 +16,7 @@ opt.randomized = params.randomize;
 var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
-	percentReporting: '{{percent}} reporting ({{counted}}/{{total}})',
+	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
 	electionTitle: 'New Hampshire Primary',  // TODO: make election-specific
 	electionDate: 'January 10, 2012',  // TODO
@@ -1287,7 +1287,8 @@ function formatLegendTable( cells ) {
 		return {
 			counted: counted,
 			total: total,
-			percent: percent1( counted / total )
+			percent: percent1( counted / total ),
+			kind: ' towns'  // TODO
 		};
 	}
 	
@@ -1564,7 +1565,8 @@ function formatLegendTable( cells ) {
 					! boxes ? 'noVotesHere'.T() : 'percentReporting'.T({
 						percent: percent1( counted / boxes ),
 						counted: counted,
-						total: boxes
+						total: boxes,
+						kind: ''
 					}),
 				'</div>',
 			'</div>',
