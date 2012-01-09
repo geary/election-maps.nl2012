@@ -1290,7 +1290,7 @@ function formatLegendTable( cells ) {
 			counted: counted,
 			total: total,
 			percent: percent1( counted / total ),
-			kind: ' towns'  // TODO
+			kind: ''  // TODO
 		};
 	}
 	
