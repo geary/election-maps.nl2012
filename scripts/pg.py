@@ -281,16 +281,20 @@ class Database:
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
 	def makeGeoJSON( self, filename, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where, jsonp ):
-		
 		print 'makeGeoJSON', filename
 		t1 = time.clock()
 		featurecollection = self.makeFeatureCollection( table, boxGeom, boxGeomLL, polyGeom, geoid, name, where )
-		fcjson = json.dumps( featurecollection )
-		if jsonp:
-			fcjson = jsonp + '(' + fcjson + ')'
-		file( filename, 'wb' ).write( fcjson )
+		self.writeGeoJSON( filename, featurecollection, jsonp )
 		t2 = time.clock()
 		print 'makeGeoJSON %.1f seconds' %( t2 - t1 )
+
+
+	def writeGeoJSON( self, filename, data, jsonp ):
+		print 'writeGeoJSON', filename
+		geojson = json.dumps( data )
+		if jsonp:
+			geojson = jsonp + '(' + geojson + ')'
+		file( filename, 'wb' ).write( geojson )
 
 
 	def makeFeatureCollection( self, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where ):
