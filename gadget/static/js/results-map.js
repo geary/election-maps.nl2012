@@ -124,8 +124,9 @@ var gm, gme;
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
 var data = {
-	counties: { geo:null, results:null },
-	states: { geo:null, results:null }
+	state: { geo:null, results:null },
+	county: { geo:null, results:null },
+	town: { geo:null, results:null }
 };
 
 var $map, mapPixBounds;
@@ -551,7 +552,7 @@ function contentTable() {
 			//		//'<select id="stateSelector">',
 			//		//	option( '-1', 'nationwideLabel'.T() ),
 			//		//	option( '', '', false, true ),
-			//		//	sortArrayBy( data.states.geo.features, 'name' )
+			//		//	sortArrayBy( data.state.geo.features, 'name' )
 			//		//		.mapjoin( function( state ) {
 			//		//			return stateOption(
 			//		//				state,
@@ -632,7 +633,8 @@ function formatLegendTable( cells ) {
 	function loadRegion() {
 		var level = 100;
 		//var kind = ( opt.counties ? 'counties' : 'states' );
-		var kind = 'cousub';  // TEMP
+		//var kind = 'cousub';  // TEMP
+		var kind = 'all';  // TEMP
 		var fips = '33';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
@@ -640,7 +642,8 @@ function formatLegendTable( cells ) {
 		}
 		else {
 			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
-			var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', '.jsonp' );
+			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', '.jsonp' );
+			var file = S( 'carto2010', '-', fips, '-goog_geom', '.jsonp' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
@@ -670,22 +673,36 @@ function formatLegendTable( cells ) {
 				$map = $('#map');
 			}
 		}
-		json.kind = 'county';  // TEMP
+		json.kind = 'all';  // TEMP
 		jsonRegion[json.kind] = json;
 		//debugger;
 		var loader = {
 			// TODO: refactor
-			state: function() {
-				json.features.index('id').index('abbr');
-				data.states.geo = json;
-				oneTime();
-				//setCounties( false );
-				getResults();
-				analytics( '/states' );
-			},
-			county: function() {
-				json.features.index('id').index('abbr');
-				data.counties.geo = json;
+			//state: function() {
+			//	json.features.index('id').index('abbr');
+			//	data.state.geo = json;
+			//	oneTime();
+			//	//setCounties( false );
+			//	getResults();
+			//	analytics( '/states' );
+			//},
+			//county: function() {
+			//	json.features.index('id').index('abbr');
+			//	data.county.geo = json;
+			//	oneTime();
+			//	//setCounties( true );
+			//	getResults();
+			//	analytics( '/counties' );
+			//},
+			all: function() {
+				function set( kind ) {
+					var geo = json[kind];
+					geo.features.index('id').index('abbr');
+					data[kind].geo = geo;
+				}
+				set( 'state' );
+				set( 'county' );
+				set( 'town' );
 				oneTime();
 				//setCounties( true );
 				getResults();
@@ -773,7 +790,7 @@ function formatLegendTable( cells ) {
 		},
 		counties: {
 			setup: function() {
-				var features = data.counties.geo.features;
+				var features = data.county.geo.features;
 				//features.playOrder = sortArrayBy( features, function( feature ) {
 				//	return(
 				//		-feature.centroid[1] * 1000000000 + feature.centroid[0]
@@ -782,8 +799,8 @@ function formatLegendTable( cells ) {
 				features.playOrder = sortArrayBy( features, 'name' );
 			},
 			tick: function() {
-				var features = data.counties.geo.features,
-					rowsByID = data.counties.results.rowsByID;
+				var features = data.county.geo.features,
+					rowsByID = data.county.results.rowsByID;
 				var order = features.playOrder,
 					next = order.next, length = order.length;
 				if( ! next  ||  next >= length ) next = 0;
@@ -939,10 +956,13 @@ function formatLegendTable( cells ) {
 	}
 	
 	function currentGeos() {
-		//data.states.geo.hittest = ! opt.counties;
-		return opt.counties ?
-			[ data.counties.geo, data.states.geo ] :
-			[ data.states.geo ];
+		//data.state.geo.hittest = ! opt.counties;
+		//return opt.counties ?
+		//	[ data.county.geo, data.state.geo ] :
+		//	[ data.state.geo ];
+		data.state.geo.hittest = false;
+		data.county.geo.hittest = false;
+		return [ data.town.geo, data.county.geo, data.state.geo ];
 	}
 	
 	function currentResults() {
@@ -950,7 +970,8 @@ function formatLegendTable( cells ) {
 	}
 	
 	function currentData() {
-		return opt.counties ? data.counties: data.states;
+		//return opt.counties ? data.county : data.state;
+		return data.town;
 	}
 	
 	function moveToGeo() {
@@ -1004,7 +1025,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function polys() {
-		colorize( /* ?? */ );
+		colorize( currentGeos() );
 		var $container = $('#map');
 		function getFeature( event, where ) {
 			return where && where.feature;
@@ -1051,9 +1072,9 @@ function formatLegendTable( cells ) {
 		else draw();
 	}
 	
-	function colorize( /* ?? */ ) {
+	function colorize( geos ) {
 		//if( opt.counties ) {
-		//	var features = data.states.geo.features;
+		//	var features = data.state.geo.features;
 		//	for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 		//		feature.fillColor = '#000000';
 		//		feature.fillOpacity = 0;
@@ -1062,65 +1083,84 @@ function formatLegendTable( cells ) {
 		//		feature.strokeWidth = 2;
 		//	}
 		//}
-		if( opt.counties ) {
-			var source = data.counties, strokeWidth = 1, strokeColor = '#666666';
-		}
-		else {
-			var source = data.states, strokeWidth = 1, strokeColor = '#666666';
-		}
-		var features = source.geo.features, results = source.results;
-		var isMulti = ( candidates.current  == -1 );
-		if( isMulti ) {
-			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
-				var candidate = row && candidates[row.candidateMax];
-				if( candidate ) {
-					feature.fillColor = candidate.color;
-					feature.fillOpacity = .6;
-				}
-				else {
-					feature.fillColor = '#FFFFFF';
+		geos.forEach( function( geo ) {
+			function simple( fillColor, strokeColor, strokeWidth ) {
+				var features = geo.features;
+				for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+					feature.fillColor = fillColor;
 					feature.fillOpacity = 0;
-				}
-				var complete = row &&
-					row[col.NumCountedBallotBoxes] ==
-					row[col.NumBallotBoxes];
-				feature.strokeColor = strokeColor;
-				feature.strokeOpacity = 1;
-				feature.strokeWidth = strokeWidth;
-			}
-		}
-		else {
-			var rows = results.rows;
-			var max = 0;
-			var candidate = candidates.by.id[candidates.current], color = candidate.color, index = candidate.index;
-			var nCols = candidates.length;
-			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
-				var total = 0, value = 0;
-				if( row ) {
-					var total = 0;
-					for( var iCol = -1;  ++iCol < nCols; )
-						total += row[iCol];
-					value = row[index];
-					max = Math.max( max,
-						row.fract = total ? value / total : 0
-					);
+					feature.strokeColor = strokeColor;
+					feature.strokeOpacity = 1;
+					feature.strokeWidth = strokeWidth;
 				}
 			}
-			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-				var id = feature.id;
-				var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
-				feature.fillColor = color;
-				feature.fillOpacity = row && max ? row.fract / max : 0;
-				var complete = row &&
-					row[col.NumCountedBallotBoxes] ==
-					row[col.NumBallotBoxes];
-				feature.strokeColor = strokeColor;
-				feature.strokeOpacity = 1;
-				feature.strokeWidth = strokeWidth;
-			}
-		}
+			var kind = geo.table.split('.')[1];
+			var colorizers = {
+				state: function() {
+					simple( '#FFFFFF', '#222222', 3 );
+				},
+				county: function() {
+					simple( '#FFFFFF', '#222222', 2 );
+				},
+				cousub: function() {
+					var features = geo.features, results = data.town.results;
+					var strokeWidth = 1, strokeColor = '#AAAAAA';
+					var isMulti = ( candidates.current  == -1 );
+					if( isMulti ) {
+						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							var candidate = row && candidates[row.candidateMax];
+							if( candidate ) {
+								feature.fillColor = candidate.color;
+								feature.fillOpacity = .6;
+							}
+							else {
+								feature.fillColor = '#FFFFFF';
+								feature.fillOpacity = 0;
+							}
+							var complete = row &&
+								row[col.NumCountedBallotBoxes] ==
+								row[col.NumBallotBoxes];
+							feature.strokeColor = strokeColor;
+							feature.strokeOpacity = 1;
+							feature.strokeWidth = strokeWidth;
+						}
+					}
+					else {
+						var rows = results.rows;
+						var max = 0;
+						var candidate = candidates.by.id[candidates.current], color = candidate.color, index = candidate.index;
+						var nCols = candidates.length;
+						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							var total = 0, value = 0;
+							if( row ) {
+								var total = 0;
+								for( var iCol = -1;  ++iCol < nCols; )
+									total += row[iCol];
+								value = row[index];
+								max = Math.max( max,
+									row.fract = total ? value / total : 0
+								);
+							}
+						}
+						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+							var id = feature.id;
+							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							feature.fillColor = color;
+							feature.fillOpacity = row && max ? row.fract / max : 0;
+							var complete = row &&
+								row[col.NumCountedBallotBoxes] ==
+								row[col.NumBallotBoxes];
+							feature.strokeColor = strokeColor;
+							feature.strokeOpacity = 1;
+							feature.strokeWidth = strokeWidth;
+						}
+					}
+				}
+			};
+			colorizers[kind]();
+		});
 	}
 	
 	// TODO: refactor this into PolyGonzo
@@ -1446,8 +1486,8 @@ function formatLegendTable( cells ) {
 			var counted = row[col.NumCountedBallotBoxes];
 		}
 		
-		var parent = data.states.geo &&
-			data.states.geo.features.by.id[feature.parent];
+		var parent = data.state.geo &&
+			data.state.geo.features.by.id[feature.parent];
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1642,8 +1682,8 @@ function formatLegendTable( cells ) {
 			if( opt.state == value ) return;
 			opt.state = value;
 			setCounties( value > 0 );
-			var state = data.states.geo.features.by.id[value];
-			fitBbox( state ? state.bbox : data.states.geo.bbox );
+			var state = data.state.geo.features.by.id[value];
+			fitBbox( state ? state.bbox : data.state.geo.bbox );
 		});
 		
 		$('#chkCounties').click( function() {
@@ -1686,7 +1726,7 @@ function formatLegendTable( cells ) {
 		showTip( false );
 		//overlays.clear();
 		//opt.state = +$('#stateSelector').val();
-		//var state = curState = data.states.geo.features.by.abbr[opt.abbr];
+		//var state = curState = data.state.geo.features.by.abbr[opt.abbr];
 		$('#spinner').show();
 		clearInterval( reloadTimer );
 		reloadTimer = null;
