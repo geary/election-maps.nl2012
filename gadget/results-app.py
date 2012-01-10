@@ -22,8 +22,27 @@ def dumpRequest( req ):
 	})
 
 
+def checkReferer( req, required ):
+	return checkRefererURL( req.environ.get('HTTP-REFERER'), required )
+
+
+def checkRefererURL( referer, required ):
+	if not referer: return not required
+	for domain in private.whitelist:
+		pattern = 'https?://(\w+\.)*%s/' % domain.replace( '.', '\.' )
+		if re.match( pattern, referer ):
+			return True
+	return False
+
+
+
 class VoteDataHandler( webapp.RequestHandler ):
-	def get( self, dump ):
+	def get( self ):
+		if not checkReferer( self.request, True ):
+			self.response.clear()
+			self.response.set_status( 403 )
+			self.response.out.write( 'Access not allowed' )
+			return
 		#logging.info( dumpRequest( self.request ) )
 		query = self.request.environ['QUERY_STRING']
 		logging.info( query )
@@ -50,8 +69,24 @@ class VoteDataHandler( webapp.RequestHandler ):
 			self.response.headers['Content-Type'] = 'text/javascript'
 
 
+class HtmlHandler( webapp.RequestHandler ):
+	def get( self, name ):
+		if not checkReferer( self.request, False ):
+			self.response.clear()
+			self.response.set_status( 403 )
+			self.response.out.write( 'Access not allowed' )
+			return
+		#logging.info( dumpRequest( self.request ) )
+		f = open( name, 'r' )
+		content = f.read()
+		f.close()
+		self.response.out.write( content )
+		self.response.headers['Content-Type'] = 'text/html'
+
+
 application = webapp.WSGIApplication([
-	( r'/vote-data(.*)', VoteDataHandler )
+	( r'/vote-data(.*)', VoteDataHandler ),
+	( r'/(.*\.html)', HtmlHandler ),
 ], debug = True )
 
 

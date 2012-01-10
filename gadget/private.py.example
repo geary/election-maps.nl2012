@@ -8,3 +8,8 @@ tables = {
 		'town': 'YOUR_FUSION_TABLE_ID',
 	},
 }
+
+whitelist = [
+	'google.com',
+	# add your domain(s) here
+]
