@@ -1402,7 +1402,7 @@ function formatLegendTable( cells ) {
 							'<input type="checkbox" id="chkCycle" ',
 								opt.cycleTimer ? 'checked="checked"' : '',
 							'>',
-							'cycle'.T(),
+							'&nbsp;', 'cycle'.T(),
 						'</label>',
 					'</div>',
 				'</div>',
