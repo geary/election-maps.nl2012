@@ -974,7 +974,7 @@ function formatLegendTable( cells ) {
 		//	[ data.state.geo ];
 		data.state.geo.hittest = false;
 		data.county.geo.hittest = false;
-		return [ data.town.geo, data.county.geo, data.state.geo ];
+		return [ data.town.geo, /*data.county.geo,*/ data.state.geo ];
 	}
 	
 	function currentResults() {
@@ -1109,14 +1109,14 @@ function formatLegendTable( cells ) {
 			var kind = geo.table.split('.')[1];
 			var colorizers = {
 				state: function() {
-					simple( '#FFFFFF', '#222222', 3 );
+					simple( '#FFFFFF', '#222222', 2.5 );
 				},
 				county: function() {
-					simple( '#FFFFFF', '#222222', 2 );
+					simple( '#FFFFFF', '#444444', 1 );
 				},
 				cousub: function() {
 					var features = geo.features, results = data.town.results;
-					var strokeWidth = 1, strokeColor = '#AAAAAA';
+					var strokeWidth = 1, strokeColor = '#666666';
 					var isMulti = ( candidates.current  == -1 );
 					if( isMulti ) {
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
