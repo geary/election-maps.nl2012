@@ -72,8 +72,8 @@ var elections = {
 			},
 			photos: true,
 			candidates: [
-				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann', show:false },
-				{ color: '#666666', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain', show:false },
+				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann' },
+				{ color: '#666666', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
 				{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
 				{ color: '#54F1F1', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
 				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
@@ -1301,10 +1301,7 @@ function formatLegendTable( cells ) {
 		max = max || Infinity;
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
-		var top = [];
-		candidates.forEach( function( candidate ) {
-			if( candidate.show !== false ) top.push( candidate );
-		});
+		var top = candidates.slice();
 		for( var i = -1;  ++i < top.length; ) {
 			var candidate = top[i], votes = result[i];
 			candidate.votes = votes;
