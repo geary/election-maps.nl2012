@@ -1,4 +1,5 @@
 \.pyc$
+gadget/static/js/local\.js$
 gadget/private\.py$
 scripts/parser\.out
 scripts/parsetab\.py
