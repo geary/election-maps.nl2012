@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+'''
+    private.py
+'''
+
+SHAPEFILE_PATH = '/your/shapefile/download/path'
+GEOJSON_PATH = '/your/geojson/output/path'
+TILE_PATH = '/your/tile/output/path'
+
+POSTGRES_USERNAME = 'postgres'
+POSTGRES_PASSWORD = ''

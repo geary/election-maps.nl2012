@@ -1,0 +1,5 @@
+\.pyc$
+gadget/private\.py$
+scripts/parser\.out
+scripts/parsetab\.py
+scripts/private\.py$

@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+	private.py
+'''
+
+tables = {
+	'NH': {
+		'town': 'YOUR_FUSION_TABLE_ID',
+	},
+}
+
+whitelist = [
+	'google.com',
+	# add your domain(s) here
+]
