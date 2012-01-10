@@ -5,9 +5,10 @@ api_version: 1
 
 handlers:
 
-- url: /(vote-data|.*\.html)
+- url: /vote-data
   script: results-app.py
   
-- url: /(css/.*|images/.*|js/.*|shapes/.*)
+- url: /(.*\.html|css/.*|images/.*|js/.*|shapes/.*)
   static_files: static/\1
-  upload: static/(css/.*|images/.*|js/.*|shapes/.*)
+  upload: static/(.*)
+  
