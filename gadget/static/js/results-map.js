@@ -21,7 +21,7 @@ var strings = {
 	electionTitle: 'New Hampshire Primary',  // TODO: make election-specific
 	electionDate: 'January 10, 2012',  // TODO
 	randomized: 'Displaying random test data',
-	automaticUpdate: 'Automatic update every two minutes',
+	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
 	cycleTip: 'Automatically cycles through the candidate maps when checked',
 	//countdownHeading: 'Live results in:',
