@@ -441,7 +441,7 @@ document.write(
 		'h2 { font-size:11pt; margin:0; padding:0; }',
 		'div.sidebar-header { padding:8px; }',
 		'div.title-text { font-size:16px; }',
-		'div.body-text { font-size:13px; }',
+		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:11px; color:#777; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
