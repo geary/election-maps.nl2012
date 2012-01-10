@@ -22,6 +22,8 @@ var strings = {
 	electionDate: 'January 10, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'Automatic update every two minutes',
+	cycle: 'Cycle Candidates',
+	cycleTip: 'Automatically cycles through the candidate maps when checked',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -1392,6 +1394,14 @@ function formatLegendTable( cells ) {
 					'<div class="faint-text" style="margin-bottom:8px;">',
 						opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
 					'</div>',
+					'<div class="body-text" style="padding-top:4px;">',
+						'<label for="chkCycle" title="', 'cycleTip'.T(), '">',
+							'<input type="checkbox" id="chkCycle" ',
+								opt.cycleTimer ? 'checked="checked"' : '',
+							'>',
+							'cycle'.T(),
+						'</label>',
+					'</div>',
 				'</div>',
 				'<div xclass="scroller" id="sidebar-scroll">',
 					formatCandidateList(
@@ -1735,9 +1745,29 @@ function formatLegendTable( cells ) {
 			click: function( event ) {
 				var id = this.id.split('-')[2];
 				if( id == 'top' ) id = -1;
+				$('#chkCycle').prop({ checked:false });
+				stopCycle();
 				setCandidate( id );
 			}
 		});
+		
+		$legend.delegate( '#chkCycle', {
+			click: function( event ) {
+				stopCycle();
+				if( this.checked ) {
+					var player = players.candidates;
+					opt.cycleTimer = setInterval( player.tick, 3000 );
+					player.tick();
+				}
+			}
+		});
+		
+		function stopCycle() {
+			if( opt.cycleTimer ) {
+				clearInterval( opt.cycleTimer );
+				opt.cycleTimer = null;
+			}
+		}
 		
 		setCandidate = function( id ) {
 			candidates.current = id;
