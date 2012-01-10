@@ -72,10 +72,10 @@ var elections = {
 			},
 			photos: true,
 			candidates: [
-				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michelle', lastName: 'Bachmann', fullName: 'Michelle Bachmann' },
-				{ color: '#54F1F1', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
+				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann', show:false },
+				{ color: '#666666', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain', show:false },
 				{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-				{ color: '#666666', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+				{ color: '#54F1F1', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
 				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
 				{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
 				{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer' },
@@ -1301,7 +1301,10 @@ function formatLegendTable( cells ) {
 		max = max || Infinity;
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
-		var top = candidates.slice();
+		var top = [];
+		candidates.forEach( function( candidate ) {
+			if( candidate.show !== false ) top.push( candidate );
+		});
 		for( var i = -1;  ++i < top.length; ) {
 			var candidate = top[i], votes = result[i];
 			candidate.votes = votes;
