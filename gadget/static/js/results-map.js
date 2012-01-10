@@ -21,7 +21,7 @@ var strings = {
 	electionTitle: 'New Hampshire Primary',  // TODO: make election-specific
 	electionDate: 'January 10, 2012',  // TODO
 	randomized: 'Displaying random test data',
-	automaticUpdate: 'This page updates automatically every two minutes.',
+	automaticUpdate: 'Automatic update every two minutes',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
