@@ -615,6 +615,8 @@ function formatLegendTable( cells ) {
 
 (function( $ ) {
 	
+	if( opt.disable ) return;
+	
 	// TODO: Refactor and use this exponential retry logic
 	//function getJSON( type, path, file, cache, callback, retries ) {
 	//	var stamp = now();
