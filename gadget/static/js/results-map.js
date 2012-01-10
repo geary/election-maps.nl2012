@@ -1818,16 +1818,19 @@ function formatLegendTable( cells ) {
 			return;
 		}
 		var url = S(
-			//'http://fusiontables.googleusercontent.com/fusiontables/api/query?',
-			//'http://localhost:8080/vote-data?',
-			'http://nh2012-test.election-maps.appspot.com/vote-data?',
-			'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
-			'&_=', Math.floor( now() / opt.resultCacheTime ),
-			'&sql=SELECT+',
-			resultsFields(),
-			'+FROM+',
-			//opt.counties ? '2458834' : 'TODO'
-			params.tableid || '{{tableid}}'
+			
+			////'http://fusiontables.googleusercontent.com/fusiontables/api/query?',
+			////'http://localhost:8080/vote-data?',
+			//'http://nh2012-test.election-maps.appspot.com/vote-data?',
+			//'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
+			//'&_=', Math.floor( now() / opt.resultCacheTime ),
+			//'&sql=SELECT+',
+			//resultsFields(),
+			//'+FROM+',
+			////opt.counties ? '2458834' : 'TODO'
+			//params.tableid || '{{tableid}}'
+			
+			'https://pollinglocation.googleapis.com/results'
 		);
 		getScript( url );
 	}
