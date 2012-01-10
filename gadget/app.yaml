@@ -10,4 +10,4 @@ handlers:
   
 - url: /(css/.*|images/.*|js/.*|shapes/.*)
   static_files: static/\1
-  upload: static/(.*)
+  upload: static/(css/.*|images/.*|js/.*|shapes/.*)

@@ -23,13 +23,13 @@ def dumpRequest( req ):
 
 
 def checkReferer( req, required ):
-	return checkRefererURL( req.environ.get('HTTP-REFERER'), required )
+	return checkRefererURL( req.headers.get('Referer'), required )
 
 
 def checkRefererURL( referer, required ):
 	if not referer: return not required
 	for domain in private.whitelist:
-		pattern = 'https?://(\w+\.)*%s/' % domain.replace( '.', '\.' )
+		pattern = 'https?://([\w_-]+\.)*%s/' % domain.replace( '.', '\.' )
 		if re.match( pattern, referer ):
 			return True
 	return False
@@ -37,26 +37,26 @@ def checkRefererURL( referer, required ):
 
 
 class VoteDataHandler( webapp.RequestHandler ):
-	def get( self ):
+	def get( self, qq ):
+		logging.info( 'VoteDataHandler GET' )
+		#logging.info( dumpRequest( self.request ) )
 		if not checkReferer( self.request, True ):
 			self.response.clear()
 			self.response.set_status( 403 )
 			self.response.out.write( 'Access not allowed' )
 			return
-		#logging.info( dumpRequest( self.request ) )
 		query = self.request.environ['QUERY_STRING']
-		logging.info( query )
 		# TODO: parameterize
 		tableid = private.tables['NH']['town']
 		q = query.replace( '{{tableid}}', tableid )
 		q = q.replace( '%7B%7Btableid%7D%7D', tableid )
-		logging.info( 'VoteDataHandler.get: ' + q )
+		logging.info( q )
 		url = FT_URL + q
 		# TODO: parameterize
 		content = 'loadCounties({"error":"500"})' 
 		try:
 			response = urlfetch.fetch( url )
-			logging.info( 'FT error: %d' % response.status_code )
+			logging.info( 'FT status: %d' % response.status_code )
 			if response.status_code != 200:
 				# TODO: parameterize
 				content = 'loadCounties({"error":%d})' % response.status_code
@@ -71,13 +71,13 @@ class VoteDataHandler( webapp.RequestHandler ):
 
 class HtmlHandler( webapp.RequestHandler ):
 	def get( self, name ):
+		#logging.info( dumpRequest( self.request ) )
 		if not checkReferer( self.request, False ):
 			self.response.clear()
 			self.response.set_status( 403 )
 			self.response.out.write( 'Access not allowed' )
 			return
-		#logging.info( dumpRequest( self.request ) )
-		f = open( name, 'r' )
+		f = open( 'static/%s' % name, 'r' )
 		content = f.read()
 		f.close()
 		self.response.out.write( content )
@@ -91,7 +91,6 @@ application = webapp.WSGIApplication([
 
 
 def main():
-	logging.info( 'main' )
 	run_wsgi_app( application )
 
 
