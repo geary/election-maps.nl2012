@@ -1799,6 +1799,17 @@ function formatLegendTable( cells ) {
 		loadRegion();
 	}
 	
+	var resizeOneshot = oneshot();
+	function resizeView() {
+		resizeOneshot( resizeViewNow, 250 );
+	}
+	
+	function resizeViewNow() {
+		// For now, just reload the page
+		// TODO: resize without reloading
+		location.href = location.href;
+	}
+	
 	//function getShapes( state, callback ) {
 	//	if( state.shapes ) callback();
 	//	else getJSON( 'shapes', opt.shapeUrl, state.abbr.toLowerCase() + '.json', 3600, function( shapes ) {
@@ -1939,9 +1950,9 @@ function formatLegendTable( cells ) {
 			$(this).stop().fadeTo( 500, .5 );
 		});
 	
-	$window.bind( 'load', function() {
-		loadView();
-	});
+	$window
+		.bind( 'load', loadView )
+		.bind( 'resize', resizeView );
 	
 	// TODO: this should work, but the standard GA script below
 	// doesn't seem to work either -  __utm.gif does not get loaded
