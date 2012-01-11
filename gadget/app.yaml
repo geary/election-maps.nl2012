@@ -1,0 +1,14 @@
+application: election-maps
+version: nh2012-coconut
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /vote-data
+  script: results-app.py
+  
+- url: /(.*\.html|css/.*|images/.*|js/.*|shapes/.*)
+  static_files: static/\1
+  upload: static/(.*)
+  

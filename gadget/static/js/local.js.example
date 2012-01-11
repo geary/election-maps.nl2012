@@ -1,0 +1,25 @@
+(function() {
+	
+	var whitelist = [
+		'election-maps.appspot.com',
+		'google.com',
+		'google.com.eg',
+		'localhost/private',
+		'localhost:8080'
+	];
+	
+	var referer = document.referrer;
+	if( ! referer ) {
+		opt.disable = false;  // allow empty referer
+		return;
+	}
+	
+	for( var domain, i = -1;  domain = whitelist[++i]; ) {
+		var re = new RegExp( '^https?://([\w_-]+\.)*' + domain.replace( '.', '\.' ) + '/' );
+		if( referer.match( re ) ) {
+			opt.disable = false;  // matched a domain/path
+			return;
+		}
+	}
+	
+})();

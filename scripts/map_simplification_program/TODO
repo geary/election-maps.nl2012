@@ -1,0 +1,3 @@
+TODO :
+	- geometry type is currently 'MULTIPOLYGON' with 2 dimensions => be more generic
+	- a little faster ;)
