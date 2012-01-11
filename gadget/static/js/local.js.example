@@ -22,6 +22,4 @@
 		}
 	}
 	
-	opt.disable = true;
-	
 })();
