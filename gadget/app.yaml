@@ -3,6 +3,8 @@ version: nh2012-coconut
 runtime: python
 api_version: 1
 
+default_expiration: "2m"
+
 handlers:
 
 - url: /vote-data
