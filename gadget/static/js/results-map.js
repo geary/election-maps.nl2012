@@ -1840,7 +1840,8 @@ function formatLegendTable( cells ) {
 			////opt.counties ? '2458834' : 'TODO'
 			//params.tableid || '{{tableid}}'
 			
-			'https://pollinglocation.googleapis.com/results'
+			'https://pollinglocation.googleapis.com/results?_=',
+			Math.floor( now() / opt.resultCacheTime )
 		);
 		getScript( url );
 	}
