@@ -718,6 +718,7 @@ function formatLegendTable( cells ) {
 				set( 'town' );
 				oneTime();
 				//setCounties( true );
+				geoReady();
 				getResults();
 				analytics( '/counties' );
 			}
@@ -1124,7 +1125,7 @@ function formatLegendTable( cells ) {
 					var isMulti = ( candidates.current  == -1 );
 					if( isMulti ) {
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							var row = results && ( results.rowsByID[feature.id] || results.rowsByID[feature.name] );
 							var candidate = row && candidates[row.candidateMax];
 							if( candidate ) {
 								feature.fillColor = candidate.color;
@@ -1376,11 +1377,40 @@ function formatLegendTable( cells ) {
 	
 	function formatSidebar() {
 		// TODO: refactor with formatLegend()
-		var topCandidates = topCandidatesByVote(
-			totalResults( currentResults() )
-		);
-		var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
-		var candidates = topCandidates.map( formatSidebarCandidate );
+		var resultsHeaderHTML = '';
+		var resultsScrollingHTML = '';
+		var results = currentResults();
+		if( results ) {
+			var topCandidates = topCandidatesByVote(
+				totalResults( currentResults() )
+			);
+			var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
+			resultsHeaderHTML = S(
+				'<div class="body-text">',
+					'percentReporting'.T( totalReporting( currentResults() ) ),
+				'</div>',
+				'<div class="faint-text" style="margin-bottom:8px;">',
+					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
+				'</div>',
+				'<div id="class="body-text" style="padding-top:4px;">',
+					'<label for="chkCycle" title="', 'cycleTip'.T(), '">',
+						'<input type="checkbox" id="chkCycle" ',
+							opt.cycleTimer ? 'checked="checked"' : '',
+						'>',
+						'&nbsp;', 'cycle'.T(),
+					'</label>',
+				'</div>'
+			);
+			var candidates = topCandidates.map( formatSidebarCandidate );
+			resultsScrollingHTML = S(
+				formatCandidateList(
+					[ top ].concat( candidates ),
+					function( candidate ) {
+						return candidate;
+					}
+				)
+			);
+		}
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
@@ -1390,28 +1420,12 @@ function formatLegendTable( cells ) {
 					'<div class="faint-text" style="margin-bottom:8px;">',
 						'electionDate'.T(),
 					'</div>',
-					'<div class="body-text">',
-						'percentReporting'.T( totalReporting( currentResults() ) ),
-					'</div>',
-					'<div class="faint-text" style="margin-bottom:8px;">',
-						opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
-					'</div>',
-					'<div class="body-text" style="padding-top:4px;">',
-						'<label for="chkCycle" title="', 'cycleTip'.T(), '">',
-							'<input type="checkbox" id="chkCycle" ',
-								opt.cycleTimer ? 'checked="checked"' : '',
-							'>',
-							'&nbsp;', 'cycle'.T(),
-						'</label>',
+					'<div id="sidebar-results-header">',
+						resultsHeaderHTML,
 					'</div>',
 				'</div>',
 				'<div xclass="scroller" id="sidebar-scroll">',
-					formatCandidateList(
-						[ top ].concat( candidates ),
-						function( candidate ) {
-							return candidate;
-						}
-					),
+					resultsScrollingHTML,
 				'</div>',
 			'</div>'
 		);
