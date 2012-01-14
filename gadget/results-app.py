@@ -4,7 +4,9 @@
 # By Michael Geary - http://mg.to/
 # See UNLICENSE or http://unlicense.org/ for public domain notice.
 
-import logging, pprint, re
+import logging, pprint
+from urlparse import urlparse
+
 from google.appengine.api import urlfetch
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -27,13 +29,28 @@ def checkReferer( req, required ):
 
 
 def checkRefererURL( referer, required ):
-	if not referer: return not required
-	for domain in private.whitelist:
-		pattern = 'https?://([\w_-]+\.)*%s/' % domain.replace( '.', '\.' )
-		if re.match( pattern, referer ):
+	if not referer:
+		return not required
+	ref = urlparse( referer )
+	if not ref:
+		return False
+	for goodURL in private.whitelist:
+		good = urlparse( goodURL )
+		if checkParsedURL( good, ref ):
 			return True
 	return False
 
+
+def checkParsedURL( good, url ):
+	return(
+		( good.scheme == ''  or  url.scheme == good.scheme )
+			and
+		( good.hostname is None  or  url.hostname.endswith(good.hostname) )
+			and
+		( good.port is None  or   url.port == good.port )
+			and
+		( good.path is None  or  url.path.startswith(good.path) )
+	)
 
 
 class VoteDataHandler( webapp.RequestHandler ):
@@ -94,5 +111,18 @@ def main():
 	run_wsgi_app( application )
 
 
+def test():
+	logging.info( 'Testing good list' )
+	for url in private.testlistgood:
+		if not checkRefererURL( url, True ):
+			logging.error( 'Good list fail: %s' % url )
+	logging.info( 'Testing bad list' )
+	for url in private.testlistbad:
+		if checkRefererURL( url, True ):
+			logging.error( 'Bad list fail: %s' % url )
+	logging.info( 'Test done' )
+
+
 if __name__ == '__main__':
+	#test()  # uncomment to run tests
 	main()
