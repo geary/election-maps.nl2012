@@ -18,8 +18,8 @@ var strings = {
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
-	electionTitle: 'New Hampshire Primary',  // TODO: make election-specific
-	electionDate: 'January 10, 2012',  // TODO
+	electionTitle: 'South Carolina Primary',  // TODO: make election-specific
+	electionDate: 'January 21, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
@@ -644,19 +644,18 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = 100;
+		var level = 2048;
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
-		var fips = '33';  // TEMP
+		var fips = '45';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
 		}
 		else {
-			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom_', level, '.jsonp' );
-			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', '.jsonp' );
-			var file = S( 'carto2010', '-', fips, '-goog_geom', '.jsonp' );
+			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', level, '.jsonp' );
+			var file = S( 'carto2010', '-', fips, '-goog_geom', level, '.jsonp' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
@@ -710,6 +709,7 @@ function formatLegendTable( cells ) {
 			all: function() {
 				function set( kind ) {
 					var geo = json[kind];
+					if( ! geo ) return;
 					geo.features.index('id').index('abbr');
 					data[kind].geo = geo;
 				}
@@ -979,7 +979,7 @@ function formatLegendTable( cells ) {
 		//	[ data.state.geo ];
 		data.state.geo.hittest = false;
 		data.county.geo.hittest = false;
-		return [ data.town.geo, /*data.county.geo,*/ data.state.geo ];
+		return [ /*data.town.geo,*/ data.county.geo, data.state.geo ];
 	}
 	
 	function currentResults() {
@@ -1112,6 +1112,7 @@ function formatLegendTable( cells ) {
 				}
 			}
 			var kind = geo.table.split('.')[1];
+			if( kind == 'coucou'  ||  kind == 'sc' /*TEMP*/ ) kind = 'county';
 			var colorizers = {
 				state: function() {
 					simple( '#FFFFFF', '#222222', 2.5 );
