@@ -1112,7 +1112,7 @@ function formatLegendTable( cells ) {
 				}
 			}
 			var kind = geo.table.split('.')[1];
-			if( kind == 'coucou'  ||  kind == 'sc' /*TEMP*/ ) kind = 'county';
+			if( kind == 'coucou'  ||  kind == 'sc' /*TEMP*/ ) kind = 'cousub';
 			var colorizers = {
 				state: function() {
 					simple( '#FFFFFF', '#222222', 1, 2 );
@@ -1842,6 +1842,12 @@ function formatLegendTable( cells ) {
 			loadResults( results, opt.counties, false );
 			return;
 		}
+		
+		if( params.randomize ) {
+			loadRandomResults( opt.counties );
+			return;
+		}
+		
 		var url = S(
 			
 			////'http://fusiontables.googleusercontent.com/fusiontables/api/query?',
@@ -1861,10 +1867,27 @@ function formatLegendTable( cells ) {
 		getScript( url );
 	}
 	
-	function randomizeData( rows) {
-		rows.forEach( function( row ) {
+	function loadRandomResults() {
+		opt.resultCacheTime = Infinity;
+		opt.reloadTime = false;
+		clearInterval( reloadTimer );
+		reloadTimer = null;
+		delete params.randomize;
+		
+		var cols = candidates.map( function( candidate ) {
+				return 'VoteCount-' + candidate.id;
+			}).concat(
+				'ID',
+				'NumVoters',
+				'NumBallotBoxes',
+				'NumCountedBallotBoxes'
+			);
+		
+		var rows = data.county.geo.features.map( function( feature ) {
+			var row = [];
+			row[col.ID] = feature.id;
 			var nVoters = 0;
-			var nPrecincts = row[col.NumBallotBoxes];
+			var nPrecincts = row[col.NumBallotBoxes] = randomInt( 50 ) + 5;
 			var nCounted = row[col.NumCountedBallotBoxes] =
 				Math.max( 0,
 					Math.min( nPrecincts,
@@ -1876,7 +1899,17 @@ function formatLegendTable( cells ) {
 			for( iCol = -1;  ++iCol < candidates.length; )
 				total += row[iCol] = nCounted ? randomInt(100000) : 0;
 			row[col.NumVoters] = total + randomInt(total*2);
+			return row;
 		});
+		
+		var json = {
+			table: {
+				cols: cols,
+				rows: rows
+			}
+		};
+		
+		loadResults( json, opt.counties, true );
 	}
 	
 	loadStates = function( json ) {
@@ -1916,21 +1949,11 @@ function formatLegendTable( cells ) {
 	};
 	
 	function loadResults( json, counties, loading ) {
-		if( params.randomize ) {
-			opt.resultCacheTime = Infinity;
-			opt.reloadTime = false;
-			clearInterval( reloadTimer );
-			reloadTimer = null;
-		}
 		if( loading )
 			cacheResults.add( counties, json, opt.resultCacheTime );
 		var results = currentData().results = json.table;
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
-		if( params.randomize ) {
-			randomizeData( rows );
-			delete params.randomize;
-		}
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			rowsByID[ row[col.ID] ] = row;
 			var nCandidates = candidates.length;
