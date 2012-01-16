@@ -24,6 +24,7 @@ def cartoFileName( state, type ):
 def process():
 	createDatabase()
 	db = openDatabase()
+	addSimplificationFunction( db )
 	createSchema( db )
 	loadStates( db )
 	loadCounties( db )
@@ -49,6 +50,9 @@ def closeDatabase( db ):
 	db.connection.commit()
 	db.connection.close()
 
+
+def addSimplificationFunction( db ):
+	db.execute( file( 'map_simplification_program/func.sql').read() )
 
 def createSchema( db ):
 	print 'Creating schema %s' % schema
