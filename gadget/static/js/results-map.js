@@ -978,7 +978,7 @@ function formatLegendTable( cells ) {
 		//	[ data.county.geo, data.state.geo ] :
 		//	[ data.state.geo ];
 		data.state.geo.hittest = false;
-		data.county.geo.hittest = false;
+		//data.county.geo.hittest = false;
 		return [ /*data.town.geo,*/ data.county.geo, data.state.geo ];
 	}
 	
