@@ -1042,6 +1042,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function polys() {
+		var mousedown = false;
 		colorize( currentGeos() );
 		var $container = $('#map');
 		function getFeature( event, where ) {
@@ -1049,10 +1050,14 @@ function formatLegendTable( cells ) {
 		}
 		var events = playType() ? {} : {
 			mousedown: function( event, where ) {
+				showTip( false );
+				mousedown = true;
 			},
 			mouseup: function( event, where ) {
+				mousedown = false;
 			},
 			mousemove: function( event, where ) {
+				if( mousedown ) return;
 				var feature = getFeature( event, where );
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
