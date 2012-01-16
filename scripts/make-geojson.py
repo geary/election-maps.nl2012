@@ -1,44 +1,81 @@
 # -*- coding: utf-8 -*-
 
+from map_simplification_program import simplify, vertex
 import pg, private
 
 
 def process():
 	schema = 'carto2010'
+	schemaVertex = 'carto2010_vertex'
 	fullGeom = 'full_geom'
 	googGeom = 'goog_geom'
 	boxGeom = googGeom
 	boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 	
-	#db.addGoogleGeometry( table, fullGeom, googGeom )
-	
-	#for tolerance in ( 10, 100, 1000, 10000, 100000, ):
-	for tolerance in ( None, ):
+	#for tolerance in ( None, ):
+	#for tolerance in ( 1, ):
+	#for tolerance in ( 8, ):
+	#for tolerance in ( 128, ):
+	#for tolerance in ( 1024, ):
+	for tolerance in ( 2048, ):
+	#for tolerance in ( 4096, ):  # TODO: fails! (needs ST_MakeValid?)
 		if tolerance is None:
 			simpleGeom = googGeom
 		else:
-			simpleGeom = '%s_%d' %( googGeom, tolerance )
+			simpleGeom = '%s%d' %( googGeom, tolerance )
 		
-		#db.simplifyGeometry( table, googGeom, simpleGeom, tolerance )
+		if 1:
+			db.createSchema( schemaVertex )
+			vertex.run(
+				username = private.POSTGRES_USERNAME,
+				password = private.POSTGRES_PASSWORD,
+				hostname = 'localhost',
+				database = 'usageo',
+				tableGeo = schema+'.sc',
+				colGeo = 'goog_geom',
+				colId = 'gid',
+				schemaVertex = schemaVertex,
+				minDistance = tolerance,
+			)
 		
-		geoid = '33'
-		name = 'New Hampshire'
-		where = "( state = '%s' )" %( geoid )
+		if 1:
+			simplify.run(
+				username = private.POSTGRES_USERNAME,
+				password = private.POSTGRES_PASSWORD,
+				hostname = 'localhost',
+				database = 'usageo',
+				tableGeo = schema+'.sc',
+				colGeo = 'goog_geom',
+				tableVertex = schemaVertex + '.vertex' + str(tolerance),
+				colId = 'gid',
+				minDistance = tolerance,
+			)
 		
-		geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, simpleGeom, '00', 'United States', where )
-		geoCounty = db.makeFeatureCollection( schema+'.county', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
-		geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+		if 1:
+			db.mergeGeometry(
+				schema+'.sc', 'state', simpleGeom,
+				schema+'.state', 'state', simpleGeom
+			)
 		
-		geo = {
-			'state': geoState,
-			'county': geoCounty,
-			'town': geoTown
-		};
-		
-		filename = '%s/%s-%s-%s.jsonp' %(
-			private.GEOJSON_PATH, schema, geoid, simpleGeom
-		)
-		db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
+		if 1:
+			geoid = '45'
+			name = 'South Carolina'
+			where = "( state = '%s' )" %( geoid )
+			
+			geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, simpleGeom, '00', 'United States', where )
+			geoCounty = db.makeFeatureCollection( schema+'.sc', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+			#geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+			
+			geo = {
+				'state': geoState,
+				'county': geoCounty,
+				#'town': geoTown,
+			};
+			
+			filename = '%s/%s-%s-%s.jsonp' %(
+				private.GEOJSON_PATH, schema, geoid, simpleGeom
+			)
+			db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
 
 def main():
