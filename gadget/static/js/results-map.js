@@ -999,23 +999,30 @@ function formatLegendTable( cells ) {
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
-		fitBbox( json.bboxLL );
+		fitBbox( json.bbox, json.bboxLL );
 	}
 	
-	function fitBbox( bbox ) {
-		if( ! bbox ) return;
-		//bbox = shrinkBbox( bbox, .10 );
-		var bounds = new gm.LatLngBounds(
-			new gm.LatLng( bbox[1], bbox[0] ),
-			new gm.LatLng( bbox[3], bbox[2] )
-		);
+	function fitBbox( bbox, bboxLL ) {
+		var z;
 		if( params.zoom  &&  params.zoom != 'auto' ) {
-			map.setCenter( bounds.getCenter() );
-			map.setZoom( +params.zoom );
+			z = +params.zoom;
 		}
 		else {
-			map.fitBounds( bounds );
+			if( ! bbox ) return;
+			z = PolyGonzo.Mercator.fitBbox( bbox, {
+				width: $map.width(),
+				height: $map.height()
+			});
 		}
+		z = Math.floor( z );
+		
+		var bounds = new gm.LatLngBounds(
+			new gm.LatLng( bboxLL[1], bboxLL[0] ),
+			new gm.LatLng( bboxLL[3], bboxLL[2] )
+		);
+		
+		map.setCenter( bounds.getCenter() );
+		map.setZoom( z );
 		zoom = map.getZoom();
 	}
 	
