@@ -142,8 +142,8 @@ opt.candidate = '1';
 opt.fontsize = '15px';
 var sidebarWidth = 280;
 
-opt.resultCacheTime = 60 * 1000;
-opt.reloadTime = 120 * 1000;
+opt.resultCacheTime = 30 * 1000;
+opt.reloadTime = 60 * 1000;
 
 // Non-auto-refresh settings to use after results are final
 //opt.resultCacheTime = Infinity;  // cache forever
