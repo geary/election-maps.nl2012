@@ -1794,9 +1794,10 @@ function formatLegendTable( cells ) {
 				$(this).removeClass( 'hover' );
 			},
 			click: function( event ) {
+				var selected = $(this).is('.selected');
 				stopCycle();
-				$(this).toggleClass( 'selected' );
-				if( $(this).is('.selected') ) {
+				if( ! selected ) {
+					this.title = 'cycleStopTip'.T();
 					var player = players.candidates;
 					opt.cycleTimer = setInterval( player.tick, 3000 );
 					player.tick();
@@ -1805,10 +1806,11 @@ function formatLegendTable( cells ) {
 		});
 		
 		function stopCycle() {
-			if( opt.cycleTimer ) {
-				clearInterval( opt.cycleTimer );
-				opt.cycleTimer = null;
-			}
+			clearInterval( opt.cycleTimer );
+			opt.cycleTimer = null;
+			$('#btnCycle')
+				.removeClass( 'selected' )
+				.prop({ title: 'cycleTip'.T() });
 		}
 		
 		setCandidate = function( id ) {
