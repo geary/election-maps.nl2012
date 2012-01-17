@@ -7,10 +7,9 @@ default_expiration: "2m"
 
 handlers:
 
-- url: /vote-data
+- url: /(vote-data|.*\.html)
   script: results-app.py
   
-- url: /(.*\.html|css/.*|images/.*|js/.*|shapes/.*)
+- url: /(css/.*|images/.*|js/.*|shapes/.*)
   static_files: static/\1
-  upload: static/(.*)
-  
+  upload: static/(css/.*|images/.*|js/.*|shapes/.*)
