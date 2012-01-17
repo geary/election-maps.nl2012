@@ -1050,7 +1050,7 @@ function formatLegendTable( cells ) {
 		return counties;
 	}
 	
-	var polysOneshot = oneshot(), showTipOneshot = oneshot();
+	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
 	function polys() {
 		var mousedown = false;
 		colorize( currentGeos() );
@@ -1068,14 +1068,14 @@ function formatLegendTable( cells ) {
 			},
 			mousemove: function( event, where ) {
 				if( mousedown ) return;
-				polysOneshot( function() {
+				polysThrottle( function() {
 					var feature = getFeature( event, where );
 					if( feature == mouseFeature ) return;
 					mouseFeature = feature;
 					map.setOptions({ draggableCursor: feature ? 'pointer' : null });
 					outlineFeature( feature );
-					showTipOneshot( function() { showTip(feature); }, 50 );
-				}, 20 );
+					showTipThrottle( function() { showTip(feature); });
+				});
 			},
 			click: function( event, where ) {
 				events.mousemove( event, where );
@@ -1822,6 +1822,34 @@ function formatLegendTable( cells ) {
 		return function( fun, time ) {
 			clearTimeout( timer );
 			timer = setTimeout( fun, time );
+		};
+	}
+	
+	function throttle( time ) {
+		var timer, pending;
+		function timeout() {
+			timer = setTimeout( function() {
+				timer = null;
+				if( ! pending ) return;
+				pending();
+				pending = null;
+				timeout();
+			}, time );
+		}
+		return function( fun ) {
+			if( ! time ) {
+				// unthrottled
+				fun();
+			}
+			else if( ! timer ) {
+				// first call, do it now and throttle the next call
+				fun();
+				timeout();
+			}
+			else {
+				// already throttling, save function for later
+				pending = fun;
+			}
 		};
 	}
 	
