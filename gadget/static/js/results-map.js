@@ -1048,6 +1048,7 @@ function formatLegendTable( cells ) {
 		return counties;
 	}
 	
+	var polysOneshot = oneshot(), showTipOneshot = oneshot();
 	function polys() {
 		var mousedown = false;
 		colorize( currentGeos() );
@@ -1065,12 +1066,14 @@ function formatLegendTable( cells ) {
 			},
 			mousemove: function( event, where ) {
 				if( mousedown ) return;
-				var feature = getFeature( event, where );
-				if( feature == mouseFeature ) return;
-				mouseFeature = feature;
-				map.setOptions({ draggableCursor: feature ? 'pointer' : null });
-				outlineFeature( feature );
-				showTip( feature );
+				polysOneshot( function() {
+					var feature = getFeature( event, where );
+					if( feature == mouseFeature ) return;
+					mouseFeature = feature;
+					map.setOptions({ draggableCursor: feature ? 'pointer' : null });
+					outlineFeature( feature );
+					showTipOneshot( function() { showTip(feature); }, 50 );
+				}, 20 );
 			},
 			click: function( event, where ) {
 				events.mousemove( event, where );
