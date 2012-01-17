@@ -47,7 +47,7 @@ def checkParsedURL( good, url ):
 			and
 		( good.hostname is None  or  url.hostname.endswith(good.hostname) )
 			and
-		( good.port is None  or   url.port == good.port )
+		( good.port is None  or  url.port == good.port )
 			and
 		( good.path is None  or  url.path.startswith(good.path) )
 	)
