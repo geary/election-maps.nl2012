@@ -22,8 +22,9 @@ var strings = {
 	electionDate: 'January 21, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
-	cycle: 'Cycle Candidates',
-	cycleTip: 'Automatically cycles through the candidate maps when checked',
+	cycle: 'Cycle',
+	cycleTip: 'Click to cycle through the candidate maps automatically',
+	cycleStopTip: 'Click to stop cycling through the candidate maps',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -436,6 +437,9 @@ document.write(
 	'<style type="text/css">',
 		'html, body { width:', ww, 'px; height:', wh, 'px; margin:0; padding:0; overflow:hidden; color:#222; }',
 		'* { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
+		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; height:27px; line-height:27px; padding:0 8px; }',
+		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; }',
+		'a.button.selected { background-color: #EEE; background-image:linear-gradient(top,#EEE,#E0E0E0); border:1px solid #CCC; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#333; }',
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
@@ -1407,12 +1411,13 @@ function formatLegendTable( cells ) {
 					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
 				'</div>',
 				'<div id="class="body-text" style="padding-top:4px;">',
-					'<label for="chkCycle" title="', 'cycleTip'.T(), '">',
-						'<input type="checkbox" id="chkCycle" ',
-							opt.cycleTimer ? 'checked="checked"' : '',
-						'>',
-						'&nbsp;', 'cycle'.T(),
-					'</label>',
+					'<a class="button ',
+						opt.cycleTimer ? 'selected' : '',
+						'" id="btnCycle" title="',
+						opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
+						'">',
+							'cycle'.T(),
+					'</a>',
 				'</div>'
 			);
 			var candidates = topCandidates.map( formatSidebarCandidate );
@@ -1781,10 +1786,17 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		$legend.delegate( '#chkCycle', {
+		$legend.delegate( '#btnCycle', {
+			mouseover: function( event ) {
+				$(this).addClass( 'hover' );
+			},
+			mouseout: function( event ) {
+				$(this).removeClass( 'hover' );
+			},
 			click: function( event ) {
 				stopCycle();
-				if( this.checked ) {
+				$(this).toggleClass( 'selected' );
+				if( $(this).is('.selected') ) {
 					var player = players.candidates;
 					opt.cycleTimer = setInterval( player.tick, 3000 );
 					player.tick();
