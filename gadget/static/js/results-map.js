@@ -1204,7 +1204,7 @@ function formatLegendTable( cells ) {
 		var feat = $.extend( {}, feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
-			strokeWidth: playCounties() ? 5 : opt.counties ? 3 : 4,
+			strokeWidth: playCounties() ? 5 : opt.counties ? 2 : 3,
 			strokeColor: '#000000',
 			strokeOpacity: 1
 		});
