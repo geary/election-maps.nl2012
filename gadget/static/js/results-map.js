@@ -997,11 +997,11 @@ function formatLegendTable( cells ) {
 		var json = currentGeos()[0];  // TODO
 		$('#map').show();
 		initMap();
-		gme.trigger( map, 'resize' );
+		gme && map && gme.trigger( map, 'resize' );
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
-		fitBbox( json.bbox, json.bboxLL );
+		json && fitBbox( json.bbox, json.bboxLL );
 	}
 	
 	function fitBbox( bbox, bboxLL ) {
@@ -1845,9 +1845,16 @@ function formatLegendTable( cells ) {
 	}
 	
 	function resizeViewNow() {
-		// For now, just reload the page
-		// TODO: resize without reloading
-		location.href = location.href;
+		// TODO: refactor with duplicate code that runs at startup
+		ww = $window.width();
+		wh = $window.height();
+		$('body').css({ width: ww, height: wh });
+		$('#spinner').css({
+			left: Math.floor( ww/2 - 64 ),
+			top: Math.floor( wh/2 - 20 )
+		});
+		$map.css({ width: ww - sidebarWidth, height: wh });
+		moveToGeo();
 	}
 	
 	//function getShapes( state, callback ) {
