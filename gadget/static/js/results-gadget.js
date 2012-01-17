@@ -49,8 +49,5 @@ opt.writeScript(
 	)
 );
 
-opt.disable = true;
-opt.writeScript( 'js/local.js', opt.nocache );
-
 opt.writeScript( 'js/polygonzo.js', opt.nocache );
 opt.writeScript( 'js/results-map.js', opt.nocache );
