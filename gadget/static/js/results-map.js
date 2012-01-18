@@ -967,7 +967,10 @@ function formatLegendTable( cells ) {
 		$('#spinner').hide();
 		if( ! opt.randomized  &&   opt.reloadTime ) {
 			clearInterval( reloadTimer );
-			reloadTimer = setInterval( loadView, opt.reloadTime );
+			reloadTimer = setInterval( function() {
+				analytics( '/update' );
+				loadView();
+			}, opt.reloadTime );
 		}
 		if( ! didGeoReady ) {
 			setPlayback();
