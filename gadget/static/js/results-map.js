@@ -857,9 +857,9 @@ function formatLegendTable( cells ) {
 	}
 	
 	function analytics( path ) {
-		analytics.seen = analytics.seen || {};
-		if( analytics.seen[path] ) return;
-		analytics.seen[path] = true;
+		//analytics.seen = analytics.seen || {};
+		//if( analytics.seen[path] ) return;
+		//analytics.seen[path] = true;
 		_gaq.push([ '_trackPageview', '/results' + path ]);
 	}
 	
