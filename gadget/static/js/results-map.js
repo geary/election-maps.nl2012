@@ -1800,14 +1800,17 @@ function formatLegendTable( cells ) {
 			click: function( event ) {
 				var selected = $(this).is('.selected');
 				stopCycle();
-				if( ! selected ) {
-					this.title = 'cycleStopTip'.T();
-					var player = players.candidates;
-					opt.cycleTimer = setInterval( player.tick, 3000 );
-					player.tick();
-				}
+				if( ! selected )
+					startCycle();
 			}
 		});
+		
+		function startCycle() {
+			this.title = 'cycleStopTip'.T();
+			var player = players.candidates;
+			opt.cycleTimer = setInterval( player.tick, 3000 );
+			player.tick();
+		}
 		
 		function stopCycle() {
 			clearInterval( opt.cycleTimer );
