@@ -2055,17 +2055,9 @@ function formatLegendTable( cells ) {
 		.bind( 'load', loadView )
 		.bind( 'resize', resizeView );
 	
-	// TODO: this should work, but the standard GA script below
-	// doesn't seem to work either -  __utm.gif does not get loaded
-	//getScript( S(
-	//	location.protocol == 'https:' ? 'https://ssl' : 'http://www',
-	//	'.google-analytics.com/ga.js'
-	//) );
+	getScript( S(
+		location.protocol == 'https:' ? 'https://ssl' : 'http://www',
+		'.google-analytics.com/ga.js'
+	) );
 
 })( jQuery );
-
-(function() {
-	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
