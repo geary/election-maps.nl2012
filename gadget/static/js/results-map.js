@@ -1187,7 +1187,7 @@ function formatLegendTable( cells ) {
 							var id = feature.id;
 							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
 							feature.fillColor = color;
-							feature.fillOpacity = row && max ? row.fract / max : 0;
+							feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
 							var complete = row &&
 								row[col.NumCountedBallotBoxes] ==
 								row[col.NumBallotBoxes];
