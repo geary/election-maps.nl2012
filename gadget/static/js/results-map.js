@@ -722,7 +722,7 @@ function formatLegendTable( cells ) {
 				//setCounties( true );
 				geoReady();
 				getResults();
-				analytics( '/counties' );
+				//analytics( '/counties' );
 			}
 		}[json.kind];
 		loader();
@@ -1798,14 +1798,17 @@ function formatLegendTable( cells ) {
 				$(this).removeClass( 'hover' );
 			},
 			click: function( event ) {
-				var selected = $(this).is('.selected');
-				stopCycle();
-				if( ! selected )
-					startCycle();
+				toggleCycle();
 			}
 		});
 		
+		function toggleCycle() {
+			if( opt.cycleTimer ) stopCycle();
+			else startCycle();
+		}
+		
 		function startCycle() {
+			if( opt.cycleTimer ) return;
 			this.title = 'cycleStopTip'.T();
 			var player = players.candidates;
 			opt.cycleTimer = setInterval( player.tick, 3000 );
@@ -1814,6 +1817,7 @@ function formatLegendTable( cells ) {
 		}
 		
 		function stopCycle() {
+			if( ! opt.cycleTimer ) return;
 			clearInterval( opt.cycleTimer );
 			opt.cycleTimer = null;
 			$('#btnCycle')
@@ -2068,5 +2072,7 @@ function formatLegendTable( cells ) {
 		location.protocol == 'https:' ? 'https://ssl' : 'http://www',
 		'.google-analytics.com/ga.js'
 	) );
-
+	
+	analytics( '/load' );
+	
 })( jQuery );
