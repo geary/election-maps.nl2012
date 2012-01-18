@@ -1,0 +1,9 @@
+ python vertex.py   -H cli57pl -u postgres -p turing -d cartoDev -t fdc.dcecl -v fdc -i gid -g the_geom -m 10000
+ python simplify.py -H cli57pl -u postgres -p turing -d cartoDev -v fdc.vertex10000 -t fdc.dcecl -i gid -g the_geom -m 10000
+
+
+python vertex.py   -H cli57pl -u postgres -p turing -d cartoDev -t geofla.region -v fdc -i gid -g the_geom -m 10000
+python simplify.py -H cli57pl -u postgres -p turing -d cartoDev -v geofla.vertex10000 -t geofla.region -i gid -g the_geom -m 10000
+
+python vertex.py   -H cli57pl -u postgres -p turing -d cartoDev -t geofla.departement -v geofla -i gid -g the_geom -m 10000
+python simplify.py -H cli57pl -u postgres -p turing -d cartoDev -v geofla.vertex10000 -t geofla.departement -i gid -g the_geom -m 10000
