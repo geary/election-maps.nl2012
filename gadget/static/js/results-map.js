@@ -92,7 +92,6 @@ var parties = elections[year];
 var party = params.party in parties ? params.party : 'gop';
 var election = parties[party];
 var candidates = election.candidates;
-candidates.current = -1;
 
 // Analytics
 var _gaq = _gaq || [];
@@ -787,7 +786,7 @@ function formatLegendTable( cells ) {
 				var topCandidates = topCandidatesByVote(
 					totalResults( currentResults() )
 				);
-				if( candidates.current == -1 ) {
+				if( ! candidates.current ) {
 					i = 0;
 				}
 				else {
@@ -800,7 +799,7 @@ function formatLegendTable( cells ) {
 						}
 					}
 				}
-				candidates.current = ( i == -1 ? i : topCandidates[i].id );
+				candidates.current = ( i >= 0  &&  topCandidates[i].id );
 				setCandidate( candidates.current );
 			}
 		},
@@ -1144,8 +1143,7 @@ function formatLegendTable( cells ) {
 				cousub: function() {
 					var features = geo.features, results = data.town.results;
 					var strokeColor = '#666666', strokeOpacity = .5, strokeWidth = 1;
-					var isMulti = ( candidates.current  == -1 );
-					if( isMulti ) {
+					if( ! candidates.current ) {
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 							var row = results && ( results.rowsByID[feature.id] || results.rowsByID[feature.name] );
 							var candidate = row && candidates[row.candidateMax];
@@ -1367,7 +1365,7 @@ function formatLegendTable( cells ) {
 	//	var colors = topCandidates.map( function( candidate ) {
 	//		return candidate.color;
 	//	});
-	//	var selected = candidates.current == -1 ? ' selected' : '';
+	//	var selected = candidates.current ? '' : ' selected';
 	//	return S(
 	//		'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
 	//			'<div class="legend-candidate">',
@@ -1458,7 +1456,7 @@ function formatLegendTable( cells ) {
 		var colors = topCandidates.map( function( candidate ) {
 			return candidate.color;
 		});
-		var selected = candidates.current == -1 ? ' selected' : '';
+		var selected = candidates.current ? '' : ' selected';
 		return S(
 			'<tr class="legend-candidate', selected, '" id="legend-candidate-top">',
 				'<td class="left">',
