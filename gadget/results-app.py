@@ -101,9 +101,14 @@ class HtmlHandler( webapp.RequestHandler ):
 		self.response.headers['Content-Type'] = 'text/html'
 
 
+class EmbedHandler( HtmlHandler ):
+	def get( self ):
+		HtmlHandler.get( self, 'results-map.html' )
+
+
 application = webapp.WSGIApplication([
-	( r'/vote-data(.*)', VoteDataHandler ),
-	( r'/(.*\.html)', HtmlHandler ),
+	( r'/results/vote-data(.*)', VoteDataHandler ),
+	( r'/results/embed', EmbedHandler ),
 ], debug = True )
 
 
