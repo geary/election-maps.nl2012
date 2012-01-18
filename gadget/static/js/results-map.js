@@ -1810,6 +1810,7 @@ function formatLegendTable( cells ) {
 			var player = players.candidates;
 			opt.cycleTimer = setInterval( player.tick, 3000 );
 			player.tick();
+			analytics( '/cycle/start' );
 		}
 		
 		function stopCycle() {
@@ -1818,6 +1819,7 @@ function formatLegendTable( cells ) {
 			$('#btnCycle')
 				.removeClass( 'selected' )
 				.prop({ title: 'cycleTip'.T() });
+			analytics( '/cycle/stop' );
 		}
 		
 		setCandidate = function( id ) {
