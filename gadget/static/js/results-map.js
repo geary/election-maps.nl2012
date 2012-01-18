@@ -966,6 +966,7 @@ function formatLegendTable( cells ) {
 		polys();
 		$('#spinner').hide();
 		if( ! opt.randomized  &&   opt.reloadTime ) {
+			clearInterval( reloadTimer );
 			reloadTimer = setInterval( loadView, opt.reloadTime );
 		}
 		if( ! didGeoReady ) {
