@@ -1399,7 +1399,8 @@ function formatLegendTable( cells ) {
 			var topCandidates = topCandidatesByVote(
 				totalResults( currentResults() )
 			);
-			var top = formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
+			var none = ! topCandidates.length;
+			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			resultsHeaderHTML = S(
 				'<div class="body-text">',
 					'percentReporting'.T( totalReporting( currentResults() ) ),
@@ -1407,18 +1408,20 @@ function formatLegendTable( cells ) {
 				'<div class="faint-text" style="margin-bottom:8px;">',
 					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
 				'</div>',
-				'<div id="class="body-text" style="padding-top:4px;">',
-					'<a class="button ',
-						opt.cycleTimer ? 'selected' : '',
-						'" id="btnCycle" title="',
-						opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
-						'">',
-							'cycle'.T(),
-					'</a>',
-				'</div>'
+				none ? '' : S(
+					'<div id="class="body-text" style="padding-top:4px;">',
+						'<a class="button ',
+							opt.cycleTimer ? 'selected' : '',
+							'" id="btnCycle" title="',
+							opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
+							'">',
+								'cycle'.T(),
+						'</a>',
+					'</div>'
+				)
 			);
 			var candidates = topCandidates.map( formatSidebarCandidate );
-			resultsScrollingHTML = S(
+			resultsScrollingHTML = none ? '' : S(
 				formatCandidateList(
 					[ top ].concat( candidates ),
 					function( candidate ) {
