@@ -1684,7 +1684,7 @@ function formatLegendTable( cells ) {
 	
 	var mapStyles = [
 		{
-			stylers: [ { saturation: -100 } ]
+			stylers: [ { saturation: -25 } ]
 		},{
 			featureType: "road",
 			elementType: "labels",
@@ -1692,13 +1692,13 @@ function formatLegendTable( cells ) {
 		},{
 			featureType: "road",
 			elementType: "geometry",
-			stylers: [ { lightness: 25 }, { visibility: "simplified" } ]
+			stylers: [ { lightness: 25 }, { saturation: -10 }, { visibility: "simplified" } ]
 		},{
 			featureType: "transit",
 			stylers: [ { visibility: "off" } ]
 		},{
 			featureType: "landscape",
-			stylers: [ { lightness: 100 } ]
+			stylers: [ { lightness: 100 }, { saturation: -100 } ]
 		//},{
 		//	featureType: "administrative",
 		//	stylers: [ { visibility: "off" } ]
