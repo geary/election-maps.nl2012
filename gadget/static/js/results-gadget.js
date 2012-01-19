@@ -39,10 +39,10 @@ opt.writeScript = function( url, nocache ) {
 		'<\/script>' );
 };
 
-opt.writeScript( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
+opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
 opt.writeScript(
-	'http://maps.google.com/maps/api/js?v=3.5&sensor=false' + (
+	'//maps.google.com/maps/api/js?v=3.5&sensor=false' + (
 	/(^|\.)election-maps.appspot.com\//.test(location.hostname) ?
 		'&key=AIzaSyBbwxmNf1Sz3ORtmt4SFy5ltFqIFGd2QQg' :
 		''
