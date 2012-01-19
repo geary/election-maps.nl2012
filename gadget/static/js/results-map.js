@@ -1692,7 +1692,7 @@ function formatLegendTable( cells ) {
 		},{
 			featureType: "road",
 			elementType: "geometry",
-			stylers: [ { lightness: 25 }, { saturation: -10 }, { visibility: "simplified" } ]
+			stylers: [ { lightness: 60 }, { saturation: 10 }, { visibility: "simplified" } ]
 		},{
 			featureType: "transit",
 			stylers: [ { visibility: "off" } ]
