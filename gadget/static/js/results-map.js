@@ -1776,7 +1776,7 @@ function formatLegendTable( cells ) {
 			},
 			click: function( event ) {
 				var id = this.id.split('-')[2];
-				if( id == 'top' ) id = -1;
+				if( id == 'top' ) id = null;
 				$('#chkCycle').prop({ checked:false });
 				stopCycle();
 				setCandidate( id );
