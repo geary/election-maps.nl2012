@@ -1318,7 +1318,7 @@ function formatLegendTable( cells ) {
 		if( ! result ) return [];
 		if( result == -1 ) result = totalResults( currentResults() );
 		var results = currentResults();
-		var col = results.cols;
+		var col = results.colsById;
 		var top = results.candidates.slice();
 		for( var i = -1;  ++i < top.length; ) {
 			var candidate = top[i], votes = result[i];
