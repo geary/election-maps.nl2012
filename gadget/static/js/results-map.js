@@ -22,7 +22,7 @@ var strings = {
 	electionDate: 'January 21, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
-	cycle: 'Cycle',
+	cycle: 'Cycle Candidates',
 	cycleTip: 'Cycle through the candidate maps automatically',
 	cycleStopTip: 'Stop cycling through the candidate maps',
 	//countdownHeading: 'Live results in:',
