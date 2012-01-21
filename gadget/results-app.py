@@ -31,11 +31,11 @@ def checkReferer( req, required ):
 def checkRefererURL( referer, required ):
 	if not referer:
 		return not required
-	ref = urlparse( referer )
+	ref = urlparse( referer.lower() )
 	if not ref:
 		return False
 	for goodURL in private.whitelist:
-		good = urlparse( goodURL )
+		good = urlparse( goodURL.lower() )
 		if checkParsedURL( good, ref ):
 			return True
 	return False
@@ -129,5 +129,5 @@ def test():
 
 
 if __name__ == '__main__':
-	#test()  # uncomment to run tests
+	test()  # uncomment to run tests
 	main()
