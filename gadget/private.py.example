@@ -10,6 +10,7 @@ tables = {
 }
 
 whitelist = [
+	'//*.google.com',
 	'//google.com',
 	#'//localhost',
 ]

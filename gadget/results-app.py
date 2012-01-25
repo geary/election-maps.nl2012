@@ -12,9 +12,10 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import private
+from referercheck import RefererCheck
 
 FT_URL = 'http://fusiontables.googleusercontent.com/fusiontables/api/query?'
-
+refcheck = RefererCheck(private.whitelist)
 
 def dumpRequest( req ):
 	return pprint.pformat({
@@ -25,32 +26,7 @@ def dumpRequest( req ):
 
 
 def checkReferer( req, required ):
-	return checkRefererURL( req.headers.get('Referer'), required )
-
-
-def checkRefererURL( referer, required ):
-	if not referer:
-		return not required
-	ref = urlparse( referer.lower() )
-	if not ref:
-		return False
-	for goodURL in private.whitelist:
-		good = urlparse( goodURL.lower() )
-		if checkParsedURL( good, ref ):
-			return True
-	return False
-
-
-def checkParsedURL( good, url ):
-	return(
-		( good.scheme == ''  or  url.scheme == good.scheme )
-			and
-		( good.hostname is None  or  url.hostname.endswith(good.hostname) )
-			and
-		( good.port is None  or  url.port == good.port )
-			and
-		( good.path is None  or  url.path.startswith(good.path) )
-	)
+	return refcheck.check( req.headers.get('Referer'), required = required )
 
 
 class VoteDataHandler( webapp.RequestHandler ):
