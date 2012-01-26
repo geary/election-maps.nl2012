@@ -31,6 +31,8 @@ import psycopg2
 
 import polyYacc
 
+import tracer
+
 ##############################################################################################
 def vertex(schemaVertex,tableGeo,colGeo,colId,minDistance) :
 	
@@ -371,7 +373,7 @@ def run(
 	global connexion,cur
 	# connect to the database
 	connexion = psycopg2.connect("user = '%s' password = '%s' host = '%s' dbname = '%s'"%(username,password,hostname,database))
-	cur = connexion.cursor()
+	cur = tracer.Cursor( connexion.cursor() )
 	# simplification function
 	vertex(schemaVertex,tableGeo,colGeo,colId,minDistance)
 	connexion.commit()
