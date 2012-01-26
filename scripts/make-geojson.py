@@ -12,58 +12,60 @@ def process():
 	boxGeom = googGeom
 	boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 	
-	#for tolerance in ( None, ):
+	for tolerance in ( None, ):
 	#for tolerance in ( 1, ):
 	#for tolerance in ( 8, ):
 	#for tolerance in ( 128, ):
 	#for tolerance in ( 1024, ):
-	for tolerance in ( 2048, ):
-	#for tolerance in ( 4096, ):  # TODO: fails! (needs ST_MakeValid?)
+	#for tolerance in ( 2048, ):
+	#for tolerance in ( 4096, ):
+	#for tolerance in ( 8192, ):
+	#for tolerance in ( 8192, 16384, ):
 		if tolerance is None:
 			simpleGeom = googGeom
 		else:
 			simpleGeom = '%s%d' %( googGeom, tolerance )
 		
-		if 1:
+		if 0:
 			db.createSchema( schemaVertex )
 			vertex.run(
 				username = private.POSTGRES_USERNAME,
 				password = private.POSTGRES_PASSWORD,
 				hostname = 'localhost',
 				database = 'usageo',
-				tableGeo = schema+'.sc',
+				tableGeo = schema+'.fl',
 				colGeo = 'goog_geom',
 				colId = 'gid',
 				schemaVertex = schemaVertex,
 				minDistance = tolerance,
 			)
 		
-		if 1:
+		if 0:
 			simplify.run(
 				username = private.POSTGRES_USERNAME,
 				password = private.POSTGRES_PASSWORD,
 				hostname = 'localhost',
 				database = 'usageo',
-				tableGeo = schema+'.sc',
+				tableGeo = schema+'.fl',
 				colGeo = 'goog_geom',
 				tableVertex = schemaVertex + '.vertex' + str(tolerance),
 				colId = 'gid',
 				minDistance = tolerance,
 			)
 		
-		if 1:
+		if 0:
 			db.mergeGeometry(
-				schema+'.sc', 'state', simpleGeom,
+				schema+'.fl', 'state', simpleGeom,
 				schema+'.state', 'state', simpleGeom
 			)
 		
 		if 1:
-			geoid = '45'
-			name = 'South Carolina'
+			geoid = '12'
+			name = 'Florida'
 			where = "( state = '%s' )" %( geoid )
 			
 			geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, simpleGeom, '00', 'United States', where )
-			geoCounty = db.makeFeatureCollection( schema+'.sc', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
+			geoCounty = db.makeFeatureCollection( schema+'.fl', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
 			#geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, simpleGeom, geoid, name, where )
 			
 			geo = {

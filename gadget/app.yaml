@@ -1,5 +1,5 @@
 application: election-maps
-version: sc2012
+version: fl2012-trout
 runtime: python
 api_version: 1
 

@@ -8,7 +8,7 @@ var times = {
 	gadgetLoaded: now()
 };
 
-// Default params for NH
+// Default params
 params.sidebar = ( params.sidebar !== 'false' );
 
 opt.randomized = params.randomize;
@@ -18,8 +18,8 @@ var strings = {
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
-	electionTitle: 'South Carolina Primary',  // TODO: make election-specific
-	electionDate: 'January 21, 2012',  // TODO
+	electionTitle: 'Florida Primary',  // TODO: make election-specific
+	electionDate: 'January 31, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
@@ -635,11 +635,11 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = 2048;
+		var level = '';
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
-		var fips = '45';  // TEMP
+		var fips = '12';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
@@ -1122,7 +1122,7 @@ function formatLegendTable( cells ) {
 				}
 			}
 			var kind = geo.table.split('.')[1];
-			if( kind == 'coucou'  ||  kind == 'sc' /*TEMP*/ ) kind = 'cousub';
+			if( kind == 'coucou'  ||  kind == 'fl' /*TEMP*/ ) kind = 'cousub';
 			var colorizers = {
 				state: function() {
 					simple( '#FFFFFF', '#222222', 1, 2 );
@@ -1933,7 +1933,7 @@ function formatLegendTable( cells ) {
 			//params.tableid || '{{tableid}}'
 			
 			'https://pollinglocation.googleapis.com/results?',
-			'electionid=', 2502,
+			'electionid=', 2102,
 			'&_=', Math.floor( now() / opt.resultCacheTime )
 		);
 		getScript( url );
