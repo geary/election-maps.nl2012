@@ -32,6 +32,8 @@ import psycopg2
 
 import polyYacc
 
+import tracer
+
 
 ##############################################################################################
 # Fonction createTable
@@ -245,7 +247,7 @@ def run(
 
 	# connect to the database
 	connexion = psycopg2.connect("user = '%s' password = '%s' host = '%s' dbname = '%s'"%(username,password,hostname,database))
-	cur = connexion.cursor()
+	cur = tracer.Cursor( connexion.cursor() )
 	# simplification function
 	simplify(database,tableVertex,tableGeo,colGeo,colId,minDistance,username,password,hostname)
 	connexion.commit()
