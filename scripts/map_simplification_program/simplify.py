@@ -103,7 +103,7 @@ def simplify(database,tableVertex,tableGeo,colGeo,colId,minDistance,username,pas
 	# SQL request:
 	# -> get from the table passed as argument the id and the geometry data as text
 	#        geometry data <-> polygon coordinates
-	com = 'SELECT %s,AsText(%s) '%(colId,colGeo)
+	com = 'SELECT %s,ST_AsText(%s) '%(colId,colGeo)
 	com = com + 'FROM %s.%s  ORDER BY %s'%(schema,tableGeo,colId)
 	cur.execute(com)
 
@@ -160,7 +160,7 @@ def updateCol(lid,lgeom,schema,tableGeo,newcol,tableVertex,srid,colId):
 	#print '-----------------------------------------------------'
 
 	com = 'UPDATE %s.%s'%(schema,tableGeo)
-	com = com + " SET %s = GeometryFromText('%s',%s)"%(newcol,polytext,srid)
+	com = com + " SET %s = ST_GeometryFromText('%s',%s)"%(newcol,polytext,srid)
 	com = com + ' WHERE %s = %i'%(colId,lid)
 	cur.execute(com)
 		
