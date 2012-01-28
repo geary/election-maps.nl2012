@@ -4,8 +4,14 @@
 '''
 
 SHAPEFILE_PATH = '/your/shapefile/download/path'
+TEMP_PATH = '/your/temp/path'
+SHAPES_PATH = '/your/generated/shapes/path'
+SIMPLIFIED_SHAPEFILE_PATH = SHAPES_PATH + '/shp'
 GEOJSON_PATH = '/your/geojson/output/path'
 TILE_PATH = '/your/tile/output/path'
 
+POSTGRES_BIN = 'C:/Program Files (x86)/PostgreSQL/9.0/bin'
+POSTGRES_HOST = 'localhost'
+POSTGRES_PORT = '5432'
 POSTGRES_USERNAME = 'postgres'
 POSTGRES_PASSWORD = ''
