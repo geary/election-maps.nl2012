@@ -35,15 +35,11 @@ class Database:
 		self.cursor.execute( query )
 	
 	def createGeoDatabase( self, database ):
+		self.dropDatabase( database )
 		isolation_level = self.connection.isolation_level
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		self.execute('''
-			DROP DATABASE IF EXISTS %(database)s;
-		''' % {
-			'database': database,
-		})
 		self.execute('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
@@ -51,6 +47,28 @@ class Database:
 			CONNECTION LIMIT = -1;
 		''' % {
 			'database': database,
+		})
+		self.connection.set_isolation_level( isolation_level )
+	
+	def dropDatabase( self, name ):
+		return self.drop( 'DATABASE', name )
+	
+	def dropSchema( self, name ):
+		return self.drop( 'SCHEMA', name )
+	
+	def dropTable( self, name ):
+		return self.drop( 'TABLE', name )
+	
+	def drop( self, kind, name ):
+		isolation_level = self.connection.isolation_level
+		self.connection.set_isolation_level(
+			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+		)
+		self.execute('''
+			DROP %(kind)s IF EXISTS %(name)s;
+		''' % {
+			'kind': kind,
+			'name': name,
 		})
 		self.connection.set_isolation_level( isolation_level )
 	
