@@ -112,7 +112,7 @@ def populateVertex(vertex,sequence,colId,colGeo,tableGeo,minDistance):
 	# -> get from the table passed as argument the id, the SRID and the geometry data as text
 	#geometry data <-> polygon coordinates
 	com = ''   
-	com = com + 'SELECT %s,SRID(%s),AsText(%s) '%(colId,colGeo,colGeo)
+	com = com + 'SELECT %s,ST_SRID(%s),ST_AsText(%s) '%(colId,colGeo,colGeo)
 	com = com + 'FROM %s  ORDER BY %s'%(tableGeo,colId)
 	cur.execute(com)
 	
