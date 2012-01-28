@@ -199,9 +199,9 @@ class Database:
 				%(googeom)s = ST_Multi(
 					ST_Transform(
 						ST_Force_2D(
-							-- ST_MakeValid(
+							ST_MakeValid(
 								%(llgeom)s
-							-- )
+							)
 						),
 						3857
 					)
@@ -234,11 +234,11 @@ class Database:
 				%(targetGeom)s = (
 					SELECT
 						ST_Multi(
-							-- ST_MakeValid(
+							ST_MakeValid(
 								ST_Union(
 									%(sourceGeom)s
 								)
-							-- )
+							)
 						)
 					FROM
 						%(sourceTable)s
@@ -279,12 +279,12 @@ class Database:
 			SET
 				%(targetGeom)s =
 					ST_Multi(
-						-- ST_MakeValid(
+						ST_MakeValid(
 							ST_SimplifyPreserveTopology(
 								%(sourceGeom)s,
 								%(tolerance)f
 							)
-						-- )
+						)
 					)
 			;
 			
@@ -356,8 +356,8 @@ class Database:
 			FROM
 				%(table)s
 			WHERE
-				ST_IsValid( %(polyGeom)s )
-			AND
+--				ST_IsValid( %(polyGeom)s )
+--			AND
 				%(where)s
 			;
 		''' % {
