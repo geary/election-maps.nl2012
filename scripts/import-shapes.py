@@ -14,10 +14,10 @@ fullGeom = 'full_geom'
 googGeom = 'goog_geom'
 
 
-def cartoFileName( state, type ):
+def cartoFileName( state, type, version='00' ):
 	return os.path.join(
 		private.SHAPEFILE_PATH,
-		'gz_2010_%s_%s_00_500k.zip' %( state, type )
+		'gz_2010_%s_%s_%s_500k.zip' %( state, type, version )
 	)
 
 
@@ -28,9 +28,9 @@ def process():
 	createSchema( db )
 	loadStates( db )
 	loadCounties( db )
-	#loadCountySubdivisions( db )
-	#createCountyCousub( db )
-	loadNH( db )
+	loadCongressional( db )
+	loadCountySubdivisions( db )
+	createGopPrimary( db )
 	closeDatabase( db )
 
 
@@ -60,8 +60,8 @@ def createSchema( db ):
 	db.connection.commit()
 
 
-def loadShapefile( db, state, kind, table, create=True ):
-	zipfile = cartoFileName( state, kind )
+def loadCartoFile( db, state, kind, version, table, create=True ):
+	zipfile = cartoFileName( state, kind, version )
 	table = schema + '.' + table
 	print 'Loading %s' % zipfile
 	db.loadShapefile( zipfile, private.TEMP_PATH, table, create )
@@ -69,56 +69,34 @@ def loadShapefile( db, state, kind, table, create=True ):
 
 
 def loadStates( db ):
-	loadShapefile( db, 'us', '040', 'state' )
+	loadCartoFile( db, 'us', '040', '00', 'state' )
 
 
 def loadCounties( db ):
-	loadShapefile( db, 'us', '050', 'county' )
+	loadCartoFile( db, 'us', '050', '00', 'county' )
+
+
+def loadCongressional( db ):
+	loadForStates( db, '500', '11', 'cd', [ '20' ] )
 
 
 def loadCountySubdivisions( db ):
-	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
+	loadForStates( db, '060', '00', 'cousub', [ '09', '25', '33', '50' ] )
+
+
+def loadForStates( db, code, version, table, states=None ):
+	#if states is None:
+	#	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
+	#	states = db.cursor.fetchall()
+	#...for state, in states:
 	create = True
-	for state, in db.cursor.fetchall():
-		loadShapefile( db, state, '060', 'cousub', create )
+	for state in states:
+		loadCartoFile( db, state, code, version, table, create )
 		create = False
 
 
-def loadNH( db ):
-	loadShapefile( db, '33', '060', 'coucou' )
-
-
-def createCountyCousub( db ):
-	# CT, MA, NH, VT report votes by county subdivision ("town")
-	whereCousub = '''
-		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
-	'''
-	db.execute( '''
-		DROP TABLE IF EXISTS %(schema)s.coucou;
-		CREATE TABLE %(schema)s.coucou (
-			LIKE %(schema)s.cousub
-				INCLUDING DEFAULTS
-				INCLUDING CONSTRAINTS
-				INCLUDING INDEXES
-		);
-		DROP SEQUENCE IF EXISTS %(schema)s.coucou_gid_seq;
-		CREATE SEQUENCE %(schema)s.coucou_gid_seq;
-		INSERT INTO %(schema)s.coucou
-			SELECT nextval('%(schema)s.coucou_gid_seq'),
-				geo_id, state, county, '' AS cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.county
-			WHERE NOT %(whereCousub)s;
-		INSERT INTO %(schema)s.coucou
-			SELECT nextval('%(schema)s.coucou_gid_seq'),
-				geo_id, state, county, cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.cousub
-			WHERE %(whereCousub)s;
-	''' %({
-		'schema': schema,
-		'whereCousub': whereCousub
-	}) )
+#def loadNH( db ):
+#	loadCartoFile( db, '33', '060', '00', 'gop2012' )
 
 
 def main():
