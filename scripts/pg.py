@@ -43,7 +43,7 @@ class Database:
 		self.execute('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
-			TEMPLATE = template_postgis
+			TEMPLATE = template_postgis20
 			CONNECTION LIMIT = -1;
 		''' % {
 			'database': database,
