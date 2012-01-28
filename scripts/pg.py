@@ -329,7 +329,7 @@ class Database:
 		t1 = time.clock()
 		self.execute('''
 			SELECT
-				ST_AsGeoJSON( ST_Centroid( ST_Extent( %(polyGeom)s ) ), %(digits)s ),
+				ST_AsGeoJSON( ST_Centroid( ST_Extent( %(boxGeom)s ) ), %(digits)s ),
 				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( ST_Extent( %(boxGeomLL)s ), 6, 1 )
 			FROM 
