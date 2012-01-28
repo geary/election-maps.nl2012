@@ -236,7 +236,11 @@ class Database:
 						ST_Multi(
 							ST_MakeValid(
 								ST_Union(
-									%(sourceGeom)s
+									--ST_SnapToGrid(
+										%(sourceGeom)s
+									--	,
+									--	0.0000001
+									--)
 								)
 							)
 						)
