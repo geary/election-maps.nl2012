@@ -81,7 +81,10 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapefile( self, zipfile, tempdir, tablename, create ):
+	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
+		if column is None: column = 'full_geom'
+		if srid is None: srid = '4269'
+		if encoding is None: encoding = 'LATIN1'
 		shpfile = zipfile
 		zipname = os.path.basename( zipfile )
 		basename, ext = os.path.splitext( zipname )
@@ -95,8 +98,9 @@ class Database:
 		print 'loadShapeFile %s' % shpfile
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
-		command = '"%s/shp2pgsql" -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
+		command = '"%s/shp2pgsql" %s -g %s -s %s -W %s %s %s %s >%s' %(
 			private.POSTGRES_BIN, ( '-a', '-c -I' )[create],
+			column, srid, encoding,
 			shpfile, tablename, self.database, sqlfile
 		)
 		print 'Running shp2pgsql:\n%s' % command
