@@ -22,8 +22,8 @@ class Database:
 	def __init__( self, **kw ):
 		self.database = kw.get( 'database' )
 		self.connection = psycopg2.connect(
-			host = kw.get( 'host', 'localhost' ),
-			port = kw.get( 'port', '5432' ),
+			host = kw.get( 'host', private.POSTGRES_HOST ),
+			port = kw.get( 'port', private.POSTGRES_PORT ),
 			database = self.database,
 			user = kw.get( 'user', private.POSTGRES_USERNAME ),
 			password = kw.get( 'password', private.POSTGRES_PASSWORD ),
@@ -77,15 +77,16 @@ class Database:
 		print 'loadShapeFile %s' % shpfile
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
-		command = 'shp2pgsql -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
-			( '-a', '-c -I' )[create], shpfile, tablename, self.database, sqlfile
+		command = '"%s/shp2pgsql" -g full_geom -s 4269 -W LATIN1 %s %s %s %s >%s' %(
+			private.POSTGRES_BIN, ( '-a', '-c -I' )[create],
+			shpfile, tablename, self.database, sqlfile
 		)
 		print 'Running shp2pgsql:\n%s' % command
 		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
-		command = 'psql -q -U postgres -d usageo -f %s' %(
-			sqlfile
+		command = '"%s/psql" -q -U postgres -d usageo -f %s' %(
+			private.POSTGRES_BIN, sqlfile
 		)
 		print 'Running psql:\n%s' % command
 		os.system( command )
