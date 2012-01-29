@@ -687,7 +687,7 @@ function formatLegendTable( cells ) {
 			//	oneTime();
 			//	//setCounties( false );
 			//	getResults();
-			//	analytics( '/states' );
+			//	analytics( 'data', 'states' );
 			//},
 			//county: function() {
 			//	json.features.index('id').index('abbr');
@@ -695,7 +695,7 @@ function formatLegendTable( cells ) {
 			//	oneTime();
 			//	//setCounties( true );
 			//	getResults();
-			//	analytics( '/counties' );
+			//	analytics( 'data', 'counties' );
 			//},
 			all: function() {
 				function set( kind ) {
@@ -711,7 +711,7 @@ function formatLegendTable( cells ) {
 				//setCounties( true );
 				geoReady();
 				getResults();
-				//analytics( '/counties' );
+				//analytics( 'data', 'counties' );
 			}
 		}[json.kind];
 		loader();
@@ -842,14 +842,16 @@ function formatLegendTable( cells ) {
 	}
 	
 	function reportError( type, file ) {
-		analytics( '/' + type + '/' + file );
+		analytics( 'error', type, file );
 	}
 	
-	function analytics( path ) {
+	function analytics( category, action, label, value, noninteraction ) {
 		//analytics.seen = analytics.seen || {};
 		//if( analytics.seen[path] ) return;
 		//analytics.seen[path] = true;
-		_gaq.push([ '_trackPageview', '/results' + path ]);
+		_gaq.push([ '_trackEvent',
+			category, action, label, value, noninteraction
+		]);
 	}
 	
 	function htmlEscape( str ) {
@@ -957,7 +959,6 @@ function formatLegendTable( cells ) {
 		if( ! opt.randomized  &&   opt.reloadTime ) {
 			clearInterval( reloadTimer );
 			reloadTimer = setInterval( function() {
-				analytics( '/update' );
 				loadView();
 			}, opt.reloadTime );
 		}
@@ -1803,13 +1804,15 @@ function formatLegendTable( cells ) {
 			else startCycle();
 		}
 		
+		var startCycleTime;
 		function startCycle() {
 			if( opt.cycleTimer ) return;
+			startCycleTime = now();
 			this.title = 'cycleStopTip'.T();
 			var player = players.candidates;
 			opt.cycleTimer = setInterval( player.tick, 3000 );
 			player.tick();
-			analytics( '/cycle/start' );
+			analytics( 'cycle', 'start' );
 		}
 		
 		function stopCycle() {
@@ -1819,7 +1822,8 @@ function formatLegendTable( cells ) {
 			$('#btnCycle')
 				.removeClass( 'selected' )
 				.prop({ title: 'cycleTip'.T() });
-			analytics( '/cycle/stop' );
+			var seconds = Math.round( ( now() - startCycleTime ) / 1000 );
+			analytics( 'cycle', 'stop', '', seconds );
 		}
 		
 		setCandidate = function( id ) {
@@ -2095,6 +2099,6 @@ function formatLegendTable( cells ) {
 		debug ? 'u/ga_debug.js' : 'ga.js'
 	) );
 	
-	analytics( '/load' );
+	analytics( 'map', 'load' );
 	
 })( jQuery );
