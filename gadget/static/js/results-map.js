@@ -2091,7 +2091,8 @@ function formatLegendTable( cells ) {
 	
 	getScript( S(
 		location.protocol == 'https:' ? 'https://ssl' : 'http://www',
-		'.google-analytics.com/ga.js'
+		'.google-analytics.com/',
+		debug ? 'u/ga_debug.js' : 'ga.js'
 	) );
 	
 	analytics( '/load' );
