@@ -31,6 +31,7 @@ def checkReferer( req, required ):
 
 
 def checkRefererURL( referer, required ):
+	if referer is not None: referer = referer.lower()
 	return refcheck.check( referer, required )
 
 
