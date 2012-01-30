@@ -101,6 +101,7 @@ def test():
 	assert refCheck.check("http://test.example.com/path")
 	assert not refCheck.check("http://test.example.com")
 	assert not refCheck.check("http://example.com/path")
+	assert not refCheck.check("http://www.example.com/otherpath")
 	assert not refCheck.check("http://www.example2.com")
 	assert refCheck.check("http://example2.com/path")
 	assert refCheck.check("http://example2.com/otherpath")
