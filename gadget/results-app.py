@@ -27,7 +27,11 @@ def dumpRequest( req ):
 
 
 def checkReferer( req, required ):
-	return refcheck.check( req.headers.get('Referer'), required = required )
+	return checkRefererURL( req.headers.get('Referer'), required )
+
+
+def checkRefererURL( referer, required ):
+	return refcheck.check( referer, required )
 
 
 class VoteDataHandler( webapp.RequestHandler ):
