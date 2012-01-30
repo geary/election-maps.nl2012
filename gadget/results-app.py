@@ -111,5 +111,5 @@ def test():
 
 
 if __name__ == '__main__':
-	test()  # uncomment to run tests
+	#test()  # uncomment to run tests
 	main()
