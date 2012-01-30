@@ -13,9 +13,10 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 import private
 from referercheck import RefererCheck
+refcheck = RefererCheck( private.whitelist )
 
 FT_URL = 'http://fusiontables.googleusercontent.com/fusiontables/api/query?'
-refcheck = RefererCheck(private.whitelist)
+
 
 def dumpRequest( req ):
 	return pprint.pformat({
