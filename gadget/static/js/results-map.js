@@ -10,6 +10,8 @@ var times = {
 
 // Default params
 params.sidebar = ( params.sidebar !== 'false' );
+params.source = ( params.source == 'gop' ? 'gop' : 'ap' );
+$('body').addClass( 'source-' + params.source );
 
 opt.randomized = params.randomize;
 
@@ -498,8 +500,11 @@ document.write(
 		'#centerlabel, #centerlabel * { font-size:12px; xfont-weight:bold; }',
 		'#spinner { z-index:999999; position:absolute; left:', Math.floor( ww/2 - 64 ), 'px; top:', Math.floor( wh/2 - 20 ), 'px; }',
 		'#error { z-index:999999; position:absolute; left:4px; bottom:4px; border:1px solid #888; background-color:#FFCCCC; font-weight:bold; padding:6px; }',
-		'a.logo { display:none; position:absolute; bottom:24px; width:48px; height:48px;}',
+		'a.logo { position:absolute; bottom:24px; width:48px; height:48px;}',
+		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
+		'body.source-ap #gop-logo { display:none; }',
 		'#ap-logo { right:64px; width:67px; background: url(', imgUrl('ap-logo-48x67.png'), ') no-repeat; }',
+		'body.source-gop #ap-logo { display:none; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
 	'</style>'
 );
@@ -535,6 +540,8 @@ document.write(
 	'<div id="maptip">',
 	'</div>',
 	'<a id="ap-logo" class="logo" target="_blank" href="http://www.youtube.com/apelections" title="Data from the Associated Press">',
+	'</a>',
+	'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="Data from the Nevada GOP">',
 	'</a>',
 	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections" title="Google Politics & Elections">',
 	'</a>',
@@ -1937,7 +1944,8 @@ function formatLegendTable( cells ) {
 			//params.tableid || '{{tableid}}'
 			
 			'https://pollinglocation.googleapis.com/results?',
-			'electionid=', 2104,
+			'electionid=',
+			params.source == 'gop' ? 2103 : 2104,
 			'&_=', Math.floor( now() / opt.resultCacheTime )
 		);
 		getScript( url );
@@ -2079,7 +2087,6 @@ function formatLegendTable( cells ) {
 	
 	var blank = imgUrl( 'blank.gif' );
 	
-	$('a.logo').css({ display: 'block' });
 	$('body.interactive a.logo')
 		.css({ opacity: .5 })
 		.mouseover( function() {
