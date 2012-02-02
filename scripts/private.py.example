@@ -5,8 +5,7 @@
 
 SHAPEFILE_PATH = '/your/shapefile/download/path'
 TEMP_PATH = '/your/temp/path'
-SHAPES_PATH = '/your/generated/shapes/path'
-SIMPLIFIED_SHAPEFILE_PATH = SHAPES_PATH + '/shp'
+SIMPLIFIED_SHAPEFILE_PATH = '/your/generated/shapes/path/shp'
 GEOJSON_PATH = '/your/geojson/output/path'
 TILE_PATH = '/your/tile/output/path'
 

@@ -24,13 +24,12 @@ def cartoFileName( state, type, version='00' ):
 def process():
 	createDatabase()
 	db = openDatabase()
-	addSimplificationFunction( db )
+	#addSimplificationFunction( db )
 	createSchema( db )
 	loadStates( db )
 	loadCounties( db )
 	loadCongressional( db )
 	loadCountySubdivisions( db )
-	createGopPrimary( db )
 	closeDatabase( db )
 
 
@@ -64,7 +63,10 @@ def loadCartoFile( db, state, kind, version, table, create=True ):
 	zipfile = cartoFileName( state, kind, version )
 	table = schema + '.' + table
 	print 'Loading %s' % zipfile
-	db.loadShapefile( zipfile, private.TEMP_PATH, table, create )
+	db.loadShapefile(
+		zipfile, private.TEMP_PATH, table,
+		'full_geom', '4269', 'LATIN1', create
+	)
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 
 
