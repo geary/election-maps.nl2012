@@ -135,7 +135,7 @@ opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
-var sidebarWidth = 280;
+var sidebarWidth = params.play ? 340 : 280;
 
 opt.resultCacheTime = 30 * 1000;
 opt.reloadTime = 60 * 1000;
@@ -455,6 +455,10 @@ document.write(
 		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; width:275px; }',
 		'div.candidate-name { line-height:1em; }',
 		'div.first-name { font-size:85%; }',
+		'body.tv #election-title { font-size:24px; font-weight:bold; }',
+		'body.tv #election-date { font-size:16px; color:#222; }',
+		'body.tv #percent-reporting { font-size:20px; }',
+		'body.tv #button-row, body.tv #auto-update { display:none; }',
 		'body.tv div.candidate-name { margin-right:20px; }',
 		'body.tv div.candidate-name div { line-height:1.1em; }',
 		'body.tv div.first-name { font-size:20px; }',
@@ -1411,14 +1415,14 @@ function formatLegendTable( cells ) {
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			resultsHeaderHTML = S(
-				'<div class="body-text">',
+				'<div id="percent-reporting" class="body-text">',
 					'percentReporting'.T( totalReporting( currentResults() ) ),
 				'</div>',
-				'<div class="faint-text" style="margin-bottom:8px;">',
+				'<div id="auto-update" class="faint-text" style="margin-bottom:8px;">',
 					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
 				'</div>',
 				none ? '' : S(
-					'<div id="class="body-text" style="padding-top:4px;">',
+					'<div id="button-row" class="body-text" style="padding-top:4px;">',
 						'<a class="button ',
 							opt.cycleTimer ? 'selected' : '',
 							'" id="btnCycle" title="',
@@ -1442,10 +1446,10 @@ function formatLegendTable( cells ) {
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
-					'<div class="title-text">',
+					'<div id="election-title" class="title-text">',
 						'electionTitle'.T(),
 					'</div>',
-					'<div class="faint-text" style="margin-bottom:8px;">',
+					'<div id="election-date" class="faint-text" style="margin-bottom:8px;">',
 						'electionDate'.T(),
 					'</div>',
 					'<div id="sidebar-results-header">',
