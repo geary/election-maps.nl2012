@@ -39,14 +39,14 @@ var elections = {
 		dem: {
 			tableids: 'TODO',
 			candidates: [
-				{ color: '#20FF1F', id: 'Biden', firstName: 'Joe', lastName: 'Biden', fullName: 'Joe Biden' },
-				{ color: '#FFFA00', id: 'Clinton', firstName: 'Hillary', lastName: 'Clinton', fullName: 'Hillary Clinton' },
-				{ color: '#E4Af95', id: 'Dodd', firstName: 'Chris', lastName: 'Dodd', fullName: 'Chris Dodd' },
-				{ color: '#FF1300', id: 'Edwards', firstName: 'John', lastName: 'Edwards', fullName: 'John Edwards' },
-				{ color: '#8A5C2E', id: 'Gravel', firstName: 'Mike', lastName: 'Gravel', fullName: 'Mike Gravel' },
-				{ color: '#EE00B5', id: 'Kucinich', firstName: 'Dennis', lastName: 'Kucinich', fullName: 'Dennis Kucinich' },
-				{ color: '#1700E8', id: 'Obama', firstName: 'Barack', lastName: 'Obama', fullName: 'Barack Obama' },
-				{ color: '#336633', id: 'Richardson', firstName: 'Bill', lastName: 'Richardson', fullName: 'Bill Richardson' }
+				{ color: '#20FF1F', id: 'biden', firstName: 'Joe', lastName: 'Biden', fullName: 'Joe Biden' },
+				{ color: '#FFFA00', id: 'clinton', firstName: 'Hillary', lastName: 'Clinton', fullName: 'Hillary Clinton' },
+				{ color: '#E4Af95', id: 'dodd', firstName: 'Chris', lastName: 'Dodd', fullName: 'Chris Dodd' },
+				{ color: '#FF1300', id: 'edwards', firstName: 'John', lastName: 'Edwards', fullName: 'John Edwards' },
+				{ color: '#8A5C2E', id: 'gravel', firstName: 'Mike', lastName: 'Gravel', fullName: 'Mike Gravel' },
+				{ color: '#EE00B5', id: 'kucinich', firstName: 'Dennis', lastName: 'Kucinich', fullName: 'Dennis Kucinich' },
+				{ color: '#1700E8', id: 'obama', firstName: 'Barack', lastName: 'Obama', fullName: 'Barack Obama' },
+				{ color: '#336633', id: 'richardson', firstName: 'Bill', lastName: 'Richardson', fullName: 'Bill Richardson' }
 			]
 		},
 		gop: {
@@ -54,14 +54,14 @@ var elections = {
 				IA: '2549421'
 			},
 			candidates: [
-				{ color: '#336633', id: 'Giuliani', firstName: 'Rudy', lastName: 'Giuliani', fullName: 'Rudy Giuliani' },
-				{ color: '#D50F25', id: 'Huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
-				{ color: '#8A5C2E', id: 'Hunter', firstName: 'Duncan', lastName: 'Hunter', fullName: 'Duncan Hunter' },
-				{ color: '#3369E8', id: 'McCain', firstName: 'John', lastName: 'McCain', fullName: 'John McCain' },
-				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-				{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
-				{ color: '#EE00B5', id: 'Tancredo', firstName: 'Tom', lastName: 'Tancredo', fullName: 'Tom Tancredo' },
-				{ color: '#20FF1F', id: 'Thompson', firstName: 'Fred', lastName: 'Thompson', fullName: 'Fred Thompson' }
+				{ color: '#336633', id: 'giuliani', firstName: 'Rudy', lastName: 'Giuliani', fullName: 'Rudy Giuliani' },
+				{ color: '#D50F25', id: 'huckabee', firstName: 'Mike', lastName: 'Huckabee', fullName: 'Mike Huckabee' },
+				{ color: '#8A5C2E', id: 'hunter', firstName: 'Duncan', lastName: 'Hunter', fullName: 'Duncan Hunter' },
+				{ color: '#3369E8', id: 'mcCain', firstName: 'John', lastName: 'McCain', fullName: 'John McCain' },
+				{ color: '#009925', id: 'paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+				{ color: '#EEB211', id: 'romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+				{ color: '#EE00B5', id: 'tancredo', firstName: 'Tom', lastName: 'Tancredo', fullName: 'Tom Tancredo' },
+				{ color: '#20FF1F', id: 'thompson', firstName: 'Fred', lastName: 'Thompson', fullName: 'Fred Thompson' }
 			]
 		}
 	},
@@ -73,15 +73,15 @@ var elections = {
 			},
 			photos: true,
 			candidates: [
-				{ color: '#DE6310', id: 'Bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann' },
-				{ color: '#666666', id: 'Cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
-				{ color: '#D50F25', id: 'Gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
-				{ color: '#54F1F1', id: 'Huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
-				{ color: '#009925', id: 'Paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
-				{ color: '#3369E8', id: 'Perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
-				{ color: '#A58DF4', id: 'Roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer', skip: true },
-				{ color: '#EEB211', id: 'Romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
-				{ color: '#AA0C76', id: 'Santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
+				{ color: '#DE6310', id: 'bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann' },
+				{ color: '#666666', id: 'cain', firstName: 'Herman', lastName: 'Cain', fullName: 'Herman Cain' },
+				{ color: '#D50F25', id: 'gingrich', firstName: 'Newt', lastName: 'Gingrich', fullName: 'Newt Gingrich' },
+				{ color: '#54F1F1', id: 'huntsman', firstName: 'Jon', lastName: 'Huntsman', fullName: 'Jon Huntsman' },
+				{ color: '#009925', id: 'paul', firstName: 'Ron', lastName: 'Paul', fullName: 'Ron Paul' },
+				{ color: '#3369E8', id: 'perry', firstName: 'Rick', lastName: 'Perry', fullName: 'Rick Perry' },
+				{ color: '#A58DF4', id: 'roemer', firstName: 'Buddy', lastName: 'Roemer', fullName: 'Buddy Roemer', skip: true },
+				{ color: '#EEB211', id: 'romney', firstName: 'Mitt', lastName: 'Romney', fullName: 'Mitt Romney' },
+				{ color: '#AA0C76', id: 'santorum', firstName: 'Rick', lastName: 'Santorum', fullName: 'Rick Santorum' }
 			]
 		}
 	}
@@ -2046,7 +2046,7 @@ function formatLegendTable( cells ) {
 
 		var candidates = results.candidates = [];
 		for( var i = 0, colID = col.ID;  i < colID;  ++i ) {
-			var id = cols[i].split('-')[1], candidate = election.candidates.by.id[id];
+			var id = cols[i].split('-')[1].toLowerCase(), candidate = election.candidates.by.id[id];
 			candidates.push( $.extend( {}, candidate ) );
 		}
 		candidates.index('id');
