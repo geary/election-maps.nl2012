@@ -11,6 +11,7 @@ var times = {
 // Default params
 params.sidebar = ( params.sidebar !== 'false' );
 params.source = ( params.source == 'gop' ? 'gop' : 'ap' );
+if( location.host.split('.')[0] == 'nv2012' ) params.source = 'gop';
 $('body').addClass( 'source-' + params.source );
 
 opt.randomized = params.randomize;
