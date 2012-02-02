@@ -18,8 +18,8 @@ var strings = {
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
-	electionTitle: 'Florida Primary',  // TODO: make election-specific
-	electionDate: 'January 31, 2012',  // TODO
+	electionTitle: 'Nevada Caucus',  // TODO: make election-specific
+	electionDate: 'February 4, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
@@ -635,11 +635,11 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = '8192';
+		var level = '';
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
-		var fips = '12';  // TEMP
+		var fips = '32';  // TEMP
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
@@ -1123,7 +1123,7 @@ function formatLegendTable( cells ) {
 				}
 			}
 			var kind = geo.table.split('.')[1];
-			if( kind == 'coucou'  ||  kind == 'fl' /*TEMP*/ ) kind = 'cousub';
+			if( kind == 'coucou'  ||  kind == 'gop2012' /*TEMP*/ ) kind = 'cousub';
 			var colorizers = {
 				state: function() {
 					simple( '#FFFFFF', '#222222', 1, 2 );
@@ -1937,7 +1937,7 @@ function formatLegendTable( cells ) {
 			//params.tableid || '{{tableid}}'
 			
 			'https://pollinglocation.googleapis.com/results?',
-			'electionid=', 2102,
+			'electionid=', 2104,
 			'&_=', Math.floor( now() / opt.resultCacheTime )
 		);
 		getScript( url );
