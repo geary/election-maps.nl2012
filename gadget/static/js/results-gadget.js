@@ -50,4 +50,6 @@ opt.writeScript(
 );
 
 opt.writeScript( 'js/polygonzo.js', opt.nocache );
+opt.writeScript( 'js/scriptino.js', opt.nocache );
+opt.writeScript( 'js/elections.js', opt.nocache );
 opt.writeScript( 'js/results-map.js', opt.nocache );
