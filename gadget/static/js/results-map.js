@@ -19,8 +19,6 @@ var strings = {
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
-	electionTitle: 'Nevada Caucus',  // TODO: make election-specific
-	electionDate: 'February 4, 2012',  // TODO
 	randomized: 'Displaying random test data',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
@@ -39,6 +37,24 @@ var parties = elections[year];
 var party = params.party in parties ? params.party : 'gop';
 var election = parties[party];
 var currentCandidate;
+
+states.index('fips').index('abbr');
+
+var defaultState = 'MN';
+
+function State( abbr ) {
+	if( this == window ) return new State( abbr );
+	abbr = ( abbr || params.state || defaultState ).toUpperCase();
+	var state = states.by.fips[abbr] || states.by.abbr[abbr];
+	$.extend( this, state );
+	this.electionTitle = S( this.name, ' ', this.type || 'Primary' );
+	return this;
+}
+
+$.extend( State.prototype, {
+});
+
+var state = State();
 
 // Analytics
 var _gaq = _gaq || [];
@@ -74,7 +90,7 @@ var data = {
 var $map, mapPixBounds;
 
 var debug = params.debug;
-opt.state = params.state || 'NH';
+opt.state = params.state;
 opt.counties = true;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
@@ -332,11 +348,11 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = '';
+		var level = state.level || '';
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
-		var fips = '32';  // TEMP
+		var fips = state.fips;
 		var json = jsonRegion[kind];
 		if( json ) {
 			loadGeoJSON( json );
@@ -780,7 +796,14 @@ function formatLegendTable( cells ) {
 				}
 			}
 			var kind = geo.table.split('.')[1];
-			if( kind == 'coucou'  ||  kind == 'gop2012' /*TEMP*/ ) kind = 'cousub';
+			if(
+			   kind == 'coucou'  ||
+			   kind == 'gop2012'  ||  /*TEMP*/ 
+			   kind == 'fl'  ||  /*TEMP*/
+			   kind == 'sc'  /*TEMP*/
+			) {
+				kind = 'cousub';
+			}
 			var colorizers = {
 				state: function() {
 					simple( '#FFFFFF', '#222222', 1, 2 );
@@ -1092,10 +1115,10 @@ function formatLegendTable( cells ) {
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
 					'<div id="election-title" class="title-text">',
-						'electionTitle'.T(),
+						state.electionTitle,
 					'</div>',
 					'<div id="election-date" class="faint-text" style="margin-bottom:8px;">',
-						'electionDate'.T(),
+						state.date,
 					'</div>',
 					'<div id="sidebar-results-header">',
 						resultsHeaderHTML,
@@ -1539,10 +1562,17 @@ function formatLegendTable( cells ) {
 			return;
 		}
 		
+		var electionid = state.electionid;
+		if( electionid == 'random' )
+			opt.randomized = params.randomize = true;
+		
 		if( params.randomize ) {
 			loadRandomResults( opt.counties );
 			return;
 		}
+		
+		var e = electionid.split( '|' );
+		var id = params.source == 'gop' ? e[1] : e[0];
 		
 		var url = S(
 			
@@ -1558,8 +1588,7 @@ function formatLegendTable( cells ) {
 			//params.tableid || '{{tableid}}'
 			
 			'https://pollinglocation.googleapis.com/results?',
-			'electionid=',
-			params.source == 'gop' ? 2103 : 2104,
+			'electionid=', id,
 			'&_=', Math.floor( now() / opt.resultCacheTime )
 		);
 		getScript( url );

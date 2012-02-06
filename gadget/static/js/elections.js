@@ -54,3 +54,82 @@ var elections = {
 		}
 	}
 };
+
+var states = [
+	{
+		fips: '08',
+		level: '',
+		abbr: 'CO',
+		name: 'Colorado',
+		type: 'Caucus',
+		date: 'February 7, 2012',
+		electionid: 'random',
+		done: false
+	},
+	{
+		fips: '12',
+		level: '8192',
+		abbr: 'FL',
+		name: 'Florida',
+		date: 'January 31, 2012',
+		electionid: '2102',
+		done: true
+	},
+	{
+		fips: '19',
+		abbr: 'IA',
+		name: 'Iowa',
+		type: 'Caucus',
+		date: 'January 3, 2012',
+		electionid: 'random',
+		done: true
+	},
+	{
+		fips: '27',
+		level: '',
+		abbr: 'MN',
+		name: 'Minnesota',
+		type: 'Caucus',
+		date: 'February 7, 2012',
+		electionid: 'random',
+		done: false
+	},
+	{
+		fips: '29',
+		level: '',
+		abbr: 'MO',
+		name: 'Missouri',
+		date: 'February 7, 2012',
+		electionid: 'random',
+		done: false
+	},
+	{
+		fips: '32',
+		level: '',
+		abbr: 'NV',
+		name: 'Nevada',
+		type: 'Caucus',
+		date: 'February 4, 2012',
+		electionid: '2104|2103',
+		done: true
+	},
+	{
+		fips: '33',
+		level: '',
+		abbr: 'NH',
+		name: 'New Hampshire',
+		district: 'town',
+		date: 'January 10, 2012',
+		electionid: 'random',
+		done: true
+	},
+	{
+		fips: '45',
+		level: '1024',
+		abbr: 'SC',
+		name: 'South Carolina',
+		date: 'January 21, 2012',
+		electionid: '2502',
+		done: true
+	}
+];
