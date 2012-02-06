@@ -165,7 +165,7 @@ class Database:
 		self.connection.commit()
 	
 	def indexGeometryColumn( self, table, geom, index=None ):
-		index = index or ( 'idx_' + geom )
+		index = index or '%s_%s_gist' %( table.split( '.' ).pop(), geom  )
 		print 'indexGeometryColumn %s %s %s' %( table, geom, index )
 		vars = { 'table':table, 'geom':geom, 'index':index, }
 		t1 = time.clock()

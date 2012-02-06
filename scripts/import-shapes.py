@@ -68,6 +68,7 @@ def loadCartoFile( db, state, kind, version, table, create=True ):
 		'full_geom', '4269', 'LATIN1', create
 	)
 	db.addGoogleGeometry( table, fullGeom, googGeom )
+	db.indexGeometryColumn( table, googGeom )
 
 
 def loadStates( db ):
