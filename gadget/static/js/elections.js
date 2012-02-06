@@ -58,7 +58,6 @@ var elections = {
 var states = [
 	{
 		fips: '08',
-		level: '',
 		abbr: 'CO',
 		name: 'Colorado',
 		type: 'Caucus',
@@ -68,7 +67,6 @@ var states = [
 	},
 	{
 		fips: '12',
-		level: '8192',
 		abbr: 'FL',
 		name: 'Florida',
 		date: 'January 31, 2012',
@@ -86,7 +84,6 @@ var states = [
 	},
 	{
 		fips: '27',
-		level: '',
 		abbr: 'MN',
 		name: 'Minnesota',
 		type: 'Caucus',
@@ -96,7 +93,6 @@ var states = [
 	},
 	{
 		fips: '29',
-		level: '',
 		abbr: 'MO',
 		name: 'Missouri',
 		date: 'February 7, 2012',
@@ -105,7 +101,6 @@ var states = [
 	},
 	{
 		fips: '32',
-		level: '',
 		abbr: 'NV',
 		name: 'Nevada',
 		type: 'Caucus',
@@ -115,7 +110,6 @@ var states = [
 	},
 	{
 		fips: '33',
-		level: '',
 		abbr: 'NH',
 		name: 'New Hampshire',
 		district: 'town',
@@ -125,7 +119,6 @@ var states = [
 	},
 	{
 		fips: '45',
-		level: '1024',
 		abbr: 'SC',
 		name: 'South Carolina',
 		date: 'January 21, 2012',
