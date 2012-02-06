@@ -12,7 +12,8 @@ boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 
 #levels = ( '00', '10', '20', '30', '40', '50', '60', '70', '80', '90', '95', '100', )
 #levels = ( '50', )
-levels = ( None, )
+levels = ( '1000', )
+#levels = ( None, )
 
 
 def simpleGeom( level ):
@@ -25,8 +26,9 @@ def simpleGeom( level ):
 def process():
 	createGopPrimary( db )
 	for level in levels:
-		#addLevel( db, level )
-		#mergeStates( db, level )
+		if level is not None:
+			addLevel( db, level )
+		mergeStates( db, level )
 		writeStates( db, level )
 
 
@@ -95,8 +97,11 @@ def addLevel( db, level ):
 			%(table)s
 		SET
 			%(simplegeom)s =
-				%(temptable)s.%(simplegeom)s FROM %(temptable)s
-				WHERE %(table)s.geo_id = %(temptable)s.geo_id
+				ST_MakeValid(
+					%(temptable)s.%(simplegeom)s
+				)
+		FROM %(temptable)s
+		WHERE %(table)s.geo_id = %(temptable)s.geo_id
 		;
 	''' %({
 		'table': table,
@@ -116,19 +121,19 @@ def mergeStates( db, level ):
 
 
 def writeStates( db, level ):
-	##
-	geoid = '32'
-	name = 'Nevada'
-	writeState( db, level, geoid, name )
+	db.execute( 'SELECT geo_id, name FROM %s.state ORDER BY geo_id;' %( schema ) )
+	for geo_id, name in db.cursor.fetchall():
+		fips = geo_id.split('US')[1]
+		writeState( db, level, fips, name )
 
 
-def writeState( db, level, geoid, name ):
+def writeState( db, level, fips, name ):
 	geom = simpleGeom( level )
-	where = "( state = '%s' )" %( geoid )
+	where = "( state = '%s' )" %( fips )
 	
 	geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, geom, '00', 'United States', where )
-	geoCounty = db.makeFeatureCollection( schema+'.gop2012', boxGeom, boxGeomLL, geom, geoid, name, where )
-	#geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, geom, geoid, name, where )
+	geoCounty = db.makeFeatureCollection( schema+'.gop2012', boxGeom, boxGeomLL, geom, fips, name, where )
+	#geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, geom, fips, name, where )
 	
 	geo = {
 		'state': geoState,
@@ -137,7 +142,7 @@ def writeState( db, level, geoid, name ):
 	};
 	
 	filename = '%s/%s-%s-%s.jsonp' %(
-		private.GEOJSON_PATH, schema, geoid, geom
+		private.GEOJSON_PATH, schema, fips, geom
 	)
 	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
@@ -156,30 +161,6 @@ def writeGeoJSON( db, level ):
 		private.GEOJSON_PATH, schema, '00', levelGeom
 	)
 	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
-
-
-		#if 1:
-		#	db.execute( 'SELECT state, name FROM %s.state ORDER BY state ASC;' %( schema ) )
-		#	for state, name in db.cursor.fetchall():
-		#		
-		#	geoid = '12'
-		#	name = 'Florida'
-		#	where = "( state = '%s' )" %( geoid )
-		#	
-		#	geoState = db.makeFeatureCollection( schema+'.state', boxGeom, boxGeomLL, levelGeom, '00', 'United States', where )
-		#	geoCounty = db.makeFeatureCollection( schema+'.fl', boxGeom, boxGeomLL, levelGeom, geoid, name, where )
-		#	#geoTown = db.makeFeatureCollection( schema+'.cousub', boxGeom, boxGeomLL, levelGeom, geoid, name, where )
-		#	
-		#	geo = {
-		#		'state': geoState,
-		#		'county': geoCounty,
-		#		#'town': geoTown,
-		#	}
-		#	
-		#	filename = '%s/%s-%s-%s.jsonp' %(
-		#		private.GEOJSON_PATH, schema, geoid, levelGeom
-		#	)
-		#	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
 
 def main():
