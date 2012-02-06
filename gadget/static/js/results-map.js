@@ -348,7 +348,7 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = state.level || '';
+		var level = state.level || '1000';
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
