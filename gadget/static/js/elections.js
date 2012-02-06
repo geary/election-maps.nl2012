@@ -62,7 +62,7 @@ var states = [
 		name: 'Colorado',
 		type: 'Caucus',
 		date: 'February 7, 2012',
-		electionid: 'random',
+		electionid: '2105',
 		done: false
 	},
 	{
@@ -88,7 +88,7 @@ var states = [
 		name: 'Minnesota',
 		type: 'Caucus',
 		date: 'February 7, 2012',
-		electionid: 'random',
+		electionid: '2106',
 		done: false
 	},
 	{
@@ -96,7 +96,7 @@ var states = [
 		abbr: 'MO',
 		name: 'Missouri',
 		date: 'February 7, 2012',
-		electionid: 'random',
+		electionid: '2107',
 		done: false
 	},
 	{
