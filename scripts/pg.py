@@ -379,9 +379,10 @@ class Database:
 		
 		features = []
 		for featuregeoid, featurename, featurelsad, centroidjson, geomjson in self.cursor.fetchall():
-			print featurename
-			#if not centroidjson or not geomjson:
-			#	continue
+			#print featurename
+			if not centroidjson or not geomjson:
+				print 'NO GEOMETRY for %s %s %s' %( featuregeoid, featurename, featurelsad )
+				continue
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
 			feature = {
