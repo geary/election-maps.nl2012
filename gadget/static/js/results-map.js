@@ -44,6 +44,7 @@ var defaultState = 'MN';
 
 function State( abbr ) {
 	if( this == window ) return new State( abbr );
+	if( abbr && abbr.bbox && abbr.id ) abbr = abbr.id.split('US')[1].slice(0,2);
 	abbr = ( abbr || params.state || defaultState ).toUpperCase();
 	var state = states.by.fips[abbr] || states.by.abbr[abbr];
 	$.extend( this, state );
@@ -1238,6 +1239,18 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
+	function formatFeatureName( feature ) {
+		if( ! feature ) return '';
+		var state = State( feature );
+		var suffixes = state.suffixes || {
+			city: ' City',
+			county: ' County'
+		};
+		var lsad = ( feature.lsad || '' ).toLowerCase();
+		var suffix = suffixes[lsad] || '';
+		return S( feature.name, suffix );
+	}
+	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
 		var results = currentResults(), col = results.colsById;
@@ -1262,7 +1275,7 @@ function formatLegendTable( cells ) {
 			'<div class="tiptitlebar">',
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
-						feature.name, ' ', feature.lsad,
+						formatFeatureName( feature ),
 						debug ? S(
 							'<br>geo id: ', feature.id,
 							'<br>ft id: ', row[col.ID]

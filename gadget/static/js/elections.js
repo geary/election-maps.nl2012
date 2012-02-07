@@ -115,6 +115,7 @@ var states = [
 		district: 'town',
 		date: 'January 10, 2012',
 		electionid: 'random',
+		suffixes: {},
 		done: true
 	},
 	{
