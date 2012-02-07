@@ -40,7 +40,7 @@ var currentCandidate;
 
 states.index('fips').index('abbr');
 
-var defaultState = 'MN';
+var defaultState = 'CO';
 
 function State( abbr ) {
 	if( this == window ) return new State( abbr );
