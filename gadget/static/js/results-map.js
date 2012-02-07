@@ -519,14 +519,13 @@ function formatLegendTable( cells ) {
 				features.playOrder = sortArrayBy( features, 'name' );
 			},
 			tick: function() {
-				var features = data.county.geo.features,
-					rowsByID = data.county.results.rowsByID;
+				var features = data.county.geo.features;
 				var order = features.playOrder,
 					next = order.next, length = order.length;
 				if( ! next  ||  next >= length ) next = 0;
 				while( next < length ) {
 					var feature = order[next++], id = feature.id;
-					var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+					var row = featureResults( results, feature );
 					var use = row && row[col.NumCountedBallotBoxes];
 					if( use ) {
 						outlineFeature( feature );
@@ -820,7 +819,7 @@ function formatLegendTable( cells ) {
 					var strokeColor = '#666666', strokeOpacity = .5, strokeWidth = 1;
 					if( ! currentCandidate ) {
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = results && ( results.rowsByID[feature.id] || results.rowsByID[feature.name] );
+							var row = featureResults( results, feature );
 							var candidate = row && candidates[row.candidateMax];
 							if( candidate ) {
 								feature.fillColor = candidate.color;
@@ -844,7 +843,7 @@ function formatLegendTable( cells ) {
 						var candidate = candidates.by.id[currentCandidate], color = candidate.color, index = candidate.index;
 						var nCols = candidates.length;
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							var row = featureResults( results, feature );
 							var total = 0, value = 0;
 							if( row ) {
 								var total = 0;
@@ -857,8 +856,7 @@ function formatLegendTable( cells ) {
 							}
 						}
 						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var id = feature.id;
-							var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+							var row = featureResults( results, feature );
 							feature.fillColor = color;
 							feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
 							var complete = row &&
@@ -1242,10 +1240,7 @@ function formatLegendTable( cells ) {
 	function formatFeatureName( feature ) {
 		if( ! feature ) return '';
 		var state = State( feature );
-		var suffixes = state.suffixes || {
-			city: ' City',
-			county: ' County'
-		};
+		var suffixes = state.suffixes || lsadSuffixes;
 		var lsad = ( feature.lsad || '' ).toLowerCase();
 		var suffix = suffixes[lsad] || '';
 		return S( feature.name, suffix );
@@ -1254,7 +1249,7 @@ function formatLegendTable( cells ) {
 	function formatTip( feature ) {
 		if( ! feature ) return null;
 		var results = currentResults(), col = results.colsById;
-		var row = results.rowsByID[feature.id] || results.rowsByID[feature.name];
+		var row = featureResults( results, feature );
 		
 		var content;
 		if( row ) {
@@ -1668,7 +1663,18 @@ function formatLegendTable( cells ) {
 	};
 	
 	function fixCountyIDs( json ) {
-		idFixers[opt.state] && idFixers[opt.state]( json );
+		var fixer = idFixers[opt.state];
+		if( ! fixer ) return;
+		if( typeof fixer == 'function' ) {
+			fixer( json );
+		}
+		else {
+			var result = json.table, col = result.cols;
+			result.rows.forEach( function( row ) {
+				var id = fixer[ row[col.ID] ];
+				if( id ) row[col.ID] = id;
+			});
+		}
 	}
 	
 	var idFixers = {
@@ -1682,19 +1688,30 @@ function formatLegendTable( cells ) {
 				}
 			});
 		},
-		NH: function( json ) {
-			var result = json.table, col = result.cols;
-			result.rows.forEach( function( row ) {
-				var id = fixersNH[ row[col.ID] ];
-				if( id ) row[col.ID] = id;
-			});
+		MO: {
+			'St. Louis City': '29510',
+			'St. Louis County': '29189'
+		},
+		NH: {
+			//'Waterville': 'Waterville Valley',
+			//'Harts Location': "Hart's Location"
+			'Waterville': '3300979380',
+			'Harts Location': '3300334500'
 		}
 	};
 	
-	var fixersNH = {
-		'Waterville': 'Waterville Valley',
-		'Harts Location': "Hart's Location"
+	var lsadSuffixes = {
+		city: ' City',
+		county: ' County'
 	};
+	
+	function featureResults( results, feature ) {
+		return results && feature && (
+			results.rowsByID[ feature.id ] ||
+			results.rowsByID[ feature.name ]  ||
+			results.rowsByID[ feature.name + ( lsadSuffixes[feature.lsad.toLowerCase()] || '' ) ]
+		);
+	}
 
 	function loadResults( json, counties, loading ) {
 		if( loading )
