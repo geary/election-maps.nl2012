@@ -60,7 +60,7 @@ var state = State();
 var _gaq = _gaq || [];
 _gaq.push([ '_setAccount', 'UA-27854559-1' ]);
 //_gaq.push([ '_setDomainName', '.election-maps.appspot.com' ]);
-_gaq.push([ '_trackPageview', '/results/embed' ]);
+_gaq.push([ '_trackPageview' ]);
 
 //function resultsFields() {
 //	return S(
