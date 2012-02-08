@@ -1665,7 +1665,7 @@ function formatLegendTable( cells ) {
 	function fixCountyIDs( json ) {
 		var result = json.table, col = result.cols;
 		col.index();
-		var fixer = idFixers[ opt.state.toUpperCase() ];
+		var fixer = idFixers[ ( opt.state || '' ).toUpperCase() ];
 		if( ! fixer ) return;
 		if( typeof fixer == 'function' ) {
 			fixer( json );
