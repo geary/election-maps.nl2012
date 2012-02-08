@@ -10,7 +10,14 @@ var times = {
 params.sidebar = ( params.sidebar !== 'false' );
 params.source = ( params.source == 'gop' ? 'gop' : 'ap' );
 if( location.host.split('.')[0] == 'nv2012' ) params.source = 'gop';
-$('body').addClass( 'source-' + params.source );
+var $body = $('body');
+$body.addClass( 'source-' + params.source );
+
+// Hide Google Elections logo in IE <= 7
+if( $.browser.msie ) {
+	if( +$.browser.version.split('.')[0] <= 7 )
+		$body.addClass( 'ie7' );
+}
 
 opt.randomized = params.randomize;
 
@@ -214,6 +221,9 @@ document.write(
 		'#ap-logo { right:64px; width:67px; background: url(', imgUrl('ap-logo-48x67.png'), ') no-repeat; }',
 		'body.source-gop #ap-logo { display:none; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
+		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
+		'body.ie7 #gop-logo, body.ie7 #ap-logo { right:4px; }',
+		'body.ie7 #google-logo { display:none; }',
 	'</style>'
 );
 
@@ -589,9 +599,9 @@ function formatLegendTable( cells ) {
 	//	});
 	//};
 	
-	$('body').addClass( autoplay() ? 'autoplay' : 'interactive' );
-	$('body').addClass( tv() ? 'tv' : 'web' );
-	if( params.sidebar ) $('body').addClass( 'sidebar' );
+	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
+	$body.addClass( tv() ? 'tv' : 'web' );
+	if( params.sidebar ) $body.addClass( 'sidebar' );
 
 	var map;
 	
@@ -911,7 +921,7 @@ function formatLegendTable( cells ) {
 	var tipOffset = { x:10, y:20 };
 	var $maptip, tipHtml;
 	if( ! playType() )
-		$('body').bind( 'click mousemove', moveTip );
+		$body.bind( 'click mousemove', moveTip );
 	
 	function showTip( feature ) {
 		if( ! $maptip ) $maptip = $('#maptip');
@@ -1544,7 +1554,7 @@ function formatLegendTable( cells ) {
 		// TODO: refactor with duplicate code that runs at startup
 		ww = $window.width();
 		wh = $window.height();
-		$('body').css({ width: ww, height: wh });
+		$body.css({ width: ww, height: wh });
 		$('#spinner').css({
 			left: Math.floor( ww/2 - 64 ),
 			top: Math.floor( wh/2 - 20 )
