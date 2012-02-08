@@ -1663,16 +1663,19 @@ function formatLegendTable( cells ) {
 	};
 	
 	function fixCountyIDs( json ) {
-		var fixer = idFixers[opt.state];
+		var result = json.table, col = result.cols;
+		col.index();
+		var fixer = idFixers[ opt.state.toUpperCase() ];
 		if( ! fixer ) return;
 		if( typeof fixer == 'function' ) {
 			fixer( json );
 		}
 		else {
-			var result = json.table, col = result.cols;
 			result.rows.forEach( function( row ) {
 				var id = fixer[ row[col.ID] ];
-				if( id ) row[col.ID] = id;
+				if( id ) {
+					row[col.ID] = id;
+				}
 			});
 		}
 	}
@@ -1688,9 +1691,11 @@ function formatLegendTable( cells ) {
 				}
 			});
 		},
+		MN: {
+			'Lac Qui Parle': 'Lac qui Parle'
+		},
 		MO: {
-			'St. Louis City': '29510',
-			'St. Louis County': '29189'
+			'LaClede': 'Laclede'
 		},
 		NH: {
 			//'Waterville': 'Waterville Valley',
