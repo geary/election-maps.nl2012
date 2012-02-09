@@ -1420,18 +1420,15 @@ function formatLegendTable( cells ) {
 		gm = google.maps, gme = gm.event;
 		mapPixBounds = $map.bounds();
 		var mapopt = $.extend({
+			mapTypeControl: false,
 			mapTypeId: 'simple',
 			streetViewControl: false,
 			panControl: false,
 			rotateControl: false
 		},
 		params.play ? {
-			mapTypeControl: false,
 			zoomControl: false
 		} : {
-			mapTypeControlOptions: {
-				mapTypeIds: []
-			},
 			zoomControlOptions: {
 				style: gm.ZoomControlStyle.SMALL
 			}
