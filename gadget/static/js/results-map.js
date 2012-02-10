@@ -403,7 +403,6 @@ function formatLegendTable( cells ) {
 		}
 		json.kind = 'all';  // TEMP
 		jsonRegion[json.kind] = json;
-		//debugger;
 		var loader = {
 			// TODO: refactor
 			//state: function() {
@@ -657,9 +656,15 @@ function formatLegendTable( cells ) {
 		//return opt.counties ?
 		//	[ data.county.geo, data.state.geo ] :
 		//	[ data.state.geo ];
-		data.state.geo.hittest = false;
-		//data.county.geo.hittest = false;
-		return [ /*data.town.geo,*/ data.county.geo, data.state.geo ];
+		if( state.votesby == 'state' ) {
+			data.county.geo.hittest = false;
+			return [ data.state.geo ];
+		}
+		else {
+			data.state.geo.hittest = false;
+			//data.county.geo.hittest = false;
+			return [ /*data.town.geo,*/ data.county.geo, data.state.geo ];
+		}
 	}
 	
 	function currentResults() {
@@ -796,16 +801,7 @@ function formatLegendTable( cells ) {
 		//	}
 		//}
 		geos.forEach( function( geo ) {
-			function simple( fillColor, strokeColor, strokeOpacity, strokeWidth ) {
-				var features = geo.features;
-				for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-					feature.fillColor = fillColor;
-					feature.fillOpacity = 0;
-					feature.strokeColor = strokeColor;
-					feature.strokeOpacity = strokeOpacity;
-					feature.strokeWidth = strokeWidth;
-				}
-			}
+			var features = geo.features;
 			var kind = geo.table.split('.')[1];
 			if(
 			   kind == 'coucou'  ||
@@ -817,71 +813,88 @@ function formatLegendTable( cells ) {
 			}
 			var colorizers = {
 				state: function() {
-					simple( '#FFFFFF', '#222222', 1, 2 );
+					if( state.votesby == 'state' )
+						colorVotes( features, '#666666', 1, 2 );
+					else
+						colorSimple( features, '#FFFFFF', '#222222', 1, 2 );
 				},
 				county: function() {
-					simple( '#FFFFFF', '#444444', .5, 1 );
+					colorSimple( features, '#FFFFFF', '#444444', .5, 1 );
 				},
 				cousub: function() {
-					var results = currentResults(), col = results && results.cols;
-					var candidates = results && results.candidates;
-					var features = geo.features;
-					var strokeColor = '#666666', strokeOpacity = .5, strokeWidth = 1;
-					if( ! currentCandidate ) {
-						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = featureResults( results, feature );
-							var candidate = row && candidates[row.candidateMax];
-							if( candidate ) {
-								feature.fillColor = candidate.color;
-								feature.fillOpacity = .6;
-							}
-							else {
-								feature.fillColor = '#FFFFFF';
-								feature.fillOpacity = 0;
-							}
-							var complete = row &&
-								row[col.NumCountedBallotBoxes] ==
-								row[col.NumBallotBoxes];
-							feature.strokeColor = strokeColor;
-							feature.strokeOpacity = strokeOpacity;
-							feature.strokeWidth = strokeWidth;
-						}
-					}
-					else {
-						var rows = results.rows;
-						var max = 0;
-						var candidate = candidates.by.id[currentCandidate], color = candidate.color, index = candidate.index;
-						var nCols = candidates.length;
-						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = featureResults( results, feature );
-							var total = 0, value = 0;
-							if( row ) {
-								var total = 0;
-								for( var iCol = -1;  ++iCol < nCols; )
-									total += row[iCol];
-								value = row[index];
-								max = Math.max( max,
-									row.fract = total ? value / total : 0
-								);
-							}
-						}
-						for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
-							var row = featureResults( results, feature );
-							feature.fillColor = color;
-							feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
-							var complete = row &&
-								row[col.NumCountedBallotBoxes] ==
-								row[col.NumBallotBoxes];
-							feature.strokeColor = strokeColor;
-							feature.strokeOpacity = strokeOpacity;
-							feature.strokeWidth = strokeWidth;
-						}
-					}
+					colorVotes( features, '#666666', .5, 1 );
 				}
 			};
 			colorizers[kind]();
 		});
 	}
+	
+	function colorSimple( features, fillColor, strokeColor, strokeOpacity, strokeWidth ) {
+		for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+			feature.fillColor = fillColor;
+			feature.fillOpacity = 0;
+			feature.strokeColor = strokeColor;
+			feature.strokeOpacity = strokeOpacity;
+			feature.strokeWidth = strokeWidth;
+		}
+	}
+			
+	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
+		var results = currentResults(), col = results && results.cols;
+		var candidates = results && results.candidates;
+		if( ! currentCandidate ) {
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var row = featureResults( results, feature );
+				var candidate = row && candidates[row.candidateMax];
+				if( candidate ) {
+					feature.fillColor = candidate.color;
+					feature.fillOpacity = .6;
+				}
+				else {
+					feature.fillColor = '#FFFFFF';
+					feature.fillOpacity = 0;
+				}
+				var complete = row &&
+					row[col.NumCountedBallotBoxes] ==
+					row[col.NumBallotBoxes];
+				feature.strokeColor = strokeColor;
+				feature.strokeOpacity = strokeOpacity;
+				feature.strokeWidth = strokeWidth;
+			}
+		}
+		else {
+			var rows = results.rows;
+			var max = 0;
+			var candidate = candidates.by.id[currentCandidate], color = candidate.color, index = candidate.index;
+			var nCols = candidates.length;
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var row = featureResults( results, feature );
+				var total = 0, value = 0;
+				if( row ) {
+					var total = 0;
+					for( var iCol = -1;  ++iCol < nCols; )
+						total += row[iCol];
+					value = row[index];
+					max = Math.max( max,
+						row.fract = total ? value / total : 0
+					);
+				}
+			}
+			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
+				var row = featureResults( results, feature );
+				feature.fillColor = color;
+				feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
+				var complete = row &&
+					row[col.NumCountedBallotBoxes] ==
+					row[col.NumBallotBoxes];
+				feature.strokeColor = strokeColor;
+				feature.strokeOpacity = strokeOpacity;
+				feature.strokeWidth = strokeWidth;
+			}
+		}
+	}
+
+
 	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
@@ -1629,9 +1642,9 @@ function formatLegendTable( cells ) {
 			'NumCountedBallotBoxes'
 		);
 		col.index();
-
-
-		var rows = data.county.geo.features.map( function( feature ) {
+		
+		var region = data[ state.votesby || 'county' ];
+		var rows = region.geo.features.map( function( feature ) {
 			var row = [];
 			row[col.ID] = feature.id;
 			var nVoters = 0;
@@ -1721,7 +1734,10 @@ function formatLegendTable( cells ) {
 		return results && feature && (
 			results.rowsByID[ feature.id ] ||
 			results.rowsByID[ feature.name ]  ||
-			results.rowsByID[ feature.name + ( lsadSuffixes[feature.lsad.toLowerCase()] || '' ) ]
+			results.rowsByID[ feature.name + (
+				lsadSuffixes[ ( feature.lsad || '' ).toLowerCase() ]
+				|| ''
+			) ]
 		);
 	}
 
