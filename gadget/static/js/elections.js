@@ -83,6 +83,16 @@ var states = [
 		done: true
 	},
 	{
+		fips: '23',
+		abbr: 'ME',
+		name: 'Maine',
+		type: 'Caucus',
+		date: 'February 11, 2012',
+		electionid: '2108',
+		votesby: 'state',
+		done: false
+	},
+	{
 		fips: '27',
 		abbr: 'MN',
 		name: 'Minnesota',
