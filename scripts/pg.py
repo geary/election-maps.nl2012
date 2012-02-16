@@ -95,7 +95,7 @@ class Database:
 			print 'Unzipping %s to %s' %( zipname, unzipdir )
 			ZipFile( zipfile, 'r' ).extractall( unzipdir )
 			shpfile = os.path.join( unzipdir, shpname )
-		print 'loadShapeFile %s' % shpfile
+		print 'loadShapefile %s' % shpfile
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
 		command = '"%s/shp2pgsql" %s -g %s -s %s -W %s %s %s %s >%s' %(
@@ -115,7 +115,7 @@ class Database:
 		t3 = time.clock()
 		print 'psql %.1f seconds' %( t3 - t2 )
 		shutil.rmtree( unzipdir )
-		print 'loadShapeZip done'
+		print 'loadShapefile done'
 	
 	def getSRID( self, table, column ):
 		( schema, table ) = splitTableName( table )
