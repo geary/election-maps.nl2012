@@ -81,7 +81,7 @@ def createGopPrimary( db ):
 
 def addLevel( db, level ):
 	shpfile = '%s/gop2012-%s/gop2012.shp' %(
-		private.SIMPLIFIED_SHAPEFILE_PATH, level
+		private.OUTPUT_SHAPEFILE_PATH, level
 	)
 	table = '%s.gop2012' %( schema )
 	temptable = '%s_%s'  %( table, level )

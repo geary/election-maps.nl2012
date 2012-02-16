@@ -15,7 +15,7 @@ googGeom = 'goog_geom'
 
 def cartoFileName( resolution, state, type, version='00' ):
 	return os.path.join(
-		private.SHAPEFILE_PATH,
+		private.CENSUS_SHAPEFILE_PATH,
 		'gz_2010_%s_%s_%s_%s.zip' %( state, type, version, resolution )
 	)
 
