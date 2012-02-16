@@ -81,7 +81,7 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
+	def loadShapefile( self, database, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		if encoding is None: encoding = 'LATIN1'
@@ -107,8 +107,8 @@ class Database:
 		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
-		command = '"%s/psql" -q -U postgres -d usageo -f %s' %(
-			private.POSTGRES_BIN, sqlfile
+		command = '"%s/psql" -q -U postgres -d %s -f %s' %(
+			private.POSTGRES_BIN, database, sqlfile
 		)
 		print 'Running psql:\n%s' % command
 		os.system( command )
