@@ -29,9 +29,12 @@ def process():
 		createSchema( db )
 		loadStates( db, database, resolution )
 		loadCounties( db, database, resolution )
+		saveShapefile( db, database, resolution, 'state' )
+		saveShapefile( db, database, resolution, 'county' )
 		if resolution == '500k':
 			loadCongressional( db, database, resolution )
 			loadCountySubdivisions( db, database, resolution )
+			saveShapefile( db, database, resolution, 'coucou' )
 		closeDatabase( db )
 
 
@@ -99,6 +102,13 @@ def loadForStates( db, database, resolution, code, version, table, states=None )
 		loadCartoFile( db, database, resolution, state, code, version, table, create )
 		create = False
 
+def saveShapefile( db, database, resolution, table ):
+	shpfile = 'us2012-%s-%s-full' %( table, resolution )
+	table = schema + '.' + table
+	db.saveShapefile(
+		database, shpfile, private.OUTPUT_SHAPEFILE_PATH,
+		table, 'goog_geom', '3857'
+	)
 
 def main():
 	process()
