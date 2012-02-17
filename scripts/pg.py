@@ -34,13 +34,17 @@ class Database:
 		print query
 		self.cursor.execute( query )
 	
-	def createGeoDatabase( self, database ):
-		self.dropDatabase( database )
+	def executeCommit( self, query ):
 		isolation_level = self.connection.isolation_level
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		self.execute('''
+		self.execute( query )
+		self.connection.set_isolation_level( isolation_level )
+	
+	def createGeoDatabase( self, database ):
+		self.dropDatabase( database )
+		self.executeCommit('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
 			TEMPLATE = template_postgis20
@@ -48,7 +52,6 @@ class Database:
 		''' % {
 			'database': database,
 		})
-		self.connection.set_isolation_level( isolation_level )
 	
 	def dropDatabase( self, name ):
 		return self.drop( 'DATABASE', name )
@@ -60,17 +63,12 @@ class Database:
 		return self.drop( 'TABLE', name )
 	
 	def drop( self, kind, name ):
-		isolation_level = self.connection.isolation_level
-		self.connection.set_isolation_level(
-			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-		)
-		self.execute('''
+		self.executeCommit('''
 			DROP %(kind)s IF EXISTS %(name)s;
 		''' % {
 			'kind': kind,
 			'name': name,
 		})
-		self.connection.set_isolation_level( isolation_level )
 	
 	def createSchema( self, schema ):
 		self.execute('''
@@ -201,14 +199,9 @@ class Database:
 	def analyzeTable( self, table ):
 		print 'analyzeTable %s' %( table )
 		t1 = time.clock()
-		isolation_level = self.connection.isolation_level
-		self.connection.set_isolation_level(
-			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-		)
-		self.execute('''
+		self.executeCommit('''
 			VACUUM ANALYZE %(table)s;
 		''' % { 'table':table } )
-		self.connection.set_isolation_level( isolation_level )
 		t2 = time.clock()
 		print 'VACUUM ANALYZE %.1f seconds' %( t2 - t1 )
 	
