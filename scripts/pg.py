@@ -117,6 +117,26 @@ class Database:
 		shutil.rmtree( unzipdir )
 		print 'loadShapefile done'
 	
+	def saveShapefile( self, database, shpfile, shpdir, tablename, column=None, srid=None ):
+		if column is None: column = 'full_geom'
+		if srid is None: srid = '4269'
+		outdir = os.path.join( shpdir, shpfile )
+		if os.path.exists( outdir ):
+			shutil.rmtree( outdir )
+		os.mkdir( outdir )
+		print 'saveShapefile %s' % shpfile
+		t1 = time.clock()
+		command = '"%s/pgsql2shp" -f %s/%s -u %s -P %s -g %s %s %s' %(
+			private.POSTGRES_BIN, outdir, shpfile,
+			private.POSTGRES_USERNAME, private.POSTGRES_PASSWORD,
+			column, database, tablename
+		)
+		print 'Running pgsql2shp:\n%s' % command
+		os.system( command )
+		t2 = time.clock()
+		print 'pgsql2shp %.1f seconds' %( t2 - t1 )
+		print 'saveShapefile done'
+	
 	def getSRID( self, table, column ):
 		( schema, table ) = splitTableName( table )
 		self.execute('''
