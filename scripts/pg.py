@@ -53,6 +53,22 @@ class Database:
 			'database': database,
 		})
 	
+	def createLikeTable( self, target, source ):
+		self.executeCommit('''
+			DROP TABLE IF EXISTS %(target)s;
+			CREATE TABLE %(target)s (
+				LIKE %(source)s
+					INCLUDING DEFAULTS
+					INCLUDING CONSTRAINTS
+					INCLUDING INDEXES
+			);
+			DROP SEQUENCE IF EXISTS %(target)s_gid_seq;
+			CREATE SEQUENCE %(target)s_gid_seq;
+		''' % {
+			'target': target,
+			'source': source,
+		})
+	
 	def dropDatabase( self, name ):
 		return self.drop( 'DATABASE', name )
 	

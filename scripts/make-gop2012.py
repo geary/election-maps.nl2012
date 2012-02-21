@@ -41,16 +41,8 @@ def createGopPrimary( db ):
 	whereCousub = '''
 		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
 	'''
+	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
 	db.execute( '''
-		DROP TABLE IF EXISTS %(schema)s.gop2012;
-		CREATE TABLE %(schema)s.gop2012 (
-			LIKE %(schema)s.cousub
-				INCLUDING DEFAULTS
-				INCLUDING CONSTRAINTS
-				INCLUDING INDEXES
-		);
-		DROP SEQUENCE IF EXISTS %(schema)s.gop2012_gid_seq;
-		CREATE SEQUENCE %(schema)s.gop2012_gid_seq;
 		INSERT INTO %(schema)s.gop2012
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
 				geo_id, state, county, '' AS cousub,
