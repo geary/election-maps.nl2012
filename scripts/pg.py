@@ -95,7 +95,7 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapefile( self, database, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
+	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		if encoding is None: encoding = 'LATIN1'
@@ -122,7 +122,7 @@ class Database:
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
 		command = '"%s/psql" -q -U postgres -d %s -f %s' %(
-			private.POSTGRES_BIN, database, sqlfile
+			private.POSTGRES_BIN, self.database, sqlfile
 		)
 		print 'Running psql:\n%s' % command
 		os.system( command )
@@ -131,7 +131,7 @@ class Database:
 		shutil.rmtree( unzipdir )
 		print 'loadShapefile done'
 	
-	def saveShapefile( self, database, shpfile, shpdir, tablename, column=None, srid=None ):
+	def saveShapefile( self, shpfile, shpdir, tablename, column=None, srid=None ):
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		outdir = os.path.join( shpdir, shpfile )
@@ -143,7 +143,7 @@ class Database:
 		command = '"%s/pgsql2shp" -f %s/%s -u %s -P %s -g %s %s %s' %(
 			private.POSTGRES_BIN, outdir, shpfile,
 			private.POSTGRES_USERNAME, private.POSTGRES_PASSWORD,
-			column, database, tablename
+			column, self.database, tablename
 		)
 		print 'Running pgsql2shp:\n%s' % command
 		os.system( command )
