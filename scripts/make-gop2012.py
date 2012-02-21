@@ -175,7 +175,7 @@ def writeGeoJSON( db, fips, geom, geo ):
 
 def main():
 	global db
-	db = pg.Database( database = 'usageo' )
+	db = pg.Database( database = 'usageo_500k' )
 	process()
 	db.connection.commit()
 	db.connection.close()
