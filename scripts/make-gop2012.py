@@ -56,7 +56,7 @@ def createGopPrimary( db ):
 			FROM %(schema)s.county
 			WHERE
 				NOT %(whereCousub)s
-				AND NOT %(whereCD)s;
+				AND NOT %(whereCD)s
 				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
