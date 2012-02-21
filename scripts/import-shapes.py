@@ -27,14 +27,14 @@ def process():
 		db = openDatabase( database )
 		#addSimplificationFunction( db )
 		createSchema( db )
-		loadStates( db, database, resolution )
-		loadCounties( db, database, resolution )
-		saveShapefile( db, database, resolution, 'state' )
-		saveShapefile( db, database, resolution, 'county' )
+		loadStates( db, resolution )
+		loadCounties( db, resolution )
+		saveShapefile( db, resolution, 'state' )
+		saveShapefile( db, resolution, 'county' )
 		if resolution == '500k':
-			loadCongressional( db, database, resolution )
-			loadCountySubdivisions( db, database, resolution )
-			saveShapefile( db, database, resolution, 'coucou' )
+			loadCongressional( db, resolution )
+			loadCountySubdivisions( db, resolution )
+			saveShapefile( db, resolution, 'coucou' )
 		closeDatabase( db )
 
 
@@ -45,7 +45,7 @@ def createDatabase( database ):
 	db.connection.close()
 
 
-def openDatabase( database):
+def openDatabase( database ):
 	print 'Opening database %s' % database
 	return pg.Database( database=database )
 
@@ -64,49 +64,49 @@ def createSchema( db ):
 	db.connection.commit()
 
 
-def loadCartoFile( db, database, resolution, state, kind, version, table, create=True ):
+def loadCartoFile( db, resolution, state, kind, version, table, create=True ):
 	zipfile = cartoFileName( resolution, state, kind, version )
 	table = schema + '.' + table
 	print 'Loading %s' % zipfile
 	db.loadShapefile(
-		database, zipfile, private.TEMP_PATH, table,
+		zipfile, private.TEMP_PATH, table,
 		'full_geom', '4269', 'LATIN1', create
 	)
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
 
 
-def loadStates( db, database, resolution ):
-	loadCartoFile( db, database, resolution, 'us', '040', '00', 'state' )
+def loadStates( db, resolution ):
+	loadCartoFile( db, resolution, 'us', '040', '00', 'state' )
 
 
-def loadCounties( db, database, resolution ):
-	loadCartoFile( db, database, resolution, 'us', '050', '00', 'county' )
+def loadCounties( db, resolution ):
+	loadCartoFile( db, resolution, 'us', '050', '00', 'county' )
 
 
-def loadCongressional( db, database, resolution ):
-	loadForStates( db, database, resolution, '500', '11', 'cd', [ '20' ] )
+def loadCongressional( db, resolution ):
+	loadForStates( db, resolution, '500', '11', 'cd', [ '20' ] )
 
 
-def loadCountySubdivisions( db, database, resolution ):
-	loadForStates( db, database, resolution, '060', '00', 'cousub', [ '09', '25', '33', '50' ] )
+def loadCountySubdivisions( db, resolution ):
+	loadForStates( db, resolution, '060', '00', 'cousub', [ '09', '25', '33', '50' ] )
 
 
-def loadForStates( db, database, resolution, code, version, table, states=None ):
+def loadForStates( db, resolution, code, version, table, states=None ):
 	#if states is None:
 	#	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
 	#	states = db.cursor.fetchall()
 	#...for state, in states:
 	create = True
 	for state in states:
-		loadCartoFile( db, database, resolution, state, code, version, table, create )
+		loadCartoFile( db, resolution, state, code, version, table, create )
 		create = False
 
-def saveShapefile( db, database, resolution, table ):
+def saveShapefile( db, resolution, table ):
 	shpfile = 'us2012-%s-%s-full' %( table, resolution )
 	table = schema + '.' + table
 	db.saveShapefile(
-		database, shpfile, private.OUTPUT_SHAPEFILE_PATH,
+		shpfile, private.OUTPUT_SHAPEFILE_PATH,
 		table, 'goog_geom', '3857'
 	)
 
