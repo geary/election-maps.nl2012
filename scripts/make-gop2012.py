@@ -30,7 +30,8 @@ def process():
 		if level is not None:
 			addLevel( db, level )
 		mergeStates( db, level )
-		writeStates( db, level )
+		writeEachState( db, level )
+		writeAllStates( db, level )
 
 
 def createGopPrimary( db ):
@@ -85,9 +86,10 @@ def createGopPrimary( db ):
 
 
 def addLevel( db, level ):
-	shpfile = '%s/gop2012-%s/gop2012.shp' %(
-		private.OUTPUT_SHAPEFILE_PATH, level
-	)
+	shpfile = '%(path)s/gop2012-%(level)s/gop2012-%(level)s.shp' %({
+		'path': private.OUTPUT_SHAPEFILE_PATH,
+		'level': level,
+	})
 	table = '%s.gop2012' %( schema )
 	temptable = '%s_%s'  %( table, level )
 	simplegeom = 'goog_geom%s' %( level )
@@ -125,7 +127,7 @@ def mergeStates( db, level ):
 	)
 
 
-def writeStates( db, level ):
+def writeEachState( db, level ):
 	db.execute( 'SELECT geo_id, name FROM %s.state ORDER BY geo_id;' %( schema ) )
 	for geo_id, name in db.cursor.fetchall():
 		fips = geo_id.split('US')[1]
@@ -146,24 +148,27 @@ def writeState( db, level, fips, name ):
 		#'town': geoTown,
 	};
 	
-	filename = '%s/%s-%s-%s.jsonp' %(
-		private.GEOJSON_PATH, schema, fips, geom
-	)
-	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
+	writeGeoJSON( db, fips, geom, geo )
 
 
-def writeGeoJSON( db, level ):
-	levelGeom = simpleGeom( level )
+def writeAllStates( db, level ):
+	geom = simpleGeom( level )
+	where = 'true'
+	fips = '00'
 	geoState = db.makeFeatureCollection(
 		schema + '.state',
-		boxGeom, boxGeomLL, levelGeom,
-		'00', 'United States', 'true'
+		boxGeom, boxGeomLL, geom,
+		fips, 'United States', where
 	)
 	geo = {
 		'state': geoState,
 	}
+	writeGeoJSON( db, fips, geom, geo )
+
+
+def writeGeoJSON( db, fips, geom, geo ):
 	filename = '%s/%s-%s-%s.jsonp' %(
-		private.GEOJSON_PATH, schema, '00', levelGeom
+		private.GEOJSON_PATH, schema, fips, geom
 	)
 	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
