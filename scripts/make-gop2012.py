@@ -12,7 +12,8 @@ boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 
 #levels = ( '00', '10', '20', '30', '40', '50', '60', '70', '80', '90', '95', '100', )
 #levels = ( '50', )
-levels = ( '1000', )
+#levels = ( '256', '512', '1024', '2048', '4096', '8192', '16384' )
+levels = ( '1024', )
 #levels = ( None, )
 
 
