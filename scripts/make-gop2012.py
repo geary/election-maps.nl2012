@@ -41,6 +41,10 @@ def createGopPrimary( db ):
 	whereCousub = '''
 		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
 	'''
+	 # ME reports statewide votes only
+	whereState = '''
+		( state = '23' )
+	'''
 	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
 	db.execute( '''
 		INSERT INTO %(schema)s.gop2012
@@ -51,6 +55,7 @@ def createGopPrimary( db ):
 			WHERE
 				NOT %(whereCousub)s
 				AND NOT %(whereCD)s;
+				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
 				geo_id, state, county, cousub,
@@ -63,10 +68,17 @@ def createGopPrimary( db ):
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.cd
 			WHERE %(whereCD)s;
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, '' AS county, '' AS cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.cd
+			WHERE %(whereState)s;
 	''' %({
 		'schema': schema,
 		'whereCousub': whereCousub,
 		'whereCD': whereCD,
+		'whereState': whereState,
 	}) )
 	db.connection.commit()
 
