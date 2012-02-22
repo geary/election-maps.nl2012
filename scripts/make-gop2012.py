@@ -74,7 +74,7 @@ def createGopPrimary( db ):
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
 				geo_id, state, '' AS county, '' AS cousub,
 				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.cd
+			FROM %(schema)s.state
 			WHERE %(whereState)s;
 	''' %({
 		'schema': schema,
