@@ -362,9 +362,32 @@ class Database:
 		t1 = time.clock()
 		self.execute('''
 			SELECT
-				ST_AsGeoJSON( ST_Centroid( ST_Extent( %(boxGeom)s ) ), %(digits)s ),
-				ST_AsGeoJSON( ST_Extent( %(boxGeom)s ), %(digits)s, 1 ),
-				ST_AsGeoJSON( ST_Extent( %(boxGeomLL)s ), 6, 1 )
+				ST_AsGeoJSON(
+					ST_Centroid(
+						ST_Extent( %(boxGeom)s )
+					),
+					%(digits)s
+				),
+				ST_AsGeoJSON(
+					ST_Transform(
+						ST_SetSRID(
+							ST_Centroid(
+								ST_Extent( %(boxGeom)s )
+							),
+							3857
+						),
+						4326
+					),
+					6, 1
+				),
+				ST_AsGeoJSON(
+					ST_Extent( %(boxGeom)s ),
+					%(digits)s, 1
+				),
+				ST_AsGeoJSON(
+					ST_Extent( %(boxGeomLL)s ),
+					6, 1
+				)
 			FROM 
 				%(table)s
 			WHERE
@@ -378,8 +401,9 @@ class Database:
 			'where': where,
 			'digits': digits,
 		})
-		( extentcentroidjson, extentjson, extentjsonll ) = self.cursor.fetchone()
-		extentcentroid = json.loads( extentcentroidjson )
+		( centerjson, centerjsonll, extentjson, extentjsonll ) = self.cursor.fetchone()
+		center = json.loads( centerjson )
+		centerLL = json.loads( centerjsonll )
 		extent = json.loads( extentjson )
 		extentLL = json.loads( extentjsonll )
 		t2 = time.clock()
@@ -431,7 +455,8 @@ class Database:
 			'bboxLL': extentLL['bbox'],
 			'id': geoid,
 			'name': name,
-			'centroid': extentcentroid['coordinates'],
+			'center': center['coordinates'],
+			'centerLL': centerLL['coordinates'],
 			'features': features,
 			'table': table,
 		}
