@@ -57,6 +57,15 @@ var elections = {
 
 var states = [
 	{
+		fips: '00',
+		abbr: 'US',
+		name: 'United States',
+		date: '2012',
+		electionid: 'random',
+		votesby: 'state',
+		done: false
+	},
+	{
 		fips: '08',
 		abbr: 'CO',
 		name: 'Colorado',

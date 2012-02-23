@@ -29,12 +29,16 @@ def process():
 		createSchema( db )
 		loadStates( db, resolution )
 		loadCounties( db, resolution )
-		saveShapefile( db, resolution, 'state' )
-		saveShapefile( db, resolution, 'county' )
-		if resolution == '500k':
-			loadCongressional( db, resolution )
-			loadCountySubdivisions( db, resolution )
-			saveShapefile( db, resolution, 'coucou' )
+		for table in ( 'state', 'county', ):
+			makeRegionTables( db, table )
+			saveShapefile( db, resolution, table )
+			saveShapefile( db, resolution, table+'99' )
+			saveShapefile( db, resolution, table+'02' )
+			saveShapefile( db, resolution, table+'15' )
+		#if resolution == '500k':
+		#	loadCongressional( db, resolution )
+		#	loadCountySubdivisions( db, resolution )
+		#	saveShapefile( db, resolution, 'coucou' )
 		closeDatabase( db )
 
 
@@ -102,6 +106,51 @@ def loadForStates( db, resolution, code, version, table, states=None ):
 		loadCartoFile( db, resolution, state, code, version, table, create )
 		create = False
 
+
+def makeRegionTables( db, table ):
+	county = ( '', 'county,' )[ table == 'county' ]
+	table = schema + '.' + table
+	# AK and HI get their own tables
+	whereAK = '''
+		( state = '02' )
+	'''
+	whereHI = '''
+		( state = '15' )
+	'''
+	db.createLikeTable( table+'99', table )
+	db.createLikeTable( table+'02', table )
+	db.createLikeTable( table+'15', table )
+	
+	db.execute( '''
+		INSERT INTO %(table)s99
+			SELECT nextval('%(table)s99_gid_seq'),
+				geo_id, state, %(county)s
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(table)s
+			WHERE NOT %(whereAK)s AND NOT %(whereHI)s;
+		
+		INSERT INTO %(table)s02
+			SELECT nextval('%(table)s02_gid_seq'),
+				geo_id, state, %(county)s
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(table)s
+			WHERE %(whereAK)s;
+		
+		INSERT INTO %(table)s15
+			SELECT nextval('%(table)s15_gid_seq'),
+				geo_id, state, %(county)s
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(table)s
+			WHERE %(whereHI)s;
+	''' %({
+		'table': table,
+		'county': county,
+		'whereAK': whereAK,
+		'whereHI': whereHI,
+	}) )
+	db.connection.commit()
+
+
 def saveShapefile( db, resolution, table ):
 	shpfile = 'us2012-%s-%s-full' %( table, resolution )
 	table = schema + '.' + table
@@ -109,6 +158,7 @@ def saveShapefile( db, resolution, table ):
 		shpfile, private.OUTPUT_SHAPEFILE_PATH,
 		table, 'goog_geom', '3857'
 	)
+
 
 def main():
 	process()

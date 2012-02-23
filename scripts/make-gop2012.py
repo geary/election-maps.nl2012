@@ -12,7 +12,7 @@ boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 
 #levels = ( '00', '10', '20', '30', '40', '50', '60', '70', '80', '90', '95', '100', )
 #levels = ( '50', )
-#levels = ( '256', '512', '1024', '2048', '4096', '8192', '16384' )
+#levels = ( '256', '512', '1024', '2048', '4096', '8192', '16384', )
 levels = ( '1024', )
 #levels = ( None, )
 
@@ -24,17 +24,54 @@ def simpleGeom( level ):
 		return '%s%s' %( googGeom, level )
 
 
-def process():
-	createGopPrimary( db )
+def makeState():
+	db = pg.Database( database = 'usageo_20m' )
+	combineRegionTables( db, 'state' )
+	table = '%s.state00' %( schema )
+	simplegeom = 'goog_geom00'
+	db.addGeometryColumn( table, simplegeom, 3857, True )
+	addStateLevel( db, table, simplegeom, '99', '16384' )
+	addStateLevel( db, table, simplegeom, '02', '65536' )
+	addStateLevel( db, table, simplegeom, '15', '8192' )
+	writeStatesOnly( db )
+	db.connection.commit()
+	db.connection.close()
+
+
+def combineRegionTables( db, table ):
+	county = ( '', 'county,' )[ table == 'county' ]
+	table = schema + '.' + table
+	db.createLikeTable( table+'00', table )
+	
+	for fips in ( '02', '15', '99', ):
+		db.execute( '''
+			INSERT INTO %(table)s00
+				SELECT nextval('%(table)s00_gid_seq'),
+					geo_id, state, %(county)s
+					name, lsad, censusarea, full_geom, goog_geom
+				FROM %(table)s%(fips)s;
+		''' %({
+			'table': table,
+			'county': county,
+			'fips': fips,
+		}) )
+	db.connection.commit()
+
+
+def makeGopDetail():
+	db = pg.Database( database = 'usageo_500k' )
+	createGopDetail( db )
 	for level in levels:
 		if level is not None:
 			addLevel( db, level )
 		mergeStates( db, level )
 		writeEachState( db, level )
 		writeAllStates( db, level )
+	db.connection.commit()
+	db.connection.close()
 
 
-def createGopPrimary( db ):
+def createGopDetail( db ):
 	# KS reports votes by congressional district
 	whereCD = '''
 		( state = '20' )
@@ -83,6 +120,41 @@ def createGopPrimary( db ):
 		'whereState': whereState,
 	}) )
 	db.connection.commit()
+
+
+def addStateLevel( db, table, simplegeom, fips, level ):
+	shpname = 'us2012-state%(fips)s-20m-%(level)s' %({
+		'fips': fips,
+		'level': level,
+	})
+	shpfile = '%(path)s/%(shpname)s/%(shpname)s.shp' %({
+		'path': private.OUTPUT_SHAPEFILE_PATH,
+		'shpname': shpname,
+	})
+	temptable = '%s_%s'  %( table, level )
+	db.dropTable( temptable )
+	db.loadShapefile(
+		shpfile, private.TEMP_PATH, temptable,
+		simplegeom, '3857', 'LATIN1', True
+	)
+	db.execute( '''
+		UPDATE
+			%(table)s
+		SET
+			%(simplegeom)s =
+				ST_MakeValid(
+					%(temptable)s.%(simplegeom)s
+				)
+		FROM %(temptable)s
+		WHERE %(table)s.geo_id = %(temptable)s.geo_id
+		;
+	''' %({
+		'table': table,
+		'temptable': temptable,
+		'simplegeom': simplegeom,
+	}) )
+	db.connection.commit()
+	db.dropTable( temptable )
 
 
 def addLevel( db, level ):
@@ -166,6 +238,21 @@ def writeAllStates( db, level ):
 	writeGeoJSON( db, fips, geom, geo )
 
 
+def writeStatesOnly( db ):
+	geom = simpleGeom( '00' )
+	where = 'true'
+	fips = '00'
+	geoState = db.makeFeatureCollection(
+		schema + '.state00',
+		boxGeom, boxGeomLL, geom,
+		fips, 'United States', where
+	)
+	geo = {
+		'state': geoState,
+	}
+	writeGeoJSON( db, fips, geom, geo )
+
+
 def writeGeoJSON( db, fips, geom, geo ):
 	filename = '%s/%s-%s-%s.jsonp' %(
 		private.GEOJSON_PATH, schema, fips, geom
@@ -174,11 +261,10 @@ def writeGeoJSON( db, fips, geom, geo ):
 
 
 def main():
-	global db
-	db = pg.Database( database = 'usageo_500k' )
-	process()
-	db.connection.commit()
-	db.connection.close()
+	makeState()
+	#makeCounty()
+	#makeGopCounty()
+	#makeGopDetail()
 
 
 if __name__ == "__main__":
