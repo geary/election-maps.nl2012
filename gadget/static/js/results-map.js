@@ -1415,6 +1415,14 @@ function formatLegendTable( cells ) {
 		},{
 			featureType: "landscape",
 			stylers: [ { lightness: 100 }, { saturation: -100 } ]
+		},{
+			featureType: "administrative",
+			elementType: "geometry",
+			stylers: [ { visibility: "off" } ]
+		},{
+			featureType: "administrative.country",
+			elementType: "labels",
+			stylers: [ { visibility: "off" } ]
 		//},{
 		//	featureType: "administrative",
 		//	stylers: [ { visibility: "off" } ]
