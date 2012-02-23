@@ -47,7 +47,7 @@ var currentCandidate;
 
 states.index('fips').index('abbr');
 
-var defaultState = 'ME';
+var defaultState = 'US';
 
 function State( abbr ) {
 	if( this == window ) return new State( abbr );
@@ -360,7 +360,7 @@ function formatLegendTable( cells ) {
 	
 	var jsonRegion = {};
 	function loadRegion() {
-		var level = state.level || '1000';
+		var level = params.level || state.level || '00';
 		//var kind = ( opt.counties ? 'counties' : 'states' );
 		//var kind = 'cousub';  // TEMP
 		var kind = 'all';  // TEMP
@@ -657,7 +657,7 @@ function formatLegendTable( cells ) {
 		//	[ data.county.geo, data.state.geo ] :
 		//	[ data.state.geo ];
 		if( state.votesby == 'state' ) {
-			data.county.geo.hittest = false;
+			if( data.county.geo ) data.county.geo.hittest = false;
 			return [ data.state.geo ];
 		}
 		else {
@@ -810,6 +810,11 @@ function formatLegendTable( cells ) {
 			   kind == 'sc'  /*TEMP*/
 			) {
 				kind = 'cousub';
+			}
+			if(
+			   kind == 'state00'
+			) {
+				kind = 'state';
 			}
 			var colorizers = {
 				state: function() {
