@@ -19,7 +19,7 @@ if( $.browser.msie ) {
 		$body.addClass( 'ie7' );
 }
 
-opt.randomized = params.randomize;
+opt.randomized = params.randomize || params.zero;
 
 var strings = {
 	allCandidates: 'All Candidates',
@@ -1600,8 +1600,9 @@ function formatLegendTable( cells ) {
 		if( electionid == 'random' )
 			opt.randomized = params.randomize = true;
 		
-		if( params.randomize ) {
-			loadRandomResults( opt.counties );
+		if( params.zero ) delete params.randomize;
+		if( params.randomize || params.zero ) {
+			loadRandomResults( opt.counties, params.randomize );
 			return;
 		}
 		
@@ -1628,7 +1629,8 @@ function formatLegendTable( cells ) {
 		getScript( url );
 	}
 	
-	function loadRandomResults() {
+	function loadRandomResults( counties, randomize ) {
+		var random = randomize ? randomInt : function() { return 0; };
 		opt.resultCacheTime = Infinity;
 		opt.reloadTime = false;
 		clearInterval( reloadTimer );
@@ -1653,18 +1655,18 @@ function formatLegendTable( cells ) {
 			var row = [];
 			row[col.ID] = feature.id;
 			var nVoters = 0;
-			var nPrecincts = row[col.NumBallotBoxes] = randomInt( 50 ) + 5;
+			var nPrecincts = row[col.NumBallotBoxes] = random( 50 ) + 5;
 			var nCounted = row[col.NumCountedBallotBoxes] =
 				Math.max( 0,
 					Math.min( nPrecincts,
-						randomInt( nPrecincts * 2 ) -
+						random( nPrecincts * 2 ) -
 						Math.floor( nPrecincts / 2 )
 					)
 				);
 			var total = 0;
 			for( iCol = -1;  ++iCol < col.ID; )
-				total += row[iCol] = nCounted ? randomInt(100000) : 0;
-			row[col.NumVoters] = total + randomInt(total*2);
+				total += row[iCol] = nCounted ? random(100000) : 0;
+			row[col.NumVoters] = total + random(total*2);
 			return row;
 		});
 		
