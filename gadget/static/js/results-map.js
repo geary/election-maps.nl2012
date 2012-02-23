@@ -684,10 +684,10 @@ function formatLegendTable( cells ) {
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
-		json && fitBbox( json.bbox, json.bboxLL );
+		json && fitBbox( json.bbox, json.centerLL );
 	}
 	
-	function fitBbox( bbox, bboxLL ) {
+	function fitBbox( bbox, centerLL ) {
 		var z;
 		if( params.zoom  &&  params.zoom != 'auto' ) {
 			z = +params.zoom;
@@ -701,12 +701,7 @@ function formatLegendTable( cells ) {
 		}
 		z = Math.floor( z );
 		
-		var bounds = new gm.LatLngBounds(
-			new gm.LatLng( bboxLL[1], bboxLL[0] ),
-			new gm.LatLng( bboxLL[3], bboxLL[2] )
-		);
-		
-		map.setCenter( bounds.getCenter() );
+		map.setCenter( new gm.LatLng( centerLL[1], centerLL[0] ) );
 		map.setZoom( z );
 		zoom = map.getZoom();
 	}
