@@ -684,6 +684,14 @@ function formatLegendTable( cells ) {
 		//overlays.clear();
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
+		
+		if( json.id == '00' ) {
+			json = {
+				bbox: [ -13885233, 2819924, -7452828, 6340332 ],
+				centerLL: [ -95.841534, 38.004972 ]
+			};
+		}
+		
 		json && fitBbox( json.bbox, json.centerLL );
 	}
 	
