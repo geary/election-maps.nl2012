@@ -28,42 +28,20 @@ function ImportSimplifyExport() {
 }
 
 function ForAllShapes( callback ) {
-	var tables = [
-		/*'state',*/ 'state02', 'state15', 'state99'
-//		,
-//		/*'county',*/ 'county02', 'county15', 'county99'
-	];
-//	var resolutions = [ '20m', '5m', '500k' ];
-	var tolerances = [ 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ];
-//	var tables = [ 'state02'/*, 'state15', 'state99'*/ ];
-	var resolutions = [ '20m' ];
-//	var tolerances = [ 32768, 65536, 131072, 262144 ];
-//	var tolerances = [ 4096, 8192, 16384, 32768, 65536 ];
-//	var tolerances = [ 4096 ];
-	
-/*
-	for( var table, iTable = -1;  table = tables[++iTable]; ) {
-		for( var res, iRes = -1;  res = resolutions[++iRes]; ) {
-			var shpNameBase = S( 'us2012-', table, '-', res, '-' );
-			var shpNameFull = S( shpNameBase, 'full' );
-			for( var tol, iTol = -1;  tol = tolerances[++iTol]; ) {
-				var shpNameSimple = S( shpNameBase, tol );
-				callback( shpNameFull, shpNameSimple, tol );
-			}
-		}
-	}
-*/
 
-	ForEach( tables, function( table ) {
-		ForEach( resolutions, function( res ) {
-			var shpNameBase = S( 'us2012-', table, '-', res, '-' );
-			var shpNameFull = S( shpNameBase, 'full' );
-			ForEach( tolerances, function( tol ) {
-				var shpNameSimple = S( shpNameBase, tol );
-				callback( shpNameFull, shpNameSimple, tol );
-			});
-		});
-	});
+	function go( res, table, tol ) {
+		var shpNameBase = S( 'us2012-', table, '-', res, '-' );
+		var shpNameFull = S( shpNameBase, 'full' );
+		var shpNameSimple = S( shpNameBase, tol );
+		callback( shpNameFull, shpNameSimple, tol );
+	}
+	
+	go( '20m', 'state99', '4096' );
+	go( '20m', 'state02', '32768' );
+	go( '20m', 'state15', '4096' );
+	
+	go( '500k', 'gop2012', '512' );
+
 }
 
 function RemoveDrawing( shpName ) {
