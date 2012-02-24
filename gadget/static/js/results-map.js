@@ -1737,12 +1737,20 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
+	function fixShortFIPS( col, rows ) {
+		rows.forEach( function( row ) {
+			var id = row[col];
+			if( /^\d\d\d\d$/.test(id) ) row[col] = '0' + id;
+		});
+	}
+	
 	function isCountyTEMP( json ) {
 		try {
 			var table = json.table, cols = table.cols, rows = table.rows;
 			var col = cols.index()['ID'];
 			var id = rows[0][col];
-			return ! /^[A-Z][A-Z]$/.test( id );
+			if( /^\d\d\d\d$/.test(id) ) fixShortFIPS( col, rows );
+			return ! /^[A-Z][A-Z]$/.test(id);
 		}
 		catch( e ) {
 			return false;
