@@ -1374,7 +1374,9 @@ function formatLegendTable( cells ) {
 	
 	function setState( s ) {
 		if( ! s ) return;
-		state = State( s );
+		s = State( s );
+		if( ! s.abbr ) return;
+		state = s;
 		var select = $('#stateSelector')[0];
 		select && ( select.selectedIndex = state.selectorIndex );
 		opt.state = state.abbr.toLowerCase();
