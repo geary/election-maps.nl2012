@@ -60,6 +60,7 @@ var states = [
 		fips: '00',
 		abbr: 'US',
 		name: 'United States',
+		type: 'Primaries',
 		date: '2012',
 		electionid: '2511',
 		votesby: 'state',
