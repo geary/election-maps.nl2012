@@ -561,7 +561,7 @@ function formatLegendTable( cells ) {
 	function addNationwideControl( map ) {
 		var $control = $(S(
 			'<div id="view-usa" style="display:none; margin-top:6px; cursor:pointer;">',
-				'<div style="direction:ltr; overflow:hidden; text-align:center; position:relative; color:black; font-family:Arial,sans-serif; -moz-user-select:none; font-size:12px; background:-moz-linear-gradient( center top, rgb(254,254,254), rgb(243,243,243) ) repeat scroll 0% 0% transparent; line-height:160%; padding:0px 6px; border-radius:2px 0pt 0pt 2px; box-shadow:2px 2px 3px rgba(0,0,0,0.35); border:1px solid rgb(169,187,223); font-weight:normal;" title="',
+				'<div style="direction:ltr; overflow:hidden; text-align:center; position:relative; color:black; font-family:Arial,sans-serif; -moz-user-select:none; font-size:12px; background-color:rgb(250,250,250); background:-moz-linear-gradient( center top, rgb(254,254,254), rgb(243,243,243) ) repeat scroll 0% 0% transparent; line-height:160%; padding:0px 6px; border-radius:2px 0pt 0pt 2px; box-shadow:2px 2px 3px rgba(0,0,0,0.35); border:1px solid rgb(169,187,223); font-weight:normal;" title="',
 					'titleViewUSA'.T(),
 				'">',
 					'viewUSA'.T(),
