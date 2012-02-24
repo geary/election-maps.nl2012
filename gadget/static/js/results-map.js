@@ -22,6 +22,8 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
+	viewUSA: 'View USA',
+	titleViewUSA: 'View entire USA',
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
@@ -554,27 +556,21 @@ function formatLegendTable( cells ) {
 		]);
 	}
 	
-	//NationwideControl = function( show ) {
-	//	return $.extend( new GControl, {
-	//		initialize: function( map ) {
-	//			var $control = $(S(
-	//				'<div style="color:black; font-family:Arial,sans-serif;">',
-	//					'<div style="background-color:white; border:1px solid black; cursor:pointer; text-align:center; width:6em;">',
-	//						'<div style="border-color:white #B0B0B0 #B0B0B0 white; border-style:solid; border-width:1px; font-size:12px;">',
-	//							'nationwideLabel'.T(),
-	//						'</div>',
-	//					'</div>',
-	//				'</div>'
-	//			)).click( function() { setState(stateUS); } ).appendTo( map.getContainer() );
-	//			return $control[0];
-	//		},
-	//		
-	//		getDefaultPosition: function() {
-	//			return new GControlPosition( G_ANCHOR_TOP_LEFT, new GSize( 50, 9 ) );
-	//		}
-	//	});
-	//};
-	
+	function addNationwideControl( map ) {
+		var $control = $(S(
+			'<div id="view-usa" style="display:none; margin-top:6px; cursor:pointer;">',
+				'<div style="direction:ltr; overflow:hidden; text-align:center; position:relative; color:black; font-family:Arial,sans-serif; -moz-user-select:none; font-size:12px; background:-moz-linear-gradient( center top, rgb(254,254,254), rgb(243,243,243) ) repeat scroll 0% 0% transparent; line-height:160%; padding:0px 6px; border-radius:2px 0pt 0pt 2px; box-shadow:2px 2px 3px rgba(0,0,0,0.35); border:1px solid rgb(169,187,223); font-weight:normal;" title="',
+					'titleViewUSA'.T(),
+				'">',
+					'viewUSA'.T(),
+				'</div>',
+			'</div>'
+		)), control = $control[0];
+		$control.click( function() { setState('00'); } );
+		control.index = 1;
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push( control );
+	};
+
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
 	if( params.sidebar ) $body.addClass( 'sidebar' );
@@ -614,6 +610,7 @@ function formatLegendTable( cells ) {
 			geoMoveNext = false;
 			moveToGeo();
 		}
+		$('#view-usa').toggle( state.fips != '00' );
 		polys();
 		$('#spinner').hide();
 		if( ! opt.randomized  &&   opt.reloadTime ) {
@@ -1439,6 +1436,7 @@ function formatLegendTable( cells ) {
 		map = new gm.Map( $map[0],  mapopt );
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
+		addNationwideControl( map );
 		
 		//if( ! PolyGonzo.isVML() ) {
 		//	gme.addListener( map, 'zoom_changed', function() {
