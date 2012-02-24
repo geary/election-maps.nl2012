@@ -21,7 +21,7 @@ def cartoFileName( resolution, state, type, version='00' ):
 
 
 def process():
-	for resolution in ( '500k', '5m', '20m', ):
+	for resolution in ( '20m', '500k', ):
 		database = 'usageo_' + resolution
 		createDatabase( database)
 		db = openDatabase( database )
@@ -35,10 +35,11 @@ def process():
 			saveShapefile( db, resolution, table+'99' )
 			saveShapefile( db, resolution, table+'02' )
 			saveShapefile( db, resolution, table+'15' )
-		#if resolution == '500k':
-		#	loadCongressional( db, resolution )
-		#	loadCountySubdivisions( db, resolution )
-		#	saveShapefile( db, resolution, 'coucou' )
+		if resolution == '500k':
+			loadCongressional( db, resolution )
+			loadCountySubdivisions( db, resolution )
+			makeGopDetailTable( db )
+			saveShapefile( db, resolution, 'gop2012' )
 		closeDatabase( db )
 
 
@@ -147,6 +148,57 @@ def makeRegionTables( db, table ):
 		'county': county,
 		'whereAK': whereAK,
 		'whereHI': whereHI,
+	}) )
+	db.connection.commit()
+
+
+def makeGopDetailTable( db ):
+	# KS reports votes by congressional district
+	whereCD = '''
+		( state = '20' )
+	'''
+	# CT, MA, NH, VT report votes by county subdivision ("town")
+	whereCousub = '''
+		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
+	'''
+	 # AK, ME, and ND report statewide votes only
+	whereState = '''
+		( state = '02' OR state = '23' OR state = '38' )
+	'''
+	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
+	db.execute( '''
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, county, '' AS cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.county
+			WHERE
+				NOT %(whereCousub)s
+				AND NOT %(whereCD)s
+				AND NOT %(whereState)s;
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, county, cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.cousub
+			WHERE %(whereCousub)s;
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, cd AS county, '' AS cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.cd
+			WHERE %(whereCD)s;
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, '' AS county, '' AS cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.state
+			WHERE %(whereState)s;
+	''' %({
+		'schema': schema,
+		'whereCousub': whereCousub,
+		'whereCD': whereCD,
+		'whereState': whereState,
 	}) )
 	db.connection.commit()
 

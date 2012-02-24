@@ -10,12 +10,6 @@ googGeom = 'goog_geom'
 boxGeom = googGeom
 boxGeomLL = fullGeom  # temp hack until PolyGonzo supports mercator bbox
 
-#levels = ( '00', '10', '20', '30', '40', '50', '60', '70', '80', '90', '95', '100', )
-#levels = ( '50', )
-#levels = ( '256', '512', '1024', '2048', '4096', '8192', '16384', )
-levels = ( '1024', )
-#levels = ( None, )
-
 
 def simpleGeom( level ):
 	if level is None:
@@ -63,66 +57,14 @@ def combineRegionTables( db, table ):
 
 def makeGopDetail():
 	db = pg.Database( database = 'usageo_500k' )
-	createGopDetail( db )
-	for level in levels:
-		if level is not None:
-			addLevel( db, level )
-		mergeStates( db, level )
-		writeEachState( db, level )
-		writeAllStates( db, level )
+	level = '512'
+	if level is not None:
+		addLevel( db, level )
+	mergeStates( db, level )
+	writeEachState( db, level )
+	writeAllStates( db, level )
 	db.connection.commit()
 	db.connection.close()
-
-
-def createGopDetail( db ):
-	# KS reports votes by congressional district
-	whereCD = '''
-		( state = '20' )
-	'''
-	# CT, MA, NH, VT report votes by county subdivision ("town")
-	whereCousub = '''
-		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
-	'''
-	 # ME reports statewide votes only
-	whereState = '''
-		( state = '23' )
-	'''
-	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
-	db.execute( '''
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
-				geo_id, state, county, '' AS cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.county
-			WHERE
-				NOT %(whereCousub)s
-				AND NOT %(whereCD)s
-				AND NOT %(whereState)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
-				geo_id, state, county, cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.cousub
-			WHERE %(whereCousub)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
-				geo_id, state, cd AS county, '' AS cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.cd
-			WHERE %(whereCD)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
-				geo_id, state, '' AS county, '' AS cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.state
-			WHERE %(whereState)s;
-	''' %({
-		'schema': schema,
-		'whereCousub': whereCousub,
-		'whereCD': whereCD,
-		'whereState': whereState,
-	}) )
-	db.connection.commit()
 
 
 def addStateLevel( db, table, simplegeom, fips, level ):
@@ -161,7 +103,7 @@ def addStateLevel( db, table, simplegeom, fips, level ):
 
 
 def addLevel( db, level ):
-	shpfile = '%(path)s/gop2012-%(level)s/gop2012-%(level)s.shp' %({
+	shpfile = '%(path)s/us2012-gop2012-500k-%(level)s/us2012-gop2012-500k-%(level)s.shp' %({
 		'path': private.OUTPUT_SHAPEFILE_PATH,
 		'level': level,
 	})
@@ -267,7 +209,7 @@ def main():
 	makeState()
 	#makeCounty()
 	#makeGopCounty()
-	#makeGopDetail()
+	makeGopDetail()
 
 
 if __name__ == "__main__":
