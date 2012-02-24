@@ -1590,12 +1590,14 @@ function formatLegendTable( cells ) {
 		}
 		
 		var electionid = state.electionid;
-		if( electionid == 'random' )
+		if( electionid == 'random' ) {
 			opt.randomized = params.randomize = true;
+			electionid += state.fips;
+		}
 		
 		if( params.zero ) delete params.randomize;
 		if( params.randomize || params.zero ) {
-			loadRandomResults( opt.counties, params.randomize );
+			loadRandomResults( electionid, opt.counties, params.randomize );
 			return;
 		}
 		
@@ -1622,7 +1624,7 @@ function formatLegendTable( cells ) {
 		getScript( url );
 	}
 	
-	function loadRandomResults( counties, randomize ) {
+	function loadRandomResults( electionid, counties, randomize ) {
 		var random = randomize ? randomInt : function() { return 0; };
 		opt.resultCacheTime = Infinity;
 		opt.reloadTime = false;
@@ -1664,6 +1666,8 @@ function formatLegendTable( cells ) {
 		});
 		
 		var json = {
+			electionid: electionid,
+			mode: 'test',
 			table: {
 				cols: col,
 				rows: rows
@@ -1673,11 +1677,9 @@ function formatLegendTable( cells ) {
 		loadResultTable( json, true );
 	}
 	
-	loadStates = function( json ) {
-		loadResultTable( json, true );
-	};
-	
-	loadCounties = function( json ) {
+	loadResults = function( json, electionid, mode ) {
+		json.electionid = electionid;
+		json.mode = mode;
 		loadResultTable( json, true );
 	};
 	
