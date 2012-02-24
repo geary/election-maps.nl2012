@@ -102,7 +102,7 @@ var $map, mapPixBounds;
 
 var debug = params.debug;
 opt.state = params.state;
-opt.counties = false;
+opt.counties = !! opt.state;
 opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
