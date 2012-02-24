@@ -224,6 +224,8 @@ document.write(
 		'body.source-gop #ap-logo { display:none; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
 		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
+		'body.hidelogo #gop-logo, body.hidelogo #ap-logo { right:4px; }',
+		'body.hidelogo #google-logo { display:none; }',
 		'body.ie7 #gop-logo, body.ie7 #ap-logo { right:4px; }',
 		'body.ie7 #google-logo { display:none; }',
 	'</style>'
@@ -574,6 +576,8 @@ function formatLegendTable( cells ) {
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
 	if( params.sidebar ) $body.addClass( 'sidebar' );
+	var mapWidth = ww - ( params.sidebar ? sidebarWidth : 0 );
+	$body.toggleClass( 'hidelogo', mapWidth < 140 );
 
 	var map;
 	
@@ -591,6 +595,7 @@ function formatLegendTable( cells ) {
 	
 	var didGeoReady;
 	function geoReady() {
+		// TODO: refactor with duplicate code in resizeViewNow()
 		setLegend();
 		var mapTop = $map.offset().top;
 		if( params.sidebar ) {
@@ -1549,7 +1554,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function resizeViewNow() {
-		// TODO: refactor with duplicate code that runs at startup
+		// TODO: refactor with duplicate code in geoReady()
 		ww = $window.width();
 		wh = $window.height();
 		$body.css({ width: ww, height: wh });
@@ -1557,7 +1562,10 @@ function formatLegendTable( cells ) {
 			left: Math.floor( ww/2 - 64 ),
 			top: Math.floor( wh/2 - 20 )
 		});
-		$map.css({ width: ww - sidebarWidth, height: wh });
+		var mapWidth = ww - sidebarWidth;
+		var mapHeight = wh;
+		$body.toggleClass( 'hidelogo', mapWidth < 140 );
+		$map.css({ width: mapWidth, height: mapHeight });
 		moveToGeo();
 	}
 	
