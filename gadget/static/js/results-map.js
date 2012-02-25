@@ -512,8 +512,8 @@ function formatLegendTable( cells ) {
 				features.playOrder = sortArrayBy( features, 'name' );
 			},
 			tick: function() {
-				var features = data.county.geo.features;
-				var order = features.playOrder,
+				var geo = data.county.geo;
+				var order = geo.features.playOrder,
 					next = order.next, length = order.length;
 				if( ! next  ||  next >= length ) next = 0;
 				while( next < length ) {
@@ -521,7 +521,7 @@ function formatLegendTable( cells ) {
 					var row = featureResults( results, feature );
 					var use = row && row[col.NumCountedBallotBoxes];
 					if( use ) {
-						outlineFeature( feature );
+						outlineFeature({ geo:geo, feature:feature });
 						showTip( feature );
 						break;
 					}
@@ -723,9 +723,6 @@ function formatLegendTable( cells ) {
 		var mousedown = false;
 		colorize( currentGeos() );
 		var $container = $('#map');
-		function getFeature( event, where ) {
-			return where && where.feature;
-		}
 		var events = playType() ? {} : {
 			mousedown: function( event, where ) {
 				showTip( false );
@@ -737,17 +734,17 @@ function formatLegendTable( cells ) {
 			mousemove: function( event, where ) {
 				if( mousedown ) return;
 				polysThrottle( function() {
-					var feature = getFeature( event, where );
+					var feature = where && where.feature;
 					if( feature == mouseFeature ) return;
 					mouseFeature = feature;
 					map.setOptions({ draggableCursor: feature ? 'pointer' : null });
-					outlineFeature( feature );
+					outlineFeature( where );
 					showTipThrottle( function() { showTip(feature); });
 				});
 			},
 			click: function( event, where ) {
 				events.mousemove( event, where );
-				var feature = getFeature( event, where );
+				var feature = where && where.feature;
 				if( ! feature ) return;
 				//if( feature.type == 'state'  || feature.type == 'cd' )
 					setState( feature );
@@ -884,17 +881,15 @@ function formatLegendTable( cells ) {
 		}
 	}
 
-
 	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
-	function outlineFeature( feature ) {
+	function outlineFeature( where ) {
 		if( outlineOverlay )
 			outlineOverlay.setMap( null );
 		outlineOverlay = null;
-		if( ! feature ) return;
-		var geo = currentGeos()[0];
-		var feat = $.extend( {}, feature, {
+		if( !( where && where.feature ) ) return;
+		var feat = $.extend( {}, where.feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
 			strokeWidth: playCounties() ? 5 : opt.counties ? 2 : 3,
@@ -904,8 +899,8 @@ function formatLegendTable( cells ) {
 		outlineOverlay = new PolyGonzo.PgOverlay({
 			map: map,
 			geos: [{
-				crs: geo.crs,
-				kind: geo.kind,
+				crs: where.geo.crs,
+				kind: where.geo.kind,
 				features: [ feat ]
 			}]
 		});
