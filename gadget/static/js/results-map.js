@@ -47,7 +47,7 @@ var party = params.party in parties ? params.party : 'gop';
 var election = parties[party];
 var currentCandidate;
 
-states.index('fips').index('abbr');
+states.index('abbr').index('electionid').index('fips');
 
 var defaultState = 'US';
 
@@ -55,7 +55,10 @@ function State( abbr ) {
 	if( this == window ) return new State( abbr );
 	if( abbr && abbr.bbox && abbr.id ) abbr = abbr.id.split('US')[1].slice(0,2);
 	abbr = ( abbr || params.state || defaultState ).toUpperCase();
-	var state = states.by.fips[abbr] || states.by.abbr[abbr];
+	var state =
+		states.by.fips[abbr] ||
+		states.by.abbr[abbr] ||
+		states.by.electionid[abbr];
 	$.extend( this, state );
 	this.electionTitle = S( this.name, ' ', this.type || 'Primary' );
 	return this;
@@ -64,7 +67,7 @@ function State( abbr ) {
 $.extend( State.prototype, {
 });
 
-var state = State();
+var state = State(), stateUS = State('00');
 
 // Analytics
 var _gaq = _gaq || [];
@@ -1583,21 +1586,21 @@ function formatLegendTable( cells ) {
 	var cacheResults = new Cache;
 	
 	function getResults() {
-		var results = cacheResults.get( opt.counties );
+		var electionid = state.electionid;
+		//if( electionid == 'random' ) {
+		//	opt.randomized = params.randomize = true;
+		//	electionid += state.fips;
+		//}
+		
+		var results = cacheResults.get( electionid );
 		if( results ) {
 			loadResultTable( results, false );
 			return;
 		}
 		
-		var electionid = state.electionid;
-		if( electionid == 'random' ) {
-			opt.randomized = params.randomize = true;
-			electionid += state.fips;
-		}
-		
 		if( params.zero ) delete params.randomize;
 		if( params.randomize || params.zero ) {
-			loadRandomResults( electionid, opt.counties, params.randomize );
+			loadTestResults( electionid, params.randomize );
 			return;
 		}
 		
@@ -1624,7 +1627,7 @@ function formatLegendTable( cells ) {
 		getScript( url );
 	}
 	
-	function loadRandomResults( electionid, counties, randomize ) {
+	function loadTestResults( electionid, randomize ) {
 		var random = randomize ? randomInt : function() { return 0; };
 		opt.resultCacheTime = Infinity;
 		opt.reloadTime = false;
@@ -1772,7 +1775,7 @@ function formatLegendTable( cells ) {
 		if( counties )
 			fixCountyIDs( json );
 		if( loading )
-			cacheResults.add( counties, json, opt.resultCacheTime );
+			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
 		var results = currentData().results = json.table;
 
