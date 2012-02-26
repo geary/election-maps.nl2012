@@ -52,22 +52,18 @@ states.index('abbr').index('electionid').index('fips');
 var defaultState = 'US';
 
 function State( abbr ) {
-	if( this == window ) return new State( abbr );
 	if( abbr && abbr.bbox && abbr.id ) abbr = abbr.id.split('US')[1].slice(0,2);
 	abbr = ( abbr || params.state || defaultState ).toUpperCase();
 	var state =
 		states.by.fips[abbr] ||
 		states.by.abbr[abbr] ||
-		states.by.electionid[abbr];
-	$.extend( this, state );
-	this.electionTitle = S( this.name, ' ', this.type || 'Primary' );
-	return this;
+		states.by.electionid[abbr] ||
+		stateUS;
+	state.electionTitle = S( state.name, ' ', state.type || 'Primary' );
+	return state;
 }
 
-$.extend( State.prototype, {
-});
-
-var state = State(), stateUS = State('00');
+var stateUS = State('US'), state = State();
 
 // Analytics
 var _gaq = _gaq || [];
@@ -94,12 +90,6 @@ document.write(
 var gm, gme;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
-
-var data = {
-	state: { geo:null, results:null },
-	county: { geo:null, results:null },
-	town: { geo:null, results:null }
-};
 
 var $map, mapPixBounds;
 
@@ -288,7 +278,7 @@ function contentTable() {
 			//		//'<select id="stateSelector">',
 			//		//	option( '-1', 'nationwideLabel'.T() ),
 			//		//	option( '', '', false, true ),
-			//		//	sortArrayBy( data.state.geo.features, 'name' )
+			//		//	sortArrayBy( stateUS.geo.state.features, 'name' )
 			//		//		.mapjoin( function( state ) {
 			//		//			return stateOption(
 			//		//				state,
@@ -407,17 +397,15 @@ function formatLegendTable( cells ) {
 				$map = $('#map');
 			}
 		}
-		var fips = json.county ? json.county.id : json.state.id;
+		var target = json.county ? 'county' : 'state';
+		var fips = json[target].id;
 		jsonRegion[fips] = json;
-		function set( kind ) {
-			var geo = json[kind];
-			if( ! geo ) return;
-			geo.features.index('id').index('abbr');
-			data[kind].geo = geo;
+		var state = State( fips );
+		state.geo = state.geo || {};
+		for( var kind in json ) {
+			json[kind].features.index('id').index('abbr');
+			state.geo[kind] = json[kind];
 		}
-		set( 'state' );
-		set( 'county' );
-		set( 'town' );
 		oneTime();
 		//setCounties( true );
 		geoReady();
@@ -482,7 +470,7 @@ function formatLegendTable( cells ) {
 			},
 			tick: function() {
 				var topCandidates = topCandidatesByVote(
-					totalResults( currentResults() )
+					totalResults( state.results )
 				);
 				if( ! currentCandidate ) {
 					i = 0;
@@ -502,32 +490,32 @@ function formatLegendTable( cells ) {
 			}
 		},
 		counties: {
-			setup: function() {
-				var features = data.county.geo.features;
-				//features.playOrder = sortArrayBy( features, function( feature ) {
-				//	return(
-				//		-feature.centroid[1] * 1000000000 + feature.centroid[0]
-				//	);
-				//});
-				features.playOrder = sortArrayBy( features, 'name' );
-			},
-			tick: function() {
-				var geo = data.county.geo;
-				var order = geo.features.playOrder,
-					next = order.next, length = order.length;
-				if( ! next  ||  next >= length ) next = 0;
-				while( next < length ) {
-					var feature = order[next++], id = feature.id;
-					var row = featureResults( results, feature );
-					var use = row && row[col.NumCountedBallotBoxes];
-					if( use ) {
-						outlineFeature({ geo:geo, feature:feature });
-						showTip( feature );
-						break;
-					}
-				}
-				order.next = next;
-			}
+			//setup: function() {
+			//	var features = state.geo.county.features;
+			//	//features.playOrder = sortArrayBy( features, function( feature ) {
+			//	//	return(
+			//	//		-feature.centroid[1] * 1000000000 + feature.centroid[0]
+			//	//	);
+			//	//});
+			//	features.playOrder = sortArrayBy( features, 'name' );
+			//},
+			//tick: function() {
+			//	var geo = state.geo.county;
+			//	var order = geo.features.playOrder,
+			//		next = order.next, length = order.length;
+			//	if( ! next  ||  next >= length ) next = 0;
+			//	while( next < length ) {
+			//		var feature = order[next++], id = feature.id;
+			//		var row = featureResults( results, feature );
+			//		var use = row && row[col.NumCountedBallotBoxes];
+			//		if( use ) {
+			//			outlineFeature({ geo:geo, feature:feature });
+			//			showTip( feature );
+			//			break;
+			//		}
+			//	}
+			//	order.next = next;
+			//}
 		}
 	};
 	
@@ -634,28 +622,24 @@ function formatLegendTable( cells ) {
 	}
 	
 	function currentGeos() {
-		//data.state.geo.hittest = ! opt.counties;
-		//return opt.counties ?
-		//	[ data.county.geo, data.state.geo ] :
-		//	[ data.state.geo ];
+		var fips = state.fips;
+		if( fips == '00' ) {
+			return [ state.geo.state ];
+		}
+		
 		if( state.votesby == 'state' ) {
-			if( data.county.geo ) data.county.geo.hittest = false;
-			return [ data.state.geo ];
+			//if( d.county.geo ) d.county.geo.hittest = false;
+			return [ state.geo.state ];
 		}
-		else {
-			data.state.geo.hittest = false;
-			//data.county.geo.hittest = false;
-			return [ /*data.town.geo,*/ data.county.geo, data.state.geo ];
-		}
-	}
-	
-	function currentResults() {
-		return currentData().results;
-	}
-	
-	function currentData() {
-		return opt.counties ? data.county : data.state;
-		//return data.town;
+		
+		//d.state.geo.hittest = false;
+		//d.county.geo.hittest = false;
+		return [
+			/*state.geo.town,*/
+			state.geo.county,
+			state.geo.state
+			/*stateUS.geo.state */
+		];
 	}
 	
 	function moveToGeo() {
@@ -827,7 +811,7 @@ function formatLegendTable( cells ) {
 	}
 			
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
-		var results = currentResults(), col = results && results.cols;
+		var results = state.results, col = results && results.cols;
 		var candidates = results && results.candidates;
 		if( ! currentCandidate ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
@@ -1005,8 +989,8 @@ function formatLegendTable( cells ) {
 	function topCandidatesByVote( result, max ) {
 		max = max || Infinity;
 		if( ! result ) return [];
-		if( result == -1 ) result = totalResults( currentResults() );
-		var results = currentResults();
+		var results = state.results;
+		if( result == -1 ) result = totalResults( results );
 		var col = results.colsById;
 		var top = results.candidates.slice();
 		for( var i = -1;  ++i < top.length; ) {
@@ -1038,11 +1022,11 @@ function formatLegendTable( cells ) {
 		/*if( params.sidebar )*/ return formatSidebar();
 		
 		//var topCandidates = topCandidatesByVote(
-		//	totalResults( currentResults() )
+		//	totalResults( state.results )
 		//);
 		//var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
 		//var candidates = topCandidates.map( formatLegendCandidate );
-		//return formatLegendTable( [ top ].concat( currentResults().candidates ) );
+		//return formatLegendTable( [ top ].concat( state.results.candidates ) );
 	}
 	
 	//function formatLegendTopCandidates( topCandidates ) {
@@ -1083,16 +1067,16 @@ function formatLegendTable( cells ) {
 		// TODO: refactor with formatLegend()
 		var resultsHeaderHTML = '';
 		var resultsScrollingHTML = '';
-		var results = currentResults();
+		var results = state.results;
 		if( results ) {
 			var topCandidates = topCandidatesByVote(
-				totalResults( currentResults() )
+				totalResults( state.results )
 			);
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
-					'percentReporting'.T( totalReporting( currentResults() ) ),
+					'percentReporting'.T( totalReporting(state.results) ),
 				'</div>',
 				'<div id="auto-update" class="faint-text" style="margin-bottom:8px;">',
 					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
@@ -1256,7 +1240,7 @@ function formatLegendTable( cells ) {
 	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
-		var results = currentResults(), col = results && results.colsById;
+		var results = state.results, col = results && results.colsById;
 		if( ! col ) return null;
 		var row = featureResults( results, feature );
 		
@@ -1272,8 +1256,9 @@ function formatLegendTable( cells ) {
 			var counted = row[col.NumCountedBallotBoxes];
 		}
 		
-		var parent = data.state.geo &&
-			data.state.geo.features.by.id[feature.parent];
+		// TODO
+		var parent = null;  /* data.state.geo &&
+			data.state.geo.features.by.id[feature.parent]; */
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1459,14 +1444,14 @@ function formatLegendTable( cells ) {
 		
 		//setState( opt.state );
 		
-		$('#stateSelector').bindSelector( 'change keyup', function() {
-			var value = this.value.replace('!','').toLowerCase();
-			if( opt.state == value ) return;
-			opt.state = value;
-			setCounties( value > 0 );
-			var state = data.state.geo.features.by.id[value];
-			fitBbox( state ? state.bbox : data.state.geo.bbox );
-		});
+		//$('#stateSelector').bindSelector( 'change keyup', function() {
+		//	var value = this.value.replace('!','').toLowerCase();
+		//	if( opt.state == value ) return;
+		//	opt.state = value;
+		//	setCounties( value > 0 );
+		//	var state = data.state.geo.features.by.id[value];
+		//	fitBbox( state ? state.bbox : data.state.geo.bbox );
+		//});
 		
 		$('#chkCounties').click( function() {
 			setCounties( this.checked );
@@ -1647,8 +1632,9 @@ function formatLegendTable( cells ) {
 		);
 		col.index();
 		
-		var region = data[ state.votesby || 'county' ];
-		var rows = region.geo.features.map( function( feature ) {
+		var kind = state.votesby || 'county';
+		if( kind == 'town' ) kind = 'county';  // TEMP
+		var rows = state.geo[kind].features.map( function( feature ) {
 			var row = [];
 			row[col.ID] = feature.id;
 			var nVoters = 0;
@@ -1776,7 +1762,8 @@ function formatLegendTable( cells ) {
 		if( loading )
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
-		var results = currentData().results = json.table;
+		var state = states.by.electionid[ json.electionid ];
+		var results = state.results = json.table;
 
 		var col = results.colsById = {};
 		col.candidates = 0;
