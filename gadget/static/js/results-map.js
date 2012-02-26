@@ -1582,6 +1582,10 @@ function formatLegendTable( cells ) {
 	
 	function getResults() {
 		var electionid = state.electionid;
+		if( ! electionid ) {
+			loadTestResults( state.fips, false );
+			return;
+		}
 		//if( electionid == 'random' ) {
 		//	opt.randomized = params.randomize = true;
 		//	electionid += state.fips;
