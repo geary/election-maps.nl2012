@@ -67,6 +67,11 @@ var states = [
 		done: false
 	},
 	{
+		fips: '01',
+		abbr: 'AL',
+		name: 'Alabama',
+	},
+	{
 		fips: '02',
 		abbr: 'AK',
 		name: 'Alaska',
@@ -84,12 +89,53 @@ var states = [
 		done: false
 	},
 	{
+		fips: '05',
+		abbr: 'AR',
+		name: 'Arkansas',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '06',
+		abbr: 'CA',
+		name: 'California',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '08',
 		abbr: 'CO',
 		name: 'Colorado',
 		type: 'Caucus',
 		date: 'February 7, 2012',
 		electionid: '2518',
+		done: false
+	},
+	{
+		fips: '09',
+		abbr: 'CT',
+		name: 'Connecticut',
+		votesby: 'town',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '10',
+		abbr: 'DE',
+		name: 'Delaware',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '11',
+		abbr: 'DC',
+		name: 'District of Columbia',
+		date: '',
+		electionid: '',
 		done: false
 	},
 	{
@@ -109,12 +155,36 @@ var states = [
 		done: false
 	},
 	{
+		fips: '15',
+		abbr: 'HI',
+		name: 'Hawaii',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '16',
 		abbr: 'ID',
 		name: 'Idaho',
 		type: 'Caucus',
 		date: 'March 6, 2012',
 		electionid: '2526',
+		done: false
+	},
+	{
+		fips: '17',
+		abbr: 'IL',
+		name: 'Illinois',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '18',
+		abbr: 'IN',
+		name: 'Indiana',
+		date: '',
+		electionid: '',
 		done: false
 	},
 	{
@@ -127,6 +197,31 @@ var states = [
 		done: true
 	},
 	{
+		fips: '20',
+		abbr: 'KS',
+		name: 'Kansas',
+		votesby: 'district',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '21',
+		abbr: 'KY',
+		name: 'Kentucky',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '22',
+		abbr: 'LA',
+		name: 'Louisiana',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '23',
 		abbr: 'ME',
 		name: 'Maine',
@@ -137,12 +232,24 @@ var states = [
 		done: false
 	},
 	{
+		fips: '24',
+		abbr: 'MD',
+		name: 'Maryland',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '25',
 		abbr: 'MA',
 		name: 'Massachussetts',
 		date: 'March 6, 2012',
 		electionid: '2528',
 		votesby: 'town',
+		fix: {
+			"Barnstable": "Barnstable Town",
+			"Manchester": "Manchester-by-the-Sea"
+		},
 		done: false
 	},
 	{
@@ -163,11 +270,35 @@ var states = [
 		done: false
 	},
 	{
+		fips: '28',
+		abbr: 'MS',
+		name: 'Mississippi',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '29',
 		abbr: 'MO',
 		name: 'Missouri',
 		date: 'February 7, 2012',
 		electionid: '2520',
+		done: false
+	},
+	{
+		fips: '30',
+		abbr: 'MT',
+		name: 'Montana',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '31',
+		abbr: 'NE',
+		name: 'Nebraska',
+		date: '',
+		electionid: '',
 		done: false
 	},
 	{
@@ -188,6 +319,41 @@ var states = [
 		electionid: '2513',
 		suffixes: {},
 		done: true
+	},
+	{
+		fips: '34',
+		abbr: 'NJ',
+		name: 'New Jersey',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '35',
+		abbr: 'NM',
+		name: 'New Mexico',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '36',
+		abbr: 'NY',
+		name: 'New York',
+		fix: {
+			"Brooklyn": "Kings",
+			"Manhattan": "New York",
+			"Staten Island": "Richmond",
+			"Saint Lawrence": "St. Lawrence"
+		}
+	},
+	{
+		fips: '37',
+		abbr: 'NC',
+		name: 'North Carolina',
+		date: '',
+		electionid: '',
+		done: false
 	},
 	{
 		fips: '38',
@@ -216,6 +382,30 @@ var states = [
 		done: false
 	},
 	{
+		fips: '41',
+		abbr: 'OR',
+		name: 'Oregon',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '42',
+		abbr: 'PA',
+		name: 'Pennsylvania',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '44',
+		abbr: 'RI',
+		name: 'Rhode Island',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '45',
 		abbr: 'SC',
 		name: 'South Carolina',
@@ -224,11 +414,35 @@ var states = [
 		done: true
 	},
 	{
+		fips: '46',
+		abbr: 'SD',
+		name: 'South Dakota',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
 		fips: '47',
 		abbr: 'TN',
 		name: 'Tennessee',
 		date: 'March 6, 2012',
 		electionid: '2532',
+		done: false
+	},
+	{
+		fips: '48',
+		abbr: 'TX',
+		name: 'Texas',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '49',
+		abbr: 'UT',
+		name: 'Utah',
+		date: '',
+		electionid: '',
 		done: false
 	},
 	{
@@ -245,6 +459,46 @@ var states = [
 		name: 'Virginia',
 		date: 'March 6, 2012',
 		electionid: '2535',
+		done: false
+	},
+	{
+		fips: '53',
+		abbr: 'WA',
+		name: 'Washington',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '54',
+		abbr: 'WV',
+		name: 'West Virginia',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '55',
+		abbr: 'WI',
+		name: 'Wisconsin',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '56',
+		abbr: 'WY',
+		name: 'Wyoming',
+		date: '',
+		electionid: '',
+		done: false
+	},
+	{
+		fips: '72',
+		abbr: 'PR',
+		name: 'Puerto Rico',
+		date: '',
+		electionid: '',
 		done: false
 	}
 ];
