@@ -1666,7 +1666,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	loadResults = function( json, electionid, mode ) {
-		json.electionid = electionid;
+		json.electionid = '' + electionid;
 		json.mode = mode;
 		loadResultTable( json, true );
 	};
@@ -1762,7 +1762,7 @@ function formatLegendTable( cells ) {
 		if( loading )
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
-		var state = states.by.electionid[ json.electionid ];
+		var state = State( json.electionid );
 		var results = state.results = json.table;
 
 		var col = results.colsById = {};
