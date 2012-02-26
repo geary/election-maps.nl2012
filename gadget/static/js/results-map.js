@@ -28,7 +28,7 @@ var strings = {
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
 	noVotesHere: 'This location does not report voting results',
-	randomized: 'Displaying random test data',
+	testData: 'TEST DATA',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
 	cycleTip: 'Cycle through the candidate maps automatically',
@@ -1074,12 +1074,15 @@ function formatLegendTable( cells ) {
 			);
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
+			var test = results.mode == 'test'  ||  opt.randomized;
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
 					'percentReporting'.T( totalReporting(state.results) ),
 				'</div>',
-				'<div id="auto-update" class="faint-text" style="margin-bottom:8px;">',
-					opt.randomized ? 'randomized'.T() : 'automaticUpdate'.T(),
+				'<div id="auto-update" class="faint-text" style="margin-bottom:8px; ',
+					test ? 'color:red; font-weight:bold;' : '',
+				'">',
+					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
 				none ? '' : S(
 					'<div id="button-row" class="body-text" style="padding-top:4px;">',
@@ -1260,6 +1263,8 @@ function formatLegendTable( cells ) {
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
 		
+		var test = results.mode == 'test'  ||  opt.randomized;
+		
 		return S(
 			'<div class="tiptitlebar">',
 				'<div style="float:left;">',
@@ -1283,6 +1288,11 @@ function formatLegendTable( cells ) {
 						total: boxes,
 						kind: ''
 					}),
+					test ? S(
+						'<span style="color:red; font-weight:bold; font-size:100%;"> ',
+							'testData'.T(),
+						'</span>'
+					) : '',
 				'</div>',
 			'</div>',
 			content
@@ -1764,6 +1774,7 @@ function formatLegendTable( cells ) {
 		
 		var state = State( json.electionid );
 		var results = state.results = json.table;
+		results.mode = json.mode;
 
 		var col = results.colsById = {};
 		col.candidates = 0;
