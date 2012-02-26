@@ -334,3 +334,27 @@ function throttle( time ) {
 		}
 	};
 }
+
+var monthNames = [
+	'January', 'February', 'March', 'April', 'May', 'June',
+	'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+function dateFromYMD( yyyymmdd ) {
+	var ymd = yyyymmdd.split('-');
+	return(
+		ymd.length == 1 ? new Date( +ymd[0], 0, 1 ) :
+		ymd.length == 2 ? new Date( +ymd[0], +ymd[1]-1, 1 ) :
+		new Date( +ymd[0], +ymd[1]-1, +ymd[2] )
+	);
+}
+
+function longDateFromYMD( yyyymmdd ) {
+	var ymd = yyyymmdd.split('-');
+	if( ymd.length == 1 ) return ymd[0];
+	var month = monthNames[ +ymd[1]-1 ];
+	return(
+		ymd.length == 2 ? S( monthNames[ +ymd[1]-1 ], ' ', ymd[0] ) :
+		S( monthNames[ +ymd[1]-1 ], ' ', +ymd[2], ', ', ymd[0] )
+	);
+}
