@@ -1114,7 +1114,7 @@ function formatLegendTable( cells ) {
 						state.electionTitle,
 					'</div>',
 					'<div id="election-date" class="faint-text" style="margin-bottom:8px;">',
-						state.date,
+						longDateFromYMD( state.date ),
 					'</div>',
 					'<div id="sidebar-results-header">',
 						resultsHeaderHTML,
