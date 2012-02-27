@@ -38,7 +38,7 @@ var strings = {
 	//countdownHour: '1 hour',
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
-	noVotes: 'Waiting for results&hellip;'
+	noVotesYet: 'Waiting for results&hellip;'
 };
 
 var year = params.year in elections ? +params.year : 2012;
@@ -1185,7 +1185,7 @@ function formatLegendTable( cells ) {
 	
 	function formatCandidateList( topCandidates, formatter ) {
 		if( ! topCandidates.length )
-			return 'noVotes'.T();
+			return 'noVotesYet'.T();
 		return S(
 			'<table class="candidates" cellpadding="0" cellspacing="0">',
 				topCandidates.mapjoin( formatter ),
@@ -1244,12 +1244,13 @@ function formatLegendTable( cells ) {
 	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
+		var fips = feature.id.split('US')[1];
+		var st = State( fips.slice(0,2) );
+		var date = dateFromYMD( st.date );
+		var future = ( date > now() );
 		var results = state.results, col = results && results.colsById;
-		if( ! col ) return null;
 		var row = featureResults( results, feature );
-		
-		var content;
-		if( row ) {
+		if( row && col ) {
 			var content = S(
 				'<div class="tipcontent">',
 					formatTipCandidates( row ),
@@ -1260,11 +1261,22 @@ function formatLegendTable( cells ) {
 			var counted = row[col.NumCountedBallotBoxes];
 		}
 		
+		var reporting =
+			boxes ? 'percentReporting'.T({
+				percent: percent1( counted / boxes ),
+				counted: counted,
+				total: boxes,
+				kind: ''
+			}) :
+			future ? longDateFromYMD(st.date) :
+			'noVotesYet'.T();
+			//'noVotesHere'.T();
+		
 		// TODO
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
 		
-		var test = results.mode == 'test'  ||  opt.randomized;
+		var test = results && ( results.mode == 'test'  ||  opt.randomized );
 		
 		return S(
 			'<div class="tiptitlebar">',
@@ -1283,12 +1295,7 @@ function formatLegendTable( cells ) {
 				parent ? ' ' + parent.name : '',
 				parent && debug ? ' (#' + parent.id + ')' : '',
 				'<div class="tipreporting">',
-					! boxes ? 'noVotesHere'.T() : 'percentReporting'.T({
-						percent: percent1( counted / boxes ),
-						counted: counted,
-						total: boxes,
-						kind: ''
-					}),
+					reporting,
 					test ? S(
 						'<span style="color:red; font-weight:bold; font-size:100%;"> ',
 							'testData'.T(),
