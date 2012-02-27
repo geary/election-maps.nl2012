@@ -403,8 +403,9 @@ function formatLegendTable( cells ) {
 		var state = State( fips );
 		state.geo = state.geo || {};
 		for( var kind in json ) {
-			json[kind].features.index('id').index('abbr');
-			state.geo[kind] = json[kind];
+			var geo = json[kind];
+			indexFeatures( geo );
+			state.geo[kind] = geo;
 		}
 		oneTime();
 		//setCounties( true );
@@ -412,6 +413,18 @@ function formatLegendTable( cells ) {
 		getResults();
 		//analytics( 'data', 'counties' );
 	};
+	
+	function indexFeatures( geo ) {
+		var features = geo.features;
+		var usa = ( geo.id == '00' );  // TODO
+		var by = features.by = {};
+		for( var feature, i = -1;  feature = features[++i]; ) {
+			var fips = feature.id.split('US')[1];
+			by[feature.id] = by[fips] = by[feature.name] = feature;
+			if( usa )
+				by[ states.by.fips[fips].abbr ] = feature;
+		}
+	}
 	
 	function setPlayback() {
 		var play = getPlaybackParams();
@@ -1269,8 +1282,8 @@ function formatLegendTable( cells ) {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			'noVotesYet'.T();
-			//'noVotesHere'.T();
+			fips.length == 2 ? 'noVotesYet'.T() :  // state
+			'noVotesHere'.T();  // locality
 		
 		// TODO
 		var parent = null;  /* data.state.geo &&
@@ -1283,10 +1296,10 @@ function formatLegendTable( cells ) {
 				'<div style="float:left;">',
 					'<span class="tiptitletext">',
 						formatFeatureName( feature ),
-						debug ? S(
-							'<br>geo id: ', feature.id,
-							'<br>ft id: ', row[col.ID]
-						) : '',
+						//debug ? S(
+						//	'<br>geo id: ', feature.id,
+						//	'<br>ft id: ', row[col.ID]
+						//) : '',
 						' ',
 					'</span>',
 				'</div>',
@@ -1689,49 +1702,6 @@ function formatLegendTable( cells ) {
 		loadResultTable( json, true );
 	};
 	
-	function fixCountyIDs( json ) {
-		var result = json.table, col = result.cols;
-		col.index();
-		var fixer = idFixers[ ( opt.state || '' ).toUpperCase() ];
-		if( ! fixer ) return;
-		if( typeof fixer == 'function' ) {
-			fixer( json );
-		}
-		else {
-			result.rows.forEach( function( row ) {
-				var id = fixer[ row[col.ID] ];
-				if( id ) {
-					row[col.ID] = id;
-				}
-			});
-		}
-	}
-	
-	var idFixers = {
-		IA: function( json ) {
-			var result = json.table, col = result.cols;
-			result.rows.forEach( function( row ) {
-				var id = row[col.ID];
-				if( id.length < 5 ) {
-					while( id.length < 3 ) id = '0' + id;
-					row[col.ID] = '19' + id;
-				}
-			});
-		},
-		MN: {
-			'Lac Qui Parle': 'Lac qui Parle'
-		},
-		MO: {
-			'LaClede': 'Laclede'
-		},
-		NH: {
-			//'Waterville': 'Waterville Valley',
-			//'Harts Location': "Hart's Location"
-			'Waterville': '3300979380',
-			'Harts Location': '3300334500'
-		}
-	};
-	
 	var lsadSuffixes = {
 		city: ' City',
 		county: ' County'
@@ -1775,33 +1745,44 @@ function formatLegendTable( cells ) {
 
 	function loadResultTable( json, loading ) {
 		var counties = isCountyTEMP( json );
-		if( counties )
-			fixCountyIDs( json );
 		if( loading )
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
 		var state = State( json.electionid );
 		var results = state.results = json.table;
 		results.mode = json.mode;
-
+		
 		var col = results.colsById = {};
 		col.candidates = 0;
 		var cols = results.cols;
 		for( var id, iCol = -1;  id = cols[++iCol]; ) {
 			col[id] = iCol;
 		}
-
+		
 		var candidates = results.candidates = [];
 		for( var i = 0, colID = col.ID;  i < colID;  ++i ) {
 			var id = cols[i].split('-')[1].toLowerCase(), candidate = election.candidates.by.id[id];
 			candidates.push( $.extend( {}, candidate ) );
 		}
 		candidates.index('id');
-
+		
+		var fix = state.fix || {};
+		
+		var kind = state.votesby || 'county';
+		if( kind == 'town' ) kind = 'county';  // TEMP
+		
+		var missing = [];
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
-			rowsByID[ row[col.ID] ] = row;
+			var id = row[col.ID];
+			var fixed = fix[id];
+			if( fixed ) {
+				id = row[col.ID] = fixed;
+			}
+			var feature = state.geo[kind].features.by[id];
+			if( ! feature ) missing.push( id );
+			rowsByID[id] = row;
 			var nCandidates = candidates.length;
 			var max = 0,  candidateMax = -1;
 			for( iCol = -1;  ++iCol < nCandidates; ) {
@@ -1813,9 +1794,13 @@ function formatLegendTable( cells ) {
 			}
 			row.candidateMax = candidateMax;
 		}
-
+		
 		if( counties == opt.counties )
 			geoReady();
+		
+		if( missing.length && params.debug ) {
+			alert( S( 'Missing locations:\n', missing.sort().join( '\n' ) ) );
+		}
 	}
 	
 	function objToSortedKeys( obj ) {
