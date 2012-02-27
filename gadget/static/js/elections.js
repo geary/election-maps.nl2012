@@ -250,8 +250,21 @@ var states = [
 		electionid: '2528',
 		votesby: 'town',
 		fix: {
+			"Agawam": "Agawam Town",
+			"Amesbury": "Amesbury Town",
 			"Barnstable": "Barnstable Town",
-			"Manchester": "Manchester-by-the-Sea"
+			"Braintree": "Braintree Town",
+			"Easthampton": "Easthampton Town",
+			"Franklin": "Franklin Town",
+			"Greenfield": "Greenfield Town",
+			"Manchester": "Manchester-by-the-Sea",
+			"Methuen": "Methuen Town",
+			"Palmer": "Palmer Town",
+			"Southbridge": "Southbridge Town",
+			"Watertown": "Watertown Town",
+			"West Springfield": "West Springfield Town",
+			"Weymouth": "Weymouth Town",
+			"Winthrop": "Winthrop Town"
 		},
 		done: false
 	},
@@ -317,6 +330,11 @@ var states = [
 		fips: '33',
 		abbr: 'NH',
 		name: 'New Hampshire',
+		fix: {
+			"Harts Location": "Hart's Location",
+			"Waterville": "Waterville Valley",
+			"Wentworth's Location": "3300780740"
+		},
 		votesby: 'town',
 		date: '2012-01-10',
 		electionid: '2513',
@@ -343,12 +361,6 @@ var states = [
 		fips: '36',
 		abbr: 'NY',
 		name: 'New York',
-		fix: {
-			"Brooklyn": "Kings",
-			"Manhattan": "New York",
-			"Staten Island": "Richmond",
-			"Saint Lawrence": "St. Lawrence"
-		},
 		date: '2012-04-24',
 		electionid: '',
 		done: false
@@ -455,6 +467,14 @@ var states = [
 		fips: '50',
 		abbr: 'VT',
 		name: 'Vermont',
+		fix: {
+			"Barre Town": "5002303250",
+			"Enosburgh": "Enosburg",
+			"Ferrisburg": "Ferrisburgh",
+			"Newport Town": "5001948925",
+			"Rutland Town": "5002161300",
+			"St. Albans Town": "5001161750"
+		},
 		date: '2012-03-06',
 		electionid: '2534',
 		done: false
