@@ -420,7 +420,9 @@ class Database:
 
 	def writeGeoJSON( self, filename, data, jsonp ):
 		print 'writeGeoJSON', filename
-		geojson = json.dumps( data )
+		geojson = json \
+			.dumps( data, separators=( ',', ':' ) ) \
+			.replace( '"name":', '\n"name":' )
 		if jsonp:
 			geojson = jsonp + '(' + geojson + ')'
 		file( filename, 'wb' ).write( geojson )
@@ -493,6 +495,8 @@ class Database:
 --				ST_IsValid( %(polyGeom)s )
 --			AND
 				%(where)s
+			ORDER BY
+				name
 			;
 		''' % {
 			'table': table,
