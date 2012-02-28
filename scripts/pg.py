@@ -1,10 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import json, os, os.path, shutil, tempfile, time
+import json, os, os.path, re, shutil, tempfile, time
 import psycopg2
 from zipfile import ZipFile
 
 import private
+
+
+# 20037508.342789 is halfway around the equator in Google Mercator,
+# as calculated by:
+#	SELECT ST_AsText(
+#		ST_Transform(
+#			ST_SetSRID(
+#				ST_Point(180,0),
+#				4326
+#			),
+#			3857
+#		)
+#	);
+GOOG_180 = 20037508.342789
+GOOG_360 = GOOG_180 * 2
 
 
 def splitTableName( table ):
@@ -16,6 +31,24 @@ def splitTableName( table ):
 
 def isGoogleSRID( srid ):
 	return srid == 3857 or srid == 900913
+
+
+def fixMultiPolygon180( geometry, fixer ):
+	if not re.match( r'MULTIPOLYGON\(', geometry ):
+		print 'ERROR: Not a MultiPolygon'
+		return
+	return re.sub( r'([\(,])((?:\d+)(?:\.\d+)?) ', fixer, geometry )
+
+
+def fixCoord3857( match ):
+	value = float( match.group(2) ) - GOOG_360
+	return match.group(1) + str(value) + ' '
+
+
+def fixCoord4326( match ):
+	value = float( match.group(2) ) - 360
+	return match.group(1) + str(value) + ' '
+
 
 class Database:
 	
@@ -30,16 +63,16 @@ class Database:
 		)
 		self.cursor = self.connection.cursor()
 	
-	def execute( self, query ):
-		print query
+	def execute( self, query, verbose=True ):
+		if verbose: print query
 		self.cursor.execute( query )
 	
-	def executeCommit( self, query ):
+	def executeCommit( self, query, verbose=True ):
 		isolation_level = self.connection.isolation_level
 		self.connection.set_isolation_level(
 			psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
 		)
-		self.execute( query )
+		self.execute( query, verbose )
 		self.connection.set_isolation_level( isolation_level )
 	
 	def createGeoDatabase( self, database ):
@@ -178,6 +211,46 @@ class Database:
 			'column': column,
 		})
 		return self.cursor.fetchone() is not None
+	
+	def fix180( self, table, fullGeom, googGeom, where ):
+		self.fixGeom180( table, fullGeom, 4326, 4269, fixCoord4326, where )
+		self.fixGeom180( table, googGeom, 3857, 3857, fixCoord3857, where )
+		
+	def fixGeom180( self, table, geom, srid1, srid2, fixer, where ):
+		print 'fixGeom180 %s %s %s %s' %( table, geom, fixer.func_name, where )
+		self.execute('''
+			SELECT
+				gid,
+				ST_AsText( ST_Transform( %(geom)s, %(srid1)d ) )
+			FROM
+				%(table)s
+			WHERE
+				%(where)s
+			;
+		''' % {
+			'table': table,
+			'geom': geom,
+			'srid1': srid1,
+			'where': where,
+		})
+		for gid, wkt in self.cursor.fetchall():
+			wkt = fixMultiPolygon180( wkt, fixer )
+			self.execute('''
+				UPDATE
+					%(table)s
+				SET
+					%(geom)s = ST_GeometryFromText( '%(wkt)s', %(srid2)d )
+			WHERE
+				gid = %(gid)s
+				;
+			''' % {
+				'table': table,
+				'geom': geom,
+				'wkt': wkt,
+				'srid2': srid2,
+				'gid': gid,
+			}, False )
+		self.connection.commit()
 	
 	def addGeometryColumn( self, table, geom, srid=-1, always=False ):
 		print 'addGeometryColumn %s %s' %( table, geom )

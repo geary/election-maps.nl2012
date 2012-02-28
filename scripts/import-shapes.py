@@ -75,9 +75,10 @@ def loadCartoFile( db, resolution, state, kind, version, table, create=True ):
 	print 'Loading %s' % zipfile
 	db.loadShapefile(
 		zipfile, private.TEMP_PATH, table,
-		'full_geom', '4269', 'LATIN1', create
+		fullGeom, '4269', 'LATIN1', create
 	)
 	db.addGoogleGeometry( table, fullGeom, googGeom )
+	db.fix180( table, fullGeom, googGeom, "( state = '02' )" )
 	db.indexGeometryColumn( table, googGeom )
 
 
