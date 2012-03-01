@@ -493,7 +493,7 @@ var states = [
 		abbr: 'WA',
 		name: 'Washington',
 		date: '2012-03-03',
-		electionid: '',
+		electionid: '2536',
 		done: false
 	},
 	{
