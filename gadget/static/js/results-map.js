@@ -49,15 +49,12 @@ var currentCandidate;
 
 states.index('abbr').index('electionid').index('fips');
 
-var defaultState = 'US';
-params.state = params.state || 'mi';
-params.usa = params.usa || 'false';
 if( ( params.state || '' ).toLowerCase() == 'us' ) delete params.state;
 if( ! params.state ) delete params.usa;
 
 function State( abbr ) {
 	if( abbr && abbr.bbox && abbr.id ) abbr = abbr.id.split('US')[1].slice(0,2);
-	abbr = ( abbr || params.state || defaultState ).toUpperCase();
+	abbr = ( abbr || params.state || 'US' ).toUpperCase();
 	var state =
 		states.by.fips[abbr] ||
 		states.by.abbr[abbr] ||
