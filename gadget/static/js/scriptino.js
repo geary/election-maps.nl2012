@@ -63,6 +63,15 @@ Array.prototype.random = function() {
 	return this[ randomInt(this.length) ];
 };
 
+function deleteFromArray( array, value ) {
+	for( var i = -1, n = array.length;  ++i < n; ) {
+		if( array[i] == value ) {
+			array.splice( i, 1 );
+			return;
+		}
+	}
+}
+
 // See scriptino-base.js in scriptino project for documentation
 function sortArrayBy( array, key, opt ) {
 	opt = opt || {};
