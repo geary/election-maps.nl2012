@@ -63,6 +63,7 @@ var states = [
 		type: 'Primaries',
 		date: '2012',
 		electionid: '2511',
+		electionidDelegates: '2510',
 		votesby: 'state',
 		done: false
 	},

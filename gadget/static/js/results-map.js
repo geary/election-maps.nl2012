@@ -824,7 +824,7 @@ function formatLegendTable( cells ) {
 			feature.strokeWidth = strokeWidth;
 		}
 	}
-			
+	
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
 		var results = state.results, col = results && results.cols;
 		var candidates = results && results.candidates;
@@ -1608,7 +1608,9 @@ function formatLegendTable( cells ) {
 		//	electionid += state.fips;
 		//}
 		
-		var results = cacheResults.get( electionid );
+		var results =
+			cacheResults.get( stateUS.electionidDelegates ) &&
+			cacheResults.get( electionid );
 		if( results ) {
 			loadResultTable( results, false );
 			return;
@@ -1623,24 +1625,21 @@ function formatLegendTable( cells ) {
 		var e = electionid.split( '|' );
 		var id = params.source == 'gop' ? e[1] : e[0];
 		
-		var url = S(
-			
-			////'http://fusiontables.googleusercontent.com/fusiontables/api/query?',
-			////'http://localhost:8080/vote-data?',
-			//'http://nh2012-test.election-maps.appspot.com/vote-data?',
-			//'jsonCallback=', opt.counties ? 'loadCounties' : 'loadStates',
-			//'&_=', Math.floor( now() / opt.resultCacheTime ),
-			//'&sql=SELECT+',
-			//resultsFields(),
-			//'+FROM+',
-			////opt.counties ? '2458834' : 'TODO'
-			//params.tableid || '{{tableid}}'
-			
-			'https://pollinglocation.googleapis.com/results?',
-			'electionid=', id,
-			'&_=', Math.floor( now() / opt.resultCacheTime )
-		);
-		getScript( url );
+		getElections([ id, stateUS.electionidDelegates ]);
+	}
+	
+	var electionLoading, electionsPending = [];
+	function getElections( electionids ) {
+		electionLoading = electionids[0];
+		electionsPending = [].concat( electionids );
+		electionids.forEach( function( electionid ) {
+			var url = S(
+				'https://pollinglocation.googleapis.com/results?',
+				'electionid=', electionid,
+				'&_=', Math.floor( now() / opt.resultCacheTime )
+			);
+			getScript( url );
+		});
 	}
 	
 	function loadTestResults( electionid, randomize ) {
@@ -1698,6 +1697,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	loadResults = function( json, electionid, mode ) {
+		deleteFromArray( electionsPending, electionid );
 		json.electionid = '' + electionid;
 		json.mode = mode;
 		loadResultTable( json, true );
@@ -1750,7 +1750,11 @@ function formatLegendTable( cells ) {
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
 		var state = State( json.electionid );
-		var results = state.results = json.table;
+		var results = json.table;
+		if( json.electionid == state.electionidDelegates )
+			state.delegates = results;
+		else
+			state.results = results;
 		results.mode = json.mode;
 		
 		var col = results.colsById = {};
@@ -1796,7 +1800,7 @@ function formatLegendTable( cells ) {
 			row.candidateMax = candidateMax;
 		}
 		
-		if( counties == opt.counties )
+		if( electionsPending.length == 0  &&  counties == opt.counties )
 			geoReady();
 		
 		if( missing.length && params.debug ) {
