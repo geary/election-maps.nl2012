@@ -1585,7 +1585,7 @@ function formatLegendTable( cells ) {
 		var mapWidth = ww - sidebarWidth;
 		var mapHeight = wh;
 		$body.toggleClass( 'hidelogo', mapWidth < 140 );
-		$map.css({ width: mapWidth, height: mapHeight });
+		$map && $map.css({ width: mapWidth, height: mapHeight });
 		moveToGeo();
 	}
 	
