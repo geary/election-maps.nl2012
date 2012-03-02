@@ -38,7 +38,9 @@ var strings = {
 	//countdownHour: '1 hour',
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
-	noVotesYet: 'Waiting for results&hellip;'
+	noVotesYet: 'Waiting for results&hellip;',
+	delegates: 'Delegates',
+	votes: 'Votes'
 };
 
 var year = params.year in elections ? +params.year : 2012;
@@ -169,7 +171,6 @@ document.write(
 		'body.tv div.candidate-name div { line-height:1.1em; }',
 		'body.tv div.first-name { font-size:20px; }',
 		'body.tv div.last-name { font-size:24px; font-weight:bold; }',
-		'body.tv td.candidate-percent { font-size:20px; font-weight:bold; }',
 		'body.tv #maptip { border:none; }',
 		'body.tv #map { border-left:1px solid #333; }',
 		'body.tv span.tiptitletext { font-size:28px; }',
@@ -190,6 +191,10 @@ document.write(
 		'table.candidates td { border-top:1px solid #E7E7E7; }',
 		'#maptip table.candidates { width:100%; }',
 		'#maptip table.candidates tr.first td { border-top:none; }',
+		'#maptip div.candidate-delegates { font-size:130%; font-weight:bold; }',
+		'#maptip div.candidate-percent { font-weight:bold; }',
+		'#maptip div.candidate-votes { font-size:80%; }',
+		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
@@ -484,7 +489,7 @@ function formatLegendTable( cells ) {
 			},
 			tick: function() {
 				var topCandidates = topCandidatesByVote(
-					totalResults( state.results )
+					state.results.totals
 				);
 				if( ! currentCandidate ) {
 					i = 0;
@@ -976,15 +981,6 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
-	function totalResults( results ) {
-		var rows = results.rows;
-		var total = [];
-		for( var row, i = -1;  row = rows[++i]; )
-			for( var n = row.length, j = -1;  ++j < n; )
-				total[j] = ( total[j] || 0 ) + row[j];
-		return total;
-	}
-	
 	function totalReporting( results ) {
 		var col = results.colsById;
 		var rows = results.rows;
@@ -1005,13 +1001,14 @@ function formatLegendTable( cells ) {
 		max = max || Infinity;
 		if( ! result ) return [];
 		var results = state.results;
-		if( result == -1 ) result = totalResults( results );
+		if( result == -1 ) result = results.totals;
 		var col = results.colsById;
 		var top = results.candidates.slice();
 		for( var i = -1;  ++i < top.length; ) {
 			var candidate = top[i], votes = result[i];
 			candidate.votes = votes;
 			candidate.vsAll = votes / result[col.TabTotal];
+			candidate.delegates = getCandidateDelegates( result.state || stateUS, candidate );
 			//candidate.total = total;
 		}
 		top = sortArrayBy( top, 'votes', { numeric:true } )
@@ -1029,6 +1026,16 @@ function formatLegendTable( cells ) {
 		return top;
 	}
 	
+	function getCandidateDelegates( state, candidate ) {
+		var delegates = stateUS.delegates;
+		if( ! delegates ) return 0;
+		var iCol = delegates.colsById[ 'TabCount-' + candidate.id ];
+		var row =
+			state == stateUS ? delegates.totals :
+			delegates.rowsByID[state.abbr];
+		return row[iCol];
+	}
+	
 	function setLegend() {
 		$('#legend').html( formatLegend() );
 	}
@@ -1037,7 +1044,7 @@ function formatLegendTable( cells ) {
 		/*if( params.sidebar )*/ return formatSidebar();
 		
 		//var topCandidates = topCandidatesByVote(
-		//	totalResults( state.results )
+		//	state.results.totals
 		//);
 		//var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
 		//var candidates = topCandidates.map( formatLegendCandidate );
@@ -1085,7 +1092,7 @@ function formatLegendTable( cells ) {
 		var results = state.results;
 		if( results ) {
 			var topCandidates = topCandidatesByVote(
-				totalResults( state.results )
+				state.results.totals
 			);
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
@@ -1117,7 +1124,8 @@ function formatLegendTable( cells ) {
 					[ top ].concat( candidates ),
 					function( candidate ) {
 						return candidate;
-					}
+					},
+					false
 				)
 			);
 		}
@@ -1193,15 +1201,27 @@ function formatLegendTable( cells ) {
 	function formatTipCandidates( result ) {
 		return formatCandidateList(
 			topCandidatesByVote( result, /*params.sidebar ? 0 :*/ 4 ),
-			formatListCandidate
+			formatListCandidate,
+			true
 		);
 	}
 	
-	function formatCandidateList( topCandidates, formatter ) {
+	function formatCandidateList( topCandidates, formatter, header ) {
 		if( ! topCandidates.length )
 			return 'noVotesYet'.T();
+		var thead = header  &&  state == stateUS ? S(
+			'<tr>',
+				'<th colspan="3" style="text-align:left; padding-bottom:4px;">',
+					'delegates'.T(),
+				'</th>',
+				'<th colspan="2" style="text-align:right; padding-bottom:4px;">',
+					'votes'.T(),
+				'</th>',
+			'</tr>'
+		) : '';
 		return S(
 			'<table class="candidates" cellpadding="0" cellspacing="0">',
+				thead,
 				topCandidates.mapjoin( formatter ),
 			'</table>'
 		);
@@ -1212,15 +1232,22 @@ function formatLegendTable( cells ) {
 		var cls = i === 0 ? ' first' : '';
 		var pct = percent1( candidate.vsAll );
 		return S(
-			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
-				'<td class="left">',
+			'<tr class="left legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
+				state == stateUS ? S(
+					'<td style="text-align:right; padding-right:6px;">',
+						'<div class="candidate-delegates">',
+							candidate.delegates,
+						'</div>',
+					'</td>'
+				) : '',
+				'<td>',
 					election.photos ? S(
-						'<div style="margin:6px 6px 6px 0;">',
+						'<div style="margin:6px 0;">',
 							formatCandidateIcon( candidate, 32 ),
 						'</div>'
 					) : '',
 				'</td>',
-				'<td style="padding-right:16px;">',
+				'<td>',
 					'<div class="candidate-name" style="',
 								election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
 							'">',
@@ -1232,17 +1259,19 @@ function formatLegendTable( cells ) {
 						'</div>',
 					'</div>',
 				'</td>',
-				'<td>',
+				'<td style="text-align:center;">',
 					formatCandidateAreaPatch( candidate, 24 ),
 				'</td>',
-				'<td class="candidate-percent" style="text-align:right; padding-left:6px;">',
-					pct,
+				'<td class="right" style="text-align:right; padding-left:6px;">',
+					'<div class="candidate-percent">',
+						pct,
+					'</div>',
+					web() ? S(
+						'<div class="candidate-votes">',
+							formatNumber( candidate.votes ),
+						'</div>'
+					) : '',
 				'</td>',
-				web() ? S(
-					'<td class="candidate-votes right" style="text-align:right; padding-left:10px;">',
-						formatNumber( candidate.votes ),
-					'</td>'
-				) : '',
 			'</tr>'
 		);
 	}
@@ -1265,6 +1294,8 @@ function formatLegendTable( cells ) {
 		var results = state.results, col = results && results.colsById;
 		var row = featureResults( results, feature );
 		if( row && col ) {
+			row.fips = fips;
+			row.state = st;
 			var content = S(
 				'<div class="tipcontent">',
 					formatTipCandidates( row ),
@@ -1760,8 +1791,10 @@ function formatLegendTable( cells ) {
 		var col = results.colsById = {};
 		col.candidates = 0;
 		var cols = results.cols;
+		var totals = results.totals = [];
 		for( var id, iCol = -1;  id = cols[++iCol]; ) {
 			col[id] = iCol;
+			totals.push( 0 );
 		}
 		
 		var candidates = results.candidates = [];
@@ -1792,15 +1825,19 @@ function formatLegendTable( cells ) {
 			var max = 0,  candidateMax = -1;
 			for( iCol = -1;  ++iCol < nCandidates; ) {
 				var count = row[iCol];
+				totals[iCol] += count;
 				if( count > max ) {
 					max = count;
 					candidateMax = iCol;
 				}
 			}
 			row.candidateMax = candidateMax;
+			totals[col.TabTotal] += row[col.TabTotal];
+			totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
+			totals[col.NumBallotBoxesCounted] += row[col.NumBallotBoxesCounted];
 		}
 		
-		if( electionsPending.length == 0  &&  counties == opt.counties )
+		if( electionsPending.length == 0 )
 			geoReady();
 		
 		if( missing.length && params.debug ) {
