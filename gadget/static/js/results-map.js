@@ -723,6 +723,13 @@ function formatLegendTable( cells ) {
 		return counties;
 	}
 	
+	var dragged = false;
+	function addDragStartListener( map ) {
+		gme.addListener( map, 'dragstart', function() {
+			dragged = true;
+		});
+	}
+	
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
 	function polys() {
 		var mousedown = false;
@@ -732,9 +739,18 @@ function formatLegendTable( cells ) {
 			mousedown: function( event, where ) {
 				showTip( false );
 				mousedown = true;
+				dragged = false;
 			},
 			mouseup: function( event, where ) {
+				var didDrag = dragged;
+				dragged = false;
 				mousedown = false;
+				events.mousemove( event, where );
+				if( didDrag ) return;
+				var feature = where && where.feature;
+				if( ! feature ) return;
+				//if( feature.type == 'state'  || feature.type == 'cd' )
+					setState( feature );
 			},
 			mousemove: function( event, where ) {
 				if( mousedown ) return;
@@ -746,13 +762,6 @@ function formatLegendTable( cells ) {
 					outlineFeature( where );
 					showTipThrottle( function() { showTip(feature); });
 				});
-			},
-			click: function( event, where ) {
-				events.mousemove( event, where );
-				var feature = where && where.feature;
-				if( ! feature ) return;
-				//if( feature.type == 'state'  || feature.type == 'cd' )
-					setState( feature );
 			}
 		};
 		//overlays.clear();
@@ -1494,6 +1503,7 @@ function formatLegendTable( cells ) {
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		addNationwideControl( map );
+		addDragStartListener( map );
 		
 		//if( ! PolyGonzo.isVML() ) {
 		//	gme.addListener( map, 'zoom_changed', function() {
