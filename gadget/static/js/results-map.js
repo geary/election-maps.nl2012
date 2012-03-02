@@ -1033,7 +1033,7 @@ function formatLegendTable( cells ) {
 		var row =
 			state == stateUS ? delegates.totals :
 			delegates.rowsByID[state.abbr];
-		return row[iCol];
+		return row ? row[iCol] : 0;
 	}
 	
 	function setLegend() {
