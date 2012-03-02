@@ -1818,8 +1818,10 @@ function formatLegendTable( cells ) {
 			if( fixed ) {
 				id = row[col.ID] = fixed;
 			}
-			var feature = state.geo[kind].features.by[id];
-			if( ! feature ) missing.push( id );
+			if( state.geo ) {
+				var feature = state.geo[kind].features.by[id];
+				if( ! feature ) missing.push( id );
+			}
 			rowsByID[id] = row;
 			var nCandidates = candidates.length;
 			var max = 0,  candidateMax = -1;
