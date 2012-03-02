@@ -39,7 +39,8 @@ var strings = {
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
 	noVotesYet: 'Waiting for results&hellip;',
-	delegates: 'Delegates',
+	candidate: 'Candidate',
+	delegates: 'Del.',
 	votes: 'Votes'
 };
 
@@ -1209,13 +1210,16 @@ function formatLegendTable( cells ) {
 	function formatCandidateList( topCandidates, formatter, header ) {
 		if( ! topCandidates.length )
 			return 'noVotesYet'.T();
-		var thead = header  &&  state == stateUS ? S(
+		var thead = header ? S(
 			'<tr>',
 				'<th colspan="3" style="text-align:left; padding-bottom:4px;">',
-					'delegates'.T(),
+					'candidate'.T(),
 				'</th>',
-				'<th colspan="2" style="text-align:right; padding-bottom:4px;">',
+				'<th style="text-align:right; padding-bottom:4px;">',
 					'votes'.T(),
+				'</th>',
+				'<th style="text-align:right; padding-bottom:4px;">',
+					state == stateUS ? 'delegates'.T() : '',
 				'</th>',
 			'</tr>'
 		) : '';
@@ -1232,15 +1236,8 @@ function formatLegendTable( cells ) {
 		var cls = i === 0 ? ' first' : '';
 		var pct = percent1( candidate.vsAll );
 		return S(
-			'<tr class="left legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
-				state == stateUS ? S(
-					'<td style="text-align:right; padding-right:6px;">',
-						'<div class="candidate-delegates">',
-							candidate.delegates,
-						'</div>',
-					'</td>'
-				) : '',
-				'<td>',
+			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
+				'<td class="left">',
 					election.photos ? S(
 						'<div style="margin:6px 0;">',
 							formatCandidateIcon( candidate, 32 ),
@@ -1262,13 +1259,20 @@ function formatLegendTable( cells ) {
 				'<td style="text-align:center;">',
 					formatCandidateAreaPatch( candidate, 24 ),
 				'</td>',
-				'<td class="right" style="text-align:right; padding-left:6px;">',
+				'<td style="text-align:right; padding-left:6px;">',
 					'<div class="candidate-percent">',
 						pct,
 					'</div>',
 					web() ? S(
 						'<div class="candidate-votes">',
 							formatNumber( candidate.votes ),
+						'</div>'
+					) : '',
+				'</td>',
+				'<td class="right" style="text-align:right; padding-left:6px;">',
+					state == stateUS ? S(
+						'<div class="candidate-delegates">',
+							candidate.delegates,
 						'</div>'
 					) : '',
 				'</td>',
