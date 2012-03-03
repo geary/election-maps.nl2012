@@ -1190,7 +1190,7 @@ function formatLegendTable( cells ) {
 								'cycle'.T(),
 						'</a>'
 					),
-					state != stateUS  &&  ! params.embed_state ? S(
+					state != stateUS  &&  params.usa != 'false' ? S(
 						'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
 							'viewUSA'.T(),
 						'</a>'
