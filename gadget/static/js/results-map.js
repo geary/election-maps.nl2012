@@ -52,6 +52,11 @@ var currentCandidate;
 
 states.index('abbr').index('electionid').index('fips');
 
+if( params.embed_state ) {
+	params.usa = 'false';
+	if( ! params.state  &&  params.embed_state.length == 2 )
+		params.state = params.embed_state;
+}
 if( ( params.state || '' ).toLowerCase() == 'us' ) delete params.state;
 if( ! params.state ) delete params.usa;
 
