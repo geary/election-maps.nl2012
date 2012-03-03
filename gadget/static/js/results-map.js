@@ -1926,7 +1926,7 @@ function formatLegendTable( cells ) {
 				}
 				row[col.TabTotal] = 0;
 				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
-				row[col.NumBallotBoxesCounted] = 0;
+				row[col.NumCountedBallotBoxes] = 0;
 			}
 			else {
 				for( iCol = -1;  ++iCol < nCandidates; ) {
@@ -1939,7 +1939,7 @@ function formatLegendTable( cells ) {
 				}
 				totals[col.TabTotal] += row[col.TabTotal];
 				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
-				totals[col.NumBallotBoxesCounted] += row[col.NumBallotBoxesCounted];
+				totals[col.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
 			}
 			row.candidateMax = candidateMax;
 		}
