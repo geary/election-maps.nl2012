@@ -1169,24 +1169,24 @@ function formatLegendTable( cells ) {
 				'">',
 					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
-				none ? '' : S(
-					'<div id="button-row" class="body-text" style="padding-top:4px; position:relative">',
+				'<div id="button-row" class="body-text" style="padding-top:4px; position:relative">',
+					none ? '' : S(
 						'<a class="button ',
 							opt.cycleTimer ? 'selected' : '',
 							'" id="btnCycle" title="',
 							opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
 							'" style="float:left;">',
 								'cycle'.T(),
-						'</a>',
-						state != stateUS  &&  ! params.embed_state ? S(
-							'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
-								'viewUSA'.T(),
-							'</a>'
-						) : '',
-						'<div style="clear:both;">',
-						'</div>',
-					'</div>'
-				)
+						'</a>'
+					),
+					state != stateUS  &&  ! params.embed_state ? S(
+						'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
+							'viewUSA'.T(),
+						'</a>'
+					) : '',
+					'<div style="clear:both;">',
+					'</div>',
+				'</div>'
 			);
 			var candidates = topCandidates.map( formatSidebarCandidate );
 			resultsScrollingHTML = none ? '' : S(
