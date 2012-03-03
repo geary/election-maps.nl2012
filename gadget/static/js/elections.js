@@ -517,7 +517,8 @@ var states = [
 		abbr: 'WY',
 		name: 'Wyoming',
 		date: '2012-03-10',
-		electionid: '',
+		electionid: '2537',
+		votesby: 'state',
 		done: false
 	},
 	{
