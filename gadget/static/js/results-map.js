@@ -54,6 +54,7 @@ var currentCandidate;
 states.index('abbr').index('electionid').index('fips');
 
 params.state = params.state || params.embed_state;
+params.state = params.state || 'wa';
 if( ( params.state || '' ).toLowerCase() == 'us' ) delete params.state;
 
 function State( abbr ) {
