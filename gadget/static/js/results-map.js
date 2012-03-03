@@ -53,13 +53,8 @@ var currentCandidate;
 
 states.index('abbr').index('electionid').index('fips');
 
-if( params.embed_state ) {
-	params.usa = 'false';
-	if( ! params.state  &&  params.embed_state.length == 2 )
-		params.state = params.embed_state;
-}
+params.state = params.state || params.embed_state;
 if( ( params.state || '' ).toLowerCase() == 'us' ) delete params.state;
-if( ! params.state ) delete params.usa;
 
 function State( abbr ) {
 	if( abbr && abbr.bbox && abbr.id ) abbr = abbr.id.split('US')[1].slice(0,2);
@@ -731,7 +726,7 @@ function formatLegendTable( cells ) {
 		gme.addListener( map, 'idle', function() {
 			polys();
 		});
-		gme.addListener( map, 'zoom_changed', function() {
+		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
 			if( zoom <= 4  &&  state != stateUS )
 				setState( '00' );
@@ -1161,6 +1156,11 @@ function formatLegendTable( cells ) {
 		return params.debug && results && ( results.mode == 'test'  ||  opt.randomized );
 	}
 	
+	function usEnabled() {
+		return state != stateUS  &&
+			( ! params.state  ||  params.usa == 'true' );
+	}
+	
 	function formatSidebar() {
 		// TODO: refactor with formatTopbar()
 		var resultsHeaderHTML = '';
@@ -1190,7 +1190,7 @@ function formatLegendTable( cells ) {
 								'cycle'.T(),
 						'</a>'
 					),
-					state != stateUS  &&  params.usa != 'false' ? S(
+					usEnabled() ? S(
 						'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
 							'viewUSA'.T(),
 						'</a>'
