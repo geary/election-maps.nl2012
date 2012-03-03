@@ -667,6 +667,7 @@ function formatLegendTable( cells ) {
 		//$('script[title=jsonresult]').remove();
 		//if( json.status == 'later' ) return;
 		
+		outlineFeature( null );
 		json && fitBbox( json.bbox, json.centerLL );
 	}
 	
