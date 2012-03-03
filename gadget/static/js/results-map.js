@@ -742,15 +742,7 @@ function formatLegendTable( cells ) {
 				dragged = false;
 			},
 			mouseup: function( event, where ) {
-				var didDrag = dragged;
-				dragged = false;
 				mousedown = false;
-				events.mousemove( event, where );
-				if( didDrag ) return;
-				var feature = where && where.feature;
-				if( ! feature ) return;
-				//if( feature.type == 'state'  || feature.type == 'cd' )
-					setState( feature );
 			},
 			mousemove: function( event, where ) {
 				if( mousedown ) return;
@@ -762,6 +754,17 @@ function formatLegendTable( cells ) {
 					outlineFeature( where );
 					showTipThrottle( function() { showTip(feature); });
 				});
+			},
+			click: function( event, where ) {
+				mousedown = false;
+				var didDrag = dragged;
+				dragged = false;
+				events.mousemove( event, where );
+				if( didDrag ) return;
+				var feature = where && where.feature;
+				if( ! feature ) return;
+				//if( feature.type == 'state'  || feature.type == 'cd' )
+					setState( feature );
 			}
 		};
 		//overlays.clear();
