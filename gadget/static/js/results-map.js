@@ -728,6 +728,9 @@ function formatLegendTable( cells ) {
 		gme.addListener( map, 'dragstart', function() {
 			dragged = true;
 		});
+		gme.addListener( map, 'idle', function() {
+			polys();
+		});
 		gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
 			if( zoom <= 4  &&  state != stateUS )
