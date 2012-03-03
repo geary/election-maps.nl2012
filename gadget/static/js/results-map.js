@@ -846,7 +846,7 @@ function formatLegendTable( cells ) {
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
 		var results = state.results, col = results && results.cols;
 		var candidates = results && results.candidates;
-		if( ! currentCandidate ) {
+		if( !( candidates && currentCandidate ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				var candidate = row && candidates[row.candidateMax];
