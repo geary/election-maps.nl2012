@@ -7,7 +7,6 @@ var times = {
 };
 
 // Default params
-params.sidebar = ( params.sidebar !== 'false' );
 params.source = ( params.source == 'gop' ? 'gop' : 'ap' );
 if( location.host.split('.')[0] == 'nv2012' ) params.source = 'gop';
 var $body = $('body');
@@ -151,8 +150,7 @@ document.write(
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
-		'div.topbar-header { padding:3px; }',
-		'div.sidebar-header { padding:8px; }',
+		'div.topbar-header, div.sidebar-header { padding:3px; }',
 		'div.title-text { font-size:18px; }',
 		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:12px; color:#777; }',
@@ -576,10 +574,16 @@ function formatLegendTable( cells ) {
 		]);
 	}
 	
+	var useSidebar;
+	function setSidebar() {
+		useSidebar = ( state != stateUS );
+		$body.toggleClass( 'sidebar', useSidebar );
+	}
+	
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
-	if( params.sidebar ) $body.addClass( 'sidebar' );
-	var mapWidth = ww - ( params.sidebar ? sidebarWidth : 0 );
+	setSidebar();
+	var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
 	$body.toggleClass( 'hidelogo', mapWidth < 140 );
 
 	var map;
@@ -599,21 +603,26 @@ function formatLegendTable( cells ) {
 	var didGeoReady;
 	function geoReady() {
 		// TODO: refactor with duplicate code in resizeViewNow()
+		setSidebar();
 		setLegend();
-		var mapTop = $map.offset().top;
-		if( params.sidebar ) {
-			mapTop = 0;
-			$map.css({
-				position: 'absolute',
-				left: sidebarWidth,
-				top: mapTop,
-				width: ww - sidebarWidth,
-				height: wh
-			});
+		var mapLeft = 0, mapTop = 0, mapWidth = ww, mapHeight = wh;
+		if( useSidebar ) {
+			mapLeft = sidebarWidth;
+			mapWidth -= mapLeft;
 			//var $sidebarScroll = $('#sidebar-scroll');
 			//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
 		}
-		$map.height( wh - mapTop );
+		else {
+			mapTop = $('#topbar').height();
+			mapHeight -= mapTop;
+		}
+		$map.css({
+			position: 'absolute',
+			left: mapLeft,
+			top: mapTop,
+			width: mapWidth,
+			height: mapHeight
+		});
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
@@ -1044,7 +1053,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatLegend() {
-		return params.sidebar ? formatSidebar() : formatTopbar();
+		return useSidebar ? formatSidebar() : formatTopbar();
 	}
 	
 	function formatTopbar() {
@@ -1261,7 +1270,7 @@ function formatLegendTable( cells ) {
 	
 	function formatTipCandidates( result ) {
 		return formatCandidateList(
-			getTopCandidates( result, 'votes', /*params.sidebar ? 0 :*/ 4 ),
+			getTopCandidates( result, 'votes', /*useSidebar ? 0 :*/ 4 ),
 			formatListCandidate,
 			true
 		);
@@ -1683,7 +1692,7 @@ function formatLegendTable( cells ) {
 			left: Math.floor( ww/2 - 64 ),
 			top: Math.floor( wh/2 - 20 )
 		});
-		var mapWidth = ww - sidebarWidth;
+		var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
 		var mapHeight = wh;
 		$body.toggleClass( 'hidelogo', mapWidth < 140 );
 		$map && $map.css({ width: mapWidth, height: mapHeight });
