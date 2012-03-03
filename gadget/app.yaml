@@ -1,0 +1,15 @@
+application: election-maps
+version: us2012
+runtime: python
+api_version: 1
+
+default_expiration: "2m"
+
+handlers:
+
+- url: /(results/vote-data|results/embed)
+  script: results-app.py
+  
+- url: /results/(css/.*|images/.*|js/.*|shapes/.*)
+  static_files: static/\1
+  upload: static/(css/.*|images/.*|js/.*|shapes/.*)
