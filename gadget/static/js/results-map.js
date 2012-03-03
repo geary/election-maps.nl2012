@@ -724,9 +724,14 @@ function formatLegendTable( cells ) {
 	}
 	
 	var dragged = false;
-	function addDragStartListener( map ) {
+	function addMapListeners( map ) {
 		gme.addListener( map, 'dragstart', function() {
 			dragged = true;
+		});
+		gme.addListener( map, 'zoom_changed', function() {
+			var zoom = map.getZoom();
+			if( zoom <= 4  &&  state != stateUS )
+				setState( '00' );
 		});
 	}
 	
@@ -1562,7 +1567,7 @@ function formatLegendTable( cells ) {
 		map = new gm.Map( $map[0],  mapopt );
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
-		addDragStartListener( map );
+		addMapListeners( map );
 		
 		//if( ! PolyGonzo.isVML() ) {
 		//	gme.addListener( map, 'zoom_changed', function() {
