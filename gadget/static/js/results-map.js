@@ -154,7 +154,7 @@ document.write(
 		'div.title-text { font-size:18px; }',
 		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:12px; color:#777; }',
-		'div.topbar-delegates { font-size:22px; line-height:22px; font-weight:bold; }',
+		'div.topbar-delegates { font-size:21px; line-height:21px; font-weight:bold; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -1104,7 +1104,7 @@ function formatLegendTable( cells ) {
 	function formatTopbarCandidate( candidate ) {
 		var selected = ( candidate.id == currentCandidate ) ? ' selected' : '';
 		return S(
-			'<div style="float:left; padding:1px 3px 1px 12px;">',
+			'<div style="float:left; padding:1px 3px 1px 14px;">',
 				'<table cellpadding="0" cellspacing="0">',
 					'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
 						'<td class="left">',
@@ -1114,7 +1114,7 @@ function formatLegendTable( cells ) {
 							'<div>',
 								formatDivColorPatch(
 									candidate.color,
-									candidate.delegates < 100 ? 24 : 36,
+									candidate.delegates < 100 ? 23 : 34,
 									12
 								),
 							'</div>',
