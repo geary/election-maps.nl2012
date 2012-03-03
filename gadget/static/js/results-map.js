@@ -1073,14 +1073,17 @@ function formatLegendTable( cells ) {
 			var candidates = topCandidates.map( formatTopbarCandidate );
 			candidatesHTML = [ /*top*/ ].concat( candidates ).join('');
 		}
+		var test = testFlag( results );
 		return S(
 			'<div id="topbar" style="position:relative;">',
 				'<div class="topbar-header" style="float:left;">',
 					'<div id="election-title" class="title-text">',
 						'topbarTitle'.T(),
 					'</div>',
-					'<div id="election-subtitle" class="faint-text" style="">',
-						'topbarSubtitle'.T(),
+					'<div id="election-subtitle" class="faint-text" style="',
+						test ? 'color:red; font-weight:bold;' : '',
+					'">',
+						test ? 'testData'.T() : 'topbarSubtitle'.T(),
 					'</div>',
 				'</div>',
 				'<div id="topbar-candidates" style="position:relative; float:right;">',
