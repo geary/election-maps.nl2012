@@ -1100,6 +1100,10 @@ function formatLegendTable( cells ) {
 		}).join(' ');
 	}
 	
+	function testFlag( results ) {
+		return params.debug && results && ( results.mode == 'test'  ||  opt.randomized );
+	}
+	
 	function formatSidebar() {
 		// TODO: refactor with formatLegend()
 		var resultsHeaderHTML = '';
@@ -1111,7 +1115,7 @@ function formatLegendTable( cells ) {
 			);
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
-			var test = results.mode == 'test'  ||  opt.randomized;
+			var test = testFlag( results );
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
 					'percentReporting'.T( totalReporting(state.results) ),
@@ -1339,7 +1343,7 @@ function formatLegendTable( cells ) {
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
 		
-		var test = results && ( results.mode == 'test'  ||  opt.randomized );
+		var test = testFlag( results );
 		
 		return S(
 			'<div class="tiptitlebar">',
