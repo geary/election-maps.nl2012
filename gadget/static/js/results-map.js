@@ -1806,6 +1806,7 @@ function formatLegendTable( cells ) {
 		else
 			state.results = results;
 		results.mode = json.mode;
+		var zero = ( json.mode == 'test'  &&  ! params.debug );
 		
 		var col = results.colsById = {};
 		col.candidates = 0;
@@ -1844,18 +1845,28 @@ function formatLegendTable( cells ) {
 			rowsByID[id] = row;
 			var nCandidates = candidates.length;
 			var max = 0,  candidateMax = -1;
-			for( iCol = -1;  ++iCol < nCandidates; ) {
-				var count = row[iCol];
-				totals[iCol] += count;
-				if( count > max ) {
-					max = count;
-					candidateMax = iCol;
+			if( zero ) {
+				for( iCol = -1;  ++iCol < nCandidates; ) {
+					row[iCol] = 0;
 				}
+				row[col.TabTotal] = 0;
+				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
+				row[col.NumBallotBoxesCounted] = 0;
+			}
+			else {
+				for( iCol = -1;  ++iCol < nCandidates; ) {
+					var count = row[iCol];
+					totals[iCol] += count;
+					if( count > max ) {
+						max = count;
+						candidateMax = iCol;
+					}
+				}
+				totals[col.TabTotal] += row[col.TabTotal];
+				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
+				totals[col.NumBallotBoxesCounted] += row[col.NumBallotBoxesCounted];
 			}
 			row.candidateMax = candidateMax;
-			totals[col.TabTotal] += row[col.TabTotal];
-			totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
-			totals[col.NumBallotBoxesCounted] += row[col.NumBallotBoxesCounted];
 		}
 		
 		if( electionsPending.length == 0 )
