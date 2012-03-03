@@ -1603,7 +1603,7 @@ function formatLegendTable( cells ) {
 			},
 			click: function( event ) {
 				var id = this.id.split('-')[2];
-				if( id == 'top' ) id = null;
+				if( id == 'top'  ||  id == currentCandidate ) id = null;
 				$('#chkCycle').prop({ checked:false });
 				stopCycle();
 				setCandidate( id );
