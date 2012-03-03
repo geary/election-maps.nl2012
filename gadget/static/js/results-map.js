@@ -22,6 +22,8 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
+	topbarTitle: 'Republican Delegate Count',
+	topbarSubtitle: '1144 needed to win the nomination',
 	viewUSA: 'View Entire USA',
 	titleViewUSA: 'View entire USA',
 	allCandidates: 'All Candidates',
@@ -149,10 +151,12 @@ document.write(
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'h2 { font-size:11pt; margin:0; padding:0; }',
+		'div.topbar-header { padding:3px; }',
 		'div.sidebar-header { padding:8px; }',
-		'div.title-text { font-size:16px; }',
+		'div.title-text { font-size:18px; }',
 		'div.body-text, div.body-text label { font-size:13px; }',
-		'div.faint-text { font-size:11px; color:#777; }',
+		'div.faint-text { font-size:12px; color:#777; }',
+		'div.topbar-delegates { font-size:22px; line-height:22px; font-weight:bold; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -494,9 +498,7 @@ function formatLegendTable( cells ) {
 			setup: function() {
 			},
 			tick: function() {
-				var topCandidates = topCandidatesByVote(
-					state.results.totals
-				);
+				var topCandidates = getTopCandidates( state.results.totals, 'votes' );
 				if( ! currentCandidate ) {
 					i = 0;
 				}
@@ -887,7 +889,6 @@ function formatLegendTable( cells ) {
 		}
 	}
 
-	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
 	function outlineFeature( where ) {
@@ -999,7 +1000,7 @@ function formatLegendTable( cells ) {
 		};
 	}
 	
-	function topCandidatesByVote( result, max ) {
+	function getTopCandidates( result, sortBy, max ) {
 		max = max || Infinity;
 		if( ! result ) return [];
 		var results = state.results;
@@ -1013,7 +1014,7 @@ function formatLegendTable( cells ) {
 			candidate.delegates = getCandidateDelegates( result.state || stateUS, candidate );
 			//candidate.total = total;
 		}
-		top = sortArrayBy( top, 'votes', { numeric:true } )
+		top = sortArrayBy( top, sortBy, { numeric:true } )
 			.reverse()
 			.slice( 0, max );
 		while( top.length  &&  ! top[top.length-1].votes )
@@ -1043,17 +1044,40 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatLegend() {
-		/*if( params.sidebar )*/ return formatSidebar();
-		
-		//var topCandidates = topCandidatesByVote(
-		//	state.results.totals
-		//);
-		//var top = formatLegendTopCandidates( topCandidates.slice( 0, 4 ) );
-		//var candidates = topCandidates.map( formatLegendCandidate );
-		//return formatLegendTable( [ top ].concat( state.results.candidates ) );
+		return params.sidebar ? formatSidebar() : formatTopbar();
 	}
 	
-	//function formatLegendTopCandidates( topCandidates ) {
+	function formatTopbar() {
+		var candidatesHTML = '';
+		var results = state.results;
+		if( results ) {
+			var topCandidates = getTopCandidates( results.totals, 'delegates', 4 );
+			//var top = formatTopbarTopCandidates( topCandidates );
+			var candidates = topCandidates.map( formatTopbarCandidate );
+			candidatesHTML = [ /*top*/ ].concat( candidates ).join('');
+		}
+		return S(
+			'<div id="topbar" style="position:relative;">',
+				'<div class="topbar-header" style="float:left;">',
+					'<div id="election-title" class="title-text">',
+						'topbarTitle'.T(),
+					'</div>',
+					'<div id="election-subtitle" class="faint-text" style="">',
+						'topbarSubtitle'.T(),
+					'</div>',
+				'</div>',
+				'<div id="topbar-candidates" style="position:relative; float:right;">',
+					candidatesHTML,
+					'<div style="clear:both;">',
+					'</div>',
+				'</div>',
+				'<div style="clear:both;">',
+				'</div>',
+			'</div>'
+		);
+	}
+	
+	//function formatTopbarTopCandidates( topCandidates ) {
 	//	var colors = topCandidates.map( function( candidate ) {
 	//		return candidate.color;
 	//	});
@@ -1068,18 +1092,44 @@ function formatLegendTable( cells ) {
 	//	);
 	//}
 	
-	//function formatLegendCandidate( candidate ) {
-	//	var selected = ( candidate.id == currentCandidate ) ? ' selected' : '';
-	//	return S(
-	//		'<td class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-	//			'<div class="legend-candidate">',
-	//				formatSpanColorPatch( candidate.color, 8 ),
-	//				'&nbsp;', candidate.lastName, '&nbsp;',
-	//				percent1( candidate.vsAll ), '&nbsp;',
-	//			'</div>',
-	//		'</td>'
-	//	);
-	//}
+	function formatTopbarCandidate( candidate ) {
+		var selected = ( candidate.id == currentCandidate ) ? ' selected' : '';
+		return S(
+			'<div style="float:left; padding:1px 3px 1px 12px;">',
+				'<table cellpadding="0" cellspacing="0">',
+					'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+						'<td class="left">',
+							'<div class="topbar-delegates" style="text-align:center; margin-top:-1px;">',
+								formatNumber( candidate.delegates ),
+							'</div>',
+							'<div>',
+								formatDivColorPatch(
+									candidate.color,
+									candidate.delegates < 100 ? 24 : 36,
+									12
+								),
+							'</div>',
+						'</td>',
+						'<td>',
+							'<div style="padding:0 1px;">',
+								formatCandidateIcon( candidate, 32 ),
+							'</div>',
+						'</td>',
+						'<td class="right">',
+							'<div class="candidate-name" style="">',
+								'<div class="first-name">',
+									candidate.firstName,
+								'</div>',
+								'<div class="last-name">',
+									candidate.lastName,
+								'</div>',
+							'</div>',
+						'</td>',
+					'</tr>',
+				'</table>',
+			'</div>'
+		);
+	}
 	
 	function nameCase( name ) {
 		return name && name.split(' ').map( function( word ) {
@@ -1092,14 +1142,12 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatSidebar() {
-		// TODO: refactor with formatLegend()
+		// TODO: refactor with formatTopbar()
 		var resultsHeaderHTML = '';
 		var resultsScrollingHTML = '';
 		var results = state.results;
 		if( results ) {
-			var topCandidates = topCandidatesByVote(
-				state.results.totals
-			);
+			var topCandidates = getTopCandidates( state.results.totals, 'votes' );
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			var test = testFlag( results );
@@ -1213,7 +1261,7 @@ function formatLegendTable( cells ) {
 	
 	function formatTipCandidates( result ) {
 		return formatCandidateList(
-			topCandidatesByVote( result, /*params.sidebar ? 0 :*/ 4 ),
+			getTopCandidates( result, 'votes', /*params.sidebar ? 0 :*/ 4 ),
 			formatListCandidate,
 			true
 		);
