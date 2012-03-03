@@ -22,7 +22,7 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
-	viewUSA: 'View USA',
+	viewUSA: 'View Entire USA',
 	titleViewUSA: 'View entire USA',
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
@@ -574,22 +574,6 @@ function formatLegendTable( cells ) {
 		]);
 	}
 	
-	function addNationwideControl( map ) {
-		if( params.usa == 'false' ) return;
-		var $control = $(S(
-			'<div id="view-usa" style="display:none; margin-top:6px; cursor:pointer;">',
-				'<div style="direction:ltr; overflow:hidden; text-align:center; position:relative; color:black; font-family:Arial,sans-serif; -moz-user-select:none; font-size:12px; background-color:rgb(250,250,250); background:-moz-linear-gradient( center top, rgb(254,254,254), rgb(243,243,243) ) repeat scroll 0% 0% transparent; line-height:160%; padding:0px 6px; border-radius:2px 0pt 0pt 2px; box-shadow:2px 2px 3px rgba(0,0,0,0.35); border:1px solid rgb(169,187,223); font-weight:normal;" title="',
-					'titleViewUSA'.T(),
-				'">',
-					'viewUSA'.T(),
-				'</div>',
-			'</div>'
-		)), control = $control[0];
-		$control.click( function() { setState('00'); } );
-		control.index = 1;
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push( control );
-	};
-
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
 	if( params.sidebar ) $body.addClass( 'sidebar' );
@@ -1125,14 +1109,21 @@ function formatLegendTable( cells ) {
 					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
 				none ? '' : S(
-					'<div id="button-row" class="body-text" style="padding-top:4px;">',
+					'<div id="button-row" class="body-text" style="padding-top:4px; position:relative">',
 						'<a class="button ',
 							opt.cycleTimer ? 'selected' : '',
 							'" id="btnCycle" title="',
 							opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
-							'">',
+							'" style="float:left;">',
 								'cycle'.T(),
 						'</a>',
+						state != stateUS  &&  ! params.embed_state ? S(
+							'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
+								'viewUSA'.T(),
+							'</a>'
+						) : '',
+						'<div style="clear:both;">',
+						'</div>',
 					'</div>'
 				)
 			);
@@ -1510,7 +1501,6 @@ function formatLegendTable( cells ) {
 		map = new gm.Map( $map[0],  mapopt );
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
-		addNationwideControl( map );
 		addDragStartListener( map );
 		
 		//if( ! PolyGonzo.isVML() ) {
@@ -1559,13 +1549,22 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		$legend.delegate( '#btnCycle', {
+		$legend.delegate( 'a.button', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
 			mouseout: function( event ) {
 				$(this).removeClass( 'hover' );
-			},
+			}
+		});
+		
+		$legend.delegate( '#btnViewUSA', {
+			click: function( event ) {
+				setState('00');
+			}
+		});
+		
+		$legend.delegate( '#btnCycle', {
 			click: function( event ) {
 				toggleCycle();
 			}
