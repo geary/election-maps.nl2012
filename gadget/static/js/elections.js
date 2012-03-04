@@ -492,6 +492,7 @@ var states = [
 		fips: '53',
 		abbr: 'WA',
 		name: 'Washington',
+		type: 'Caucus',
 		date: '2012-03-03',
 		electionid: '2536',
 		done: false
