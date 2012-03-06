@@ -1514,6 +1514,9 @@ function formatLegendTable( cells ) {
 		if( ! s ) return;
 		s = State( s );
 		if( ! s.abbr ) return;
+		if( s == state ) return;
+		stopCycle();
+		if( s == stateUS ) currentCandidate = 0;
 		state = s;
 		var select = $('#stateSelector')[0];
 		select && ( select.selectedIndex = state.selectorIndex );
@@ -1652,37 +1655,37 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		function toggleCycle() {
-			if( opt.cycleTimer ) stopCycle();
-			else startCycle();
-		}
-		
-		var startCycleTime;
-		function startCycle() {
-			if( opt.cycleTimer ) return;
-			startCycleTime = now();
-			this.title = 'cycleStopTip'.T();
-			var player = players.candidates;
-			opt.cycleTimer = setInterval( player.tick, 3000 );
-			player.tick();
-			analytics( 'cycle', 'start' );
-		}
-		
-		function stopCycle() {
-			if( ! opt.cycleTimer ) return;
-			clearInterval( opt.cycleTimer );
-			opt.cycleTimer = null;
-			$('#btnCycle')
-				.removeClass( 'selected' )
-				.prop({ title: 'cycleTip'.T() });
-			var seconds = Math.round( ( now() - startCycleTime ) / 1000 );
-			analytics( 'cycle', 'stop', '', seconds );
-		}
-		
 		setCandidate = function( id ) {
 			currentCandidate = id;
 			loadView();
 		}
+	}
+	
+	function toggleCycle() {
+		if( opt.cycleTimer ) stopCycle();
+		else startCycle();
+	}
+	
+	var startCycleTime;
+	function startCycle() {
+		if( opt.cycleTimer ) return;
+		startCycleTime = now();
+		this.title = 'cycleStopTip'.T();
+		var player = players.candidates;
+		opt.cycleTimer = setInterval( player.tick, 3000 );
+		player.tick();
+		analytics( 'cycle', 'start' );
+	}
+	
+	function stopCycle() {
+		if( ! opt.cycleTimer ) return;
+		clearInterval( opt.cycleTimer );
+		opt.cycleTimer = null;
+		$('#btnCycle')
+			.removeClass( 'selected' )
+			.prop({ title: 'cycleTip'.T() });
+		var seconds = Math.round( ( now() - startCycleTime ) / 1000 );
+		analytics( 'cycle', 'stop', '', seconds );
 	}
 	
 	function hittest( latlng ) {
