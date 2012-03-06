@@ -1833,7 +1833,7 @@ function formatLegendTable( cells ) {
 		col.index();
 		
 		var kind = state.votesby || 'county';
-		if( kind == 'town' ) kind = 'county';  // TEMP
+		if( kind == 'town'  ||  kind == 'district' ) kind = 'county';  // TEMP
 		var rows = state.geo[kind].features.map( function( feature ) {
 			var row = [];
 			row[col.ID] = feature.id;
@@ -1873,6 +1873,7 @@ function formatLegendTable( cells ) {
 	};
 	
 	var lsadPrefixes = {
+		cd: 'District ',
 		shd: 'District '
 	};
 	
