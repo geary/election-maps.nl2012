@@ -1989,7 +1989,8 @@ function formatLegendTable( cells ) {
 			}
 			if( state.geo ) {
 				var feature = state.geo[kind].features.by[id];
-				if( ! feature ) missing.push( id );
+				if( ! feature  &&  id != 'SuperDelegates' )
+					missing.push( id );
 			}
 			rowsByID[id] = row;
 			var nCandidates = candidates.length;
