@@ -1173,7 +1173,7 @@ function formatLegendTable( cells ) {
 	
 	function usEnabled() {
 		return state != stateUS  &&
-			( ! params.state  ||  params.usa == 'true' );
+			( ! params.embed_state  ||  params.usa == 'true' );
 	}
 	
 	function formatSidebar() {
