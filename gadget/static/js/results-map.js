@@ -8,7 +8,12 @@ var times = {
 
 // Default params
 params.source = ( params.source == 'gop' ? 'gop' : 'ap' );
-if( location.host.split('.')[0] == 'nv2012' ) params.source = 'gop';
+var hostPrefix = location.host.split('.')[0];
+var match = hostPrefix.match( /^([a-z][a-z])2012(-\w+)$/ );
+if( match ) {
+	if( hostPrefix == 'nv2012' ) params.source = 'gop';
+	params.state = match[1];
+}
 var $body = $('body');
 $body.addClass( 'source-' + params.source );
 
