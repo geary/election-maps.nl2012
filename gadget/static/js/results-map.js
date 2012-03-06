@@ -1123,6 +1123,8 @@ function formatLegendTable( cells ) {
 	
 	function formatTopbarCandidate( candidate ) {
 		var selected = ( candidate.id === currentCandidate ) ? ' selected' : '';
+		var delegates = candidate.delegates;
+		if( params.triple ) delegates = 999;
 		return S(
 			'<div style="float:left; padding:1px 3px 1px 14px;">',
 				'<table cellpadding="0" cellspacing="0">',
@@ -1130,12 +1132,12 @@ function formatLegendTable( cells ) {
 						'<td class="left">',
 							'<div class="topbar-delegates" style="text-align:center; margin-top:-1px;">',
 								candidate.delegates == null ? ' ' :
-									formatNumber( candidate.delegates ),
+									formatNumber( delegates ),
 							'</div>',
 							'<div>',
 								formatDivColorPatch(
 									candidate.color || 'white',
-									candidate.delegates < 100 ? 23 : 34,
+									delegates < 100 ? 23 : 34,
 									12, '1px solid transparent'
 								),
 							'</div>',
