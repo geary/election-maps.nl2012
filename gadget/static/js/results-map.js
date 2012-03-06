@@ -23,7 +23,7 @@ opt.randomized = params.randomize || params.zero;
 var strings = {
 	topbarTitle: 'Republican Delegate Count',
 	topbarSubtitle: '1144 needed to win the nomination',
-	viewUSA: '« Back to U.S. Overview Map',
+	viewUSA: '&laquo; Back to U.S. Overview Map',
 	titleViewUSA: 'View state-by-state results',
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
