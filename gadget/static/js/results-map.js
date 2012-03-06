@@ -727,11 +727,13 @@ function formatLegendTable( cells ) {
 		gme.addListener( map, 'idle', function() {
 			polys();
 		});
+/*
 		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
 			if( zoom <= 4  &&  state != stateUS )
 				setState( '00' );
 		});
+*/
 	}
 	
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
