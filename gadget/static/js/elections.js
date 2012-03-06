@@ -380,8 +380,8 @@ var states = [
 		name: 'North Dakota',
 		type: 'Caucus',
 		date: '2012-03-06',
-		electionid: '2529',
-		votesby: 'state',
+		electionid: '2538',
+		votesby: 'district',
 		done: false
 	},
 	{
