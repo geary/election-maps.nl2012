@@ -43,7 +43,7 @@ opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.d
 
 opt.writeScript(
 	'//maps.google.com/maps/api/js?v=3.5&sensor=false' + (
-	/(^|\.)election-maps.appspot.com\//.test(location.hostname) ?
+	/(^|\.)election-maps.appspot.com/.test(location.hostname) ?
 		'&key=AIzaSyBbwxmNf1Sz3ORtmt4SFy5ltFqIFGd2QQg' :
 		''
 	)
