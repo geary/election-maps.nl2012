@@ -152,6 +152,7 @@ document.write(
 		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:12px; color:#777; }',
 		'div.topbar-delegates { font-size:21px; line-height:21px; font-weight:bold; }',
+		'body.narrow #topbar div.candidate-name { display:none; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -581,8 +582,11 @@ function formatLegendTable( cells ) {
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
 	setSidebar();
+	// TODO: refactor with duplicate code in geoReady() and resizeViewNow()
 	var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
-	$body.toggleClass( 'hidelogo', mapWidth < 140 );
+	$body
+		.toggleClass( 'hidelogo', mapWidth < 140 )
+		.toggleClass( 'narrow', ww < 782 );
 
 	var map;
 	
@@ -603,24 +607,7 @@ function formatLegendTable( cells ) {
 		// TODO: refactor with duplicate code in resizeViewNow()
 		setSidebar();
 		setLegend();
-		var mapLeft = 0, mapTop = 0, mapWidth = ww, mapHeight = wh;
-		if( useSidebar ) {
-			mapLeft = sidebarWidth;
-			mapWidth -= mapLeft;
-			//var $sidebarScroll = $('#sidebar-scroll');
-			//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
-		}
-		else {
-			mapTop = $('#topbar').height();
-			mapHeight -= mapTop;
-		}
-		$map.css({
-			position: 'absolute',
-			left: mapLeft,
-			top: mapTop,
-			width: mapWidth,
-			height: mapHeight
-		});
+		resizeViewOnly();
 		if( geoMoveNext ) {
 			geoMoveNext = false;
 			moveToGeo();
@@ -991,10 +978,19 @@ function formatLegendTable( cells ) {
 	}
 	
 	function formatCandidateIcon( candidate, size ) {
-		return S(
-			'<div style="background:url(',
+		var border = 'transparent', photo = '';
+		if( candidate.id ) {
+			border = '#C2C2C2';
+			photo = S(
+				'background:url(',
 					imgUrl( S( 'candidate-photos-', year, '-', size, '.png' ) ),
-				'); background-position:-', election.candidates.by.id[candidate.id].index * size, 'px 0px; width:', size, 'px; height:', size, 'px; border:1px solid #C2C2C2;">',
+				'); ',
+				'background-position:-',
+				election.candidates.by.id[candidate.id].index * size, 'px 0px; '
+			);
+		}
+		return S(
+			'<div style="', photo, ' width:', size, 'px; height:', size, 'px; border:1px solid ', border, ';">',
 			'</div>'
 		);
 	}
@@ -1068,7 +1064,9 @@ function formatLegendTable( cells ) {
 		if( results ) {
 			var topCandidates = getTopCandidates( results.totals, 'delegates', 4 );
 			//var top = formatTopbarTopCandidates( topCandidates );
-			var candidates = topCandidates.map( formatTopbarCandidate );
+			var candidates =
+				topCandidates.length ? topCandidates.map( formatTopbarCandidate ) :
+				formatTopbarCandidate({});
 			candidatesHTML = [ /*top*/ ].concat( candidates ).join('');
 		}
 		var test = testFlag( results );
@@ -1111,20 +1109,21 @@ function formatLegendTable( cells ) {
 	//}
 	
 	function formatTopbarCandidate( candidate ) {
-		var selected = ( candidate.id == currentCandidate ) ? ' selected' : '';
+		var selected = ( candidate.id === currentCandidate ) ? ' selected' : '';
 		return S(
 			'<div style="float:left; padding:1px 3px 1px 14px;">',
 				'<table cellpadding="0" cellspacing="0">',
 					'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
 						'<td class="left">',
 							'<div class="topbar-delegates" style="text-align:center; margin-top:-1px;">',
-								formatNumber( candidate.delegates ),
+								candidate.delegates == null ? ' ' :
+									formatNumber( candidate.delegates ),
 							'</div>',
 							'<div>',
 								formatDivColorPatch(
-									candidate.color,
+									candidate.color || 'white',
 									candidate.delegates < 100 ? 23 : 34,
-									12
+									12, '1px solid transparent'
 								),
 							'</div>',
 						'</td>',
@@ -1136,10 +1135,10 @@ function formatLegendTable( cells ) {
 						'<td class="right">',
 							'<div class="candidate-name" style="">',
 								'<div class="first-name">',
-									candidate.firstName,
+									candidate.firstName || '&nbsp;',
 								'</div>',
 								'<div class="last-name">',
-									candidate.lastName,
+									candidate.lastName || '&nbsp;',
 								'</div>',
 							'</div>',
 						'</td>',
@@ -1697,19 +1696,45 @@ function formatLegendTable( cells ) {
 		resizeOneshot( resizeViewNow, 250 );
 	}
 	
-	function resizeViewNow() {
+	function resizeViewOnly() {
 		// TODO: refactor with duplicate code in geoReady()
 		ww = $window.width();
 		wh = $window.height();
-		$body.css({ width: ww, height: wh });
+		$body
+			.css({ width: ww, height: wh })
+			.toggleClass( 'hidelogo', mapWidth < 140 )
+			.toggleClass( 'narrow', ww < 782 );
+		
 		$('#spinner').css({
 			left: Math.floor( ww/2 - 64 ),
 			top: Math.floor( wh/2 - 20 )
 		});
-		var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
-		var mapHeight = wh;
-		$body.toggleClass( 'hidelogo', mapWidth < 140 );
-		$map && $map.css({ width: mapWidth, height: mapHeight });
+		
+		var mapLeft = 0, mapTop = 0, mapWidth = ww, mapHeight = wh;
+		if( useSidebar ) {
+			mapLeft = sidebarWidth;
+			mapWidth -= mapLeft;
+			//var $sidebarScroll = $('#sidebar-scroll');
+			//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
+		}
+		else {
+			var topbarHeight = $('#topbar').height() + 1;
+			//if( topbarHeight > 50 )  // two rows
+			//	$('#topbar-candidates').css({ float:'left' });
+			mapTop = topbarHeight;
+			mapHeight -= mapTop;
+		}
+		$map && $map.css({
+			position: 'absolute',
+			left: mapLeft,
+			top: mapTop,
+			width: mapWidth,
+			height: mapHeight
+		});
+	}
+	
+	function resizeViewNow() {
+		resizeViewOnly();
 		moveToGeo();
 	}
 	
