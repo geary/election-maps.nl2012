@@ -122,7 +122,7 @@ opt.reloadTime = 60 * 1000;
 //opt.resultCacheTime = Infinity;  // cache forever
 //opt.reloadTime = false;  // no auto-reload
 
-var stateZoom;
+var zoom;
 
 String.prototype.T = function( args ) {
 	return ( /*prefs.getMsg(this) ||*/ strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,
@@ -692,10 +692,9 @@ function formatLegendTable( cells ) {
 		}
 		z = Math.floor( z );
 		
-		stateZoom = z;
 		map.setCenter( new gm.LatLng( centerLL[1], centerLL[0] ) );
 		map.setZoom( z );
-		stateZoom = map.getZoom();
+		zoom = map.getZoom();
 	}
 	
 	//function shrinkBbox( bbox, amount ) {
@@ -728,12 +727,13 @@ function formatLegendTable( cells ) {
 		gme.addListener( map, 'idle', function() {
 			polys();
 		});
-		gme.addListener( map, 'zoom_changed', function() {
-			if( ! usEnabled() ) return;
+/*
+		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
-			if( zoom < stateZoom  &&  state != stateUS )
+			if( zoom <= 4  &&  state != stateUS )
 				setState( '00' );
 		});
+*/
 	}
 	
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
@@ -1619,6 +1619,17 @@ function formatLegendTable( cells ) {
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		addMapListeners( map );
+		
+		//if( ! PolyGonzo.isVML() ) {
+		//	gme.addListener( map, 'zoom_changed', function() {
+		//		var oldZoom = zoom;
+		//		zoom = map.getZoom();
+		//		if( zoom > oldZoom  &&  zoom >= 7 )
+		//			setCounties( true );
+		//		else if( zoom < oldZoom  &&  zoom < 7 )
+		//			setCounties( false );
+		//	});
+		//}
 	}
 	
 	function initSelectors() {
