@@ -26,6 +26,8 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
+	linkToMap: 'Link to this Map',
+	linkToMapTitle: 'Link to this Map on Google Politics & Elections',
 	topbarTitle: 'Republican Delegate Count',
 	topbarSubtitle: '1144 needed to win the nomination',
 	viewUSA: '&laquo; Back to U.S. Overview Map',
@@ -158,6 +160,7 @@ document.write(
 		'div.title-text { font-size:18px; }',
 		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:12px; color:#777; }',
+		'div.small-text, a.small-text { font-size:11px; }',
 		'div.topbar-delegates { font-size:21px; line-height:21px; font-weight:bold; }',
 		'body.narrow #topbar div.candidate-name { display:none; }',
 		'.content table { xwidth:100%; }',
@@ -241,7 +244,7 @@ document.write(
 		'body.hidelogo #gop-logo, body.hidelogo #ap-logo { right:4px; }',
 		'body.hidelogo #google-logo { display:none; }',
 		'body.ie7 #gop-logo, body.ie7 #ap-logo { right:4px; }',
-		'body.ie7 #google-logo { display:none; }',
+		'body.ie7 #google-logo, body.ie7 #linkToMap { display:none; }',
 	'</style>'
 );
 
@@ -1215,6 +1218,18 @@ function formatLegendTable( cells ) {
 				)
 			);
 		}
+		var linkHTML = !(
+			params.usa ||
+			params.hide_links ||
+			params.embed_state
+		) ? S(
+			'<a href="http://www.google.com/elections/ed/us/results/2012/gop-primary/',
+					state.abbr.toLowerCase(),
+					'" target="_parent" id="linkToMap" class="small-text" title="',
+					'linkToMapTitle'.T(), '">',
+				'linkToMap'.T(),
+			'</a>'
+		) : '';
 		var footerHTML = usEnabled() ? S(
 			'<div id="sidebar-footer">',
 				'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
@@ -1228,11 +1243,15 @@ function formatLegendTable( cells ) {
 					'<div id="election-title" class="title-text">',
 						state.electionTitle,
 					'</div>',
-					'<div id="election-date" class="faint-text" style="margin-bottom:8px;">',
-						longDateFromYMD( state.date ),
-					'</div>',
-					'<div id="sidebar-results-header">',
-						resultsHeaderHTML,
+					'<div id="election-date-row" class="" style="margin-bottom:8px; position:relative;">',
+						'<div id="election-date" class="faint-text" style="float:left;">',
+							longDateFromYMD( state.date ),
+						'</div>',
+						'<div id="sidebar-results-header" class="small-text" style="float:right; padding-right:3px;">',
+							linkHTML,
+						'</div>',
+						'<div style="clear:both;">',
+						'</div>',
 					'</div>',
 				'</div>',
 				'<div xclass="scroller" id="sidebar-scroll">',
