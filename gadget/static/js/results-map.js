@@ -1364,10 +1364,12 @@ function formatLegendTable( cells ) {
 	function formatFeatureName( feature ) {
 		if( ! feature ) return '';
 		var state = State( feature );
+		var prefixes = state.prefixes || lsadPrefixes;
 		var suffixes = state.suffixes || lsadSuffixes;
 		var lsad = ( feature.lsad || '' ).toLowerCase();
+		var prefix = prefixes[lsad] || '';
 		var suffix = suffixes[lsad] || '';
-		return S( feature.name, suffix );
+		return S( prefix, feature.name, suffix );
 	}
 	
 	function formatTip( feature ) {
@@ -1866,6 +1868,10 @@ function formatLegendTable( cells ) {
 		loadResultTable( json, true );
 	};
 	
+	var lsadPrefixes = {
+		shd: 'District '
+	};
+	
 	var lsadSuffixes = {
 		city: ' City',
 		county: ' County'
@@ -1940,7 +1946,7 @@ function formatLegendTable( cells ) {
 		var fix = state.fix || {};
 		
 		var kind = state.votesby || 'county';
-		if( kind == 'town' ) kind = 'county';  // TEMP
+		if( kind == 'town'  ||  kind == 'district' ) kind = 'county';  // TEMP
 		
 		var missing = [];
 		var rowsByID = results.rowsByID = {};
