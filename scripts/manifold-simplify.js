@@ -41,7 +41,6 @@ function ForAllShapes( callback ) {
 	go( '20m', 'state15', '4096' );
 	
 	go( '500k', 'gop2012', '512' );
-
 }
 
 function RemoveDrawing( shpName ) {
@@ -108,7 +107,7 @@ function Simplify( shpNameFull, shpNameSimple, tolerance ) {
 			errors.push( S(
 				e.name, ' (', e.description, '): ', shpNameSimple, '[', i, ']'
 			) );
-			return null;
+			geom = Application.NewGeom( GeomArea );
 		}
 		
 		var recordFull =
