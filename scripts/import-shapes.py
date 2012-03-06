@@ -13,10 +13,13 @@ fullGeom = 'full_geom'
 googGeom = 'goog_geom'
 
 
-def cartoFileName( resolution, state, type, version='00' ):
+def cartoFileName(
+	resolution, year, state, type, version='00',
+	path=private.CENSUS_SHAPEFILE_PATH
+):
 	return os.path.join(
-		private.CENSUS_SHAPEFILE_PATH,
-		'gz_2010_%s_%s_%s_%s.zip' %( state, type, version, resolution )
+		path,
+		'gz_%s_%s_%s_%s_%s.zip' %( year, state, type, version, resolution )
 	)
 
 
@@ -38,6 +41,18 @@ def process():
 		if resolution == '500k':
 			loadCongressional( db, resolution )
 			loadCountySubdivisions( db, resolution )
+			loadCustom( db, resolution )
+			makeGopDetailTable( db )
+			saveShapefile( db, resolution, 'gop2012' )
+		closeDatabase( db )
+
+
+def processNew():
+	for resolution in ( '500k', ):
+		database = 'usageo_' + resolution
+		db = openDatabase( database )
+		if resolution == '500k':
+			#loadCustom( db, resolution )
 			makeGopDetailTable( db )
 			saveShapefile( db, resolution, 'gop2012' )
 		closeDatabase( db )
@@ -69,12 +84,19 @@ def createSchema( db ):
 	db.connection.commit()
 
 
-def loadCartoFile( db, resolution, state, kind, version, table, create=True ):
-	zipfile = cartoFileName( resolution, state, kind, version )
+def loadCartoFile(
+	db, resolution, year, state, kind, version, table, create=True,
+	path=private.CENSUS_SHAPEFILE_PATH
+):
+	filename = cartoFileName( resolution, year, state, kind, version, path )
+	loadCartoFileName( db, filename, table, create )
+
+
+def loadCartoFileName( db, filename, table, create=True ):
 	table = schema + '.' + table
-	print 'Loading %s' % zipfile
+	print 'Loading %s' % filename
 	db.loadShapefile(
-		zipfile, private.TEMP_PATH, table,
+		filename, private.TEMP_PATH, table,
 		fullGeom, '4269', 'LATIN1', create
 	)
 	db.addGoogleGeometry( table, fullGeom, googGeom )
@@ -83,29 +105,39 @@ def loadCartoFile( db, resolution, state, kind, version, table, create=True ):
 
 
 def loadStates( db, resolution ):
-	loadCartoFile( db, resolution, 'us', '040', '00', 'state' )
+	loadCartoFile( db, resolution, '2010', 'us', '040', '00', 'state' )
 
 
 def loadCounties( db, resolution ):
-	loadCartoFile( db, resolution, 'us', '050', '00', 'county' )
+	loadCartoFile( db, resolution, '2010', 'us', '050', '00', 'county' )
 
 
 def loadCongressional( db, resolution ):
-	loadForStates( db, resolution, '500', '11', 'cd', [ '20' ] )
+	loadForStates( db, resolution, '2010', '500', '11', 'cd', [ '20' ] )
 
 
 def loadCountySubdivisions( db, resolution ):
-	loadForStates( db, resolution, '060', '00', 'cousub', [ '09', '25', '33', '50' ] )
+	loadForStates( db, resolution, '2010', '060', '00', 'cousub', [ '09', '25', '33', '50' ] )
 
 
-def loadForStates( db, resolution, code, version, table, states=None ):
+def loadCustom( db, resolution ):
+	loadForStates(
+		db, resolution, '2012', '620', 'l2', 'shd', [ '38' ],
+		os.path.join( private.OUTPUT_SHAPEFILE_PATH, 'custom' )
+	)
+
+
+def loadForStates(
+	db, resolution, year, code, version, table, states=None,
+	path=private.CENSUS_SHAPEFILE_PATH
+):
 	#if states is None:
 	#	db.execute( 'SELECT state FROM %s.state ORDER BY state ASC;' %( schema ) )
 	#	states = db.cursor.fetchall()
 	#...for state, in states:
 	create = True
 	for state in states:
-		loadCartoFile( db, resolution, state, code, version, table, create )
+		loadCartoFile( db, resolution, year, state, code, version, table, create, path )
 		create = False
 
 
@@ -162,9 +194,13 @@ def makeGopDetailTable( db ):
 	whereCousub = '''
 		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
 	'''
-	 # AK, ME, and ND report statewide votes only
+	 # ND reports votes by state house district
+	whereSHD = '''
+		( state = '38' )
+	'''
+	 # AK and ME report statewide votes only
 	whereState = '''
-		( state = '02' OR state = '23' OR state = '38' )
+		( state = '02' OR state = '23' )
 	'''
 	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
 	db.execute( '''
@@ -176,6 +212,7 @@ def makeGopDetailTable( db ):
 			WHERE
 				NOT %(whereCousub)s
 				AND NOT %(whereCD)s
+				AND NOT %(whereSHD)s
 				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
@@ -195,9 +232,16 @@ def makeGopDetailTable( db ):
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.state
 			WHERE %(whereState)s;
+		INSERT INTO %(schema)s.gop2012
+			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+				geo_id, state, sldl AS county, '' AS cousub,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.shd
+			WHERE %(whereSHD)s;
 	''' %({
 		'schema': schema,
 		'whereCousub': whereCousub,
+		'whereSHD': whereSHD,
 		'whereCD': whereCD,
 		'whereState': whereState,
 	}) )
