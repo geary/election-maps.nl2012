@@ -28,8 +28,8 @@ opt.randomized = params.randomize || params.zero;
 var strings = {
 	linkToMap: 'Link to this Map',
 	linkToMapTitle: 'Link to this Map on Google Politics & Elections',
-	topbarTitle: 'Republican Delegate Count',
-	topbarSubtitle: '1144 needed to win the nomination',
+	topbarTitle: 'GOP Delegate Count',
+	topbarSubtitle: '1144 to win the nomination',
 	viewUSA: '&laquo; Back to U.S. Overview Map',
 	titleViewUSA: 'View state-by-state results',
 	allCandidates: 'All Candidates',
