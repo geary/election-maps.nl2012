@@ -1174,7 +1174,9 @@ function formatLegendTable( cells ) {
 	}
 	
 	function usEnabled() {
-		return state != stateUS  &&  ! params.embed_state  &&  params.usa != 'false';
+		return state != stateUS  &&
+			params.usa != 'false'  &&
+			( ! params.embed_state  ||  params.embed_state.toLowerCase() == 'us' );
 	}
 	
 	function formatSidebar() {
