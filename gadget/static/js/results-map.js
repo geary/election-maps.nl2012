@@ -42,6 +42,7 @@ var strings = {
 	noVotesYet: 'Waiting for results&hellip;',
 	candidate: 'Candidate',
 	delegates: 'Del.',
+	delegatesAttrib: 'Delegate projections from the Associated Press',
 	votes: 'Votes'
 };
 
@@ -198,6 +199,7 @@ document.write(
 		'#maptip div.candidate-delegates { font-size:130%; font-weight:bold; }',
 		'#maptip div.candidate-percent { font-weight:bold; }',
 		'#maptip div.candidate-votes { font-size:80%; }',
+		'#maptip div.delegates-attrib { text-align:center; padding:4px; }',
 		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
@@ -1280,14 +1282,6 @@ function formatLegendTable( cells ) {
 		);
 	}
 	
-	function formatTipCandidates( result ) {
-		return formatCandidateList(
-			getTopCandidates( result, 'votes', /*useSidebar ? 0 :*/ 4 ),
-			formatListCandidate,
-			true
-		);
-	}
-	
 	function formatCandidateList( topCandidates, formatter, header ) {
 		if( ! topCandidates.length )
 			return 'noVotesYet'.T();
@@ -1378,12 +1372,14 @@ function formatLegendTable( cells ) {
 		var future = ( date > now() );
 		var results = state.results, col = results && results.colsById;
 		var row = featureResults( results, feature );
+		var top = [];
 		if( row && col ) {
 			row.fips = fips;
 			row.state = st;
+			top = getTopCandidates( row, 'votes', /*useSidebar ? 0 :*/ 4 );
 			var content = S(
 				'<div class="tipcontent">',
-					formatTipCandidates( row ),
+					formatCandidateList( top, formatListCandidate, true ),
 				'</div>'
 			);
 			
@@ -1433,7 +1429,12 @@ function formatLegendTable( cells ) {
 					) : '',
 				'</div>',
 			'</div>',
-			content
+			content,
+			top.length ? S(
+				'<div class="delegates-attrib faint-text">',
+					'delegatesAttrib'.T(),
+				'</div>'
+			) : ''
 		);
 	}
 	
