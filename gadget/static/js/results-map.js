@@ -1211,13 +1211,13 @@ function formatLegendTable( cells ) {
 				)
 			);
 		}
-		var footerHTML = S(
+		var footerHTML = usEnabled() ? S(
 			'<div id="sidebar-footer">',
 				'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
 					'viewUSA'.T(),
 				'</a>',
 			'</div>'
-		);
+		) : '';
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
