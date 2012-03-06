@@ -23,7 +23,7 @@ opt.randomized = params.randomize || params.zero;
 var strings = {
 	topbarTitle: 'Republican Delegate Count',
 	topbarSubtitle: '1144 needed to win the nomination',
-	viewUSA: 'Nationwide View',
+	viewUSA: '« Back to U.S. Overview Map',
 	titleViewUSA: 'View state-by-state results',
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
@@ -141,6 +141,9 @@ document.write(
 	'<style type="text/css">',
 		'html, body { width:', ww, 'px; height:', wh, 'px; margin:0; padding:0; overflow:hidden; color:#222; background-color:white; }',
 		'* { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
+		'a { font-size:13pt; text-decoration:none; color:#1155CC; }',
+		'a:hover { text-decoration:underline; }',
+		//'a:visited { color:#6611CC; }',
 		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; height:27px; line-height:27px; padding:0 7px; }',
 		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; }',
 		'a.button.selected { background-color: #EEE; background-image:linear-gradient(top,#EEE,#E0E0E0); border:1px solid #CCC; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#333; }',
@@ -203,6 +206,7 @@ document.write(
 		'#maptip div.delegates-attrib { text-align:center; padding:4px; }',
 		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
+		'#sidebar-footer { position:absolute; left:0; bottom:0; padding:4px; background-color:white; width:100%; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
@@ -1192,11 +1196,6 @@ function formatLegendTable( cells ) {
 								'cycle'.T(),
 						'</a>'
 					),
-					usEnabled() ? S(
-						'<a class="button" id="btnViewUSA" title="', 'titleViewUSA'.T(), '" style="float:right;">',
-							'viewUSA'.T(),
-						'</a>'
-					) : '',
 					'<div style="clear:both;">',
 					'</div>',
 				'</div>'
@@ -1212,6 +1211,13 @@ function formatLegendTable( cells ) {
 				)
 			);
 		}
+		var footerHTML = S(
+			'<div id="sidebar-footer">',
+				'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
+					'viewUSA'.T(),
+				'</a>',
+			'</div>'
+		);
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
@@ -1228,7 +1234,8 @@ function formatLegendTable( cells ) {
 				'<div xclass="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
 				'</div>',
-			'</div>'
+			'</div>',
+			footerHTML
 		);
 	}
 	
@@ -1623,7 +1630,7 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		$legend.delegate( 'a.button', {
+		$legend.delegate( 'a', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
@@ -1632,9 +1639,10 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		$legend.delegate( '#btnViewUSA', {
+		$legend.delegate( '#viewUSA', {
 			click: function( event ) {
 				setState('00');
+				event.preventDefault();
 			}
 		});
 		
