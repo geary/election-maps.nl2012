@@ -1799,7 +1799,7 @@ function formatLegendTable( cells ) {
 		//}
 		
 		var results =
-			cacheResults.get( stateUS.electionidDelegates ) &&
+			( state != stateUS  ||  cacheResults.get( stateUS.electionidDelegates ) )  &&
 			cacheResults.get( electionid );
 		if( results ) {
 			loadResultTable( results, false );
@@ -1815,7 +1815,11 @@ function formatLegendTable( cells ) {
 		var e = electionid.split( '|' );
 		var id = params.source == 'gop' ? e[1] : e[0];
 		
-		getElections([ id, stateUS.electionidDelegates ]);
+		getElections(
+			state == stateUS ?
+				[ id, stateUS.electionidDelegates ] :
+				[ id ]
+		);
 	}
 	
 	var electionLoading, electionsPending = [];
