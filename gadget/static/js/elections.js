@@ -246,7 +246,7 @@ var states = [
 	{
 		fips: '25',
 		abbr: 'MA',
-		name: 'Massachussetts',
+		name: 'Massachusetts',
 		date: '2012-03-06',
 		electionid: '2528',
 		votesby: 'town',
