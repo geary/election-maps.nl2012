@@ -1768,13 +1768,16 @@ function formatLegendTable( cells ) {
 			mapTop = topbarHeight;
 			mapHeight -= mapTop;
 		}
-		$map && $map.css({
-			position: 'absolute',
-			left: mapLeft,
-			top: mapTop,
-			width: mapWidth,
-			height: mapHeight
-		});
+		if( $map ) {
+			$map.css({
+				position: 'absolute',
+				left: mapLeft,
+				top: mapTop,
+				width: mapWidth,
+				height: mapHeight
+			});
+		}
+		mapPixBounds = $map.bounds();
 	}
 	
 	function resizeViewNow() {
