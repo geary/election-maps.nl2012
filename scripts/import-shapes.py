@@ -186,10 +186,6 @@ def makeRegionTables( db, table ):
 
 
 def makeGopDetailTable( db ):
-	# KS reports votes by congressional district
-	whereCD = '''
-		( state = '20' )
-	'''
 	# CT, MA, NH, VT report votes by county subdivision ("town")
 	whereCousub = '''
 		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
@@ -211,7 +207,6 @@ def makeGopDetailTable( db ):
 			FROM %(schema)s.county
 			WHERE
 				NOT %(whereCousub)s
-				AND NOT %(whereCD)s
 				AND NOT %(whereSHD)s
 				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012
@@ -220,12 +215,6 @@ def makeGopDetailTable( db ):
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.cousub
 			WHERE %(whereCousub)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
-				geo_id, state, cd AS county, '' AS cousub,
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(schema)s.cd
-			WHERE %(whereCD)s;
 		INSERT INTO %(schema)s.gop2012
 			SELECT nextval('%(schema)s.gop2012_gid_seq'),
 				geo_id, state, '' AS county, '' AS cousub,
@@ -242,7 +231,6 @@ def makeGopDetailTable( db ):
 		'schema': schema,
 		'whereCousub': whereCousub,
 		'whereSHD': whereSHD,
-		'whereCD': whereCD,
 		'whereState': whereState,
 	}) )
 	db.connection.commit()

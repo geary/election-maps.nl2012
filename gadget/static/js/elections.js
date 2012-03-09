@@ -204,9 +204,8 @@ var states = [
 		fips: '20',
 		abbr: 'KS',
 		name: 'Kansas',
-		votesby: 'district',
 		date: '2012-03-10',
-		electionid: '',
+		electionid: '2539',
 		done: false
 	},
 	{
