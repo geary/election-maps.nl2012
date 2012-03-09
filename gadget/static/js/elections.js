@@ -72,7 +72,7 @@ var states = [
 		abbr: 'AL',
 		name: 'Alabama',
 		date: '2012-03-13',
-		electionid: '',
+		electionid: '2540',
 		done: false
 	},
 	{
@@ -163,7 +163,7 @@ var states = [
 		abbr: 'HI',
 		name: 'Hawaii',
 		date: '2012-03-13',
-		electionid: '',
+		electionid: '2541',
 		done: false
 	},
 	{
@@ -180,7 +180,7 @@ var states = [
 		abbr: 'IL',
 		name: 'Illinois',
 		date: '2012-03-20',
-		electionid: '',
+		electionid: '2543',
 		done: false
 	},
 	{
@@ -290,7 +290,7 @@ var states = [
 		abbr: 'MS',
 		name: 'Mississippi',
 		date: '2012-03-13',
-		electionid: '',
+		electionid: '2542',
 		done: false
 	},
 	{
