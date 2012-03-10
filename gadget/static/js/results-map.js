@@ -1776,8 +1776,8 @@ function formatLegendTable( cells ) {
 				width: mapWidth,
 				height: mapHeight
 			});
+			mapPixBounds = $map.bounds();
 		}
-		mapPixBounds = $map.bounds();
 	}
 	
 	function resizeViewNow() {
