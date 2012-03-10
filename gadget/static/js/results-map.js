@@ -736,6 +736,7 @@ function formatLegendTable( cells ) {
 */
 	}
 	
+	var touch;
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
 	function polys() {
 		var mousedown = false;
@@ -743,15 +744,17 @@ function formatLegendTable( cells ) {
 		var $container = $('#map');
 		var events = playType() ? {} : {
 			mousedown: function( event, where ) {
+				if( touch ) return;
 				showTip( false );
 				mousedown = true;
 				dragged = false;
 			},
 			mouseup: function( event, where ) {
+				if( touch ) return;
 				mousedown = false;
 			},
 			mousemove: function( event, where ) {
-				if( mousedown ) return;
+				if( touch || mousedown ) return;
 				polysThrottle( function() {
 					var feature = where && where.feature;
 					if( feature == mouseFeature ) return;
@@ -761,7 +764,36 @@ function formatLegendTable( cells ) {
 					showTipThrottle( function() { showTip(feature); });
 				});
 			},
+			touchstart: function( event, where ) {
+				touch = {};
+				if( event.touches.length == 1 )
+					touch.where = where;
+				else  // multitouch
+					this.touchcancel( event, where );
+			},
+			touchmove: function( event, where ) {
+				this.touchcancel( event, where );
+			},
+			touchend: function( event, where ) {
+				var feature = touch.where && touch.where.feature;
+				if( feature != mouseFeature ) {
+					mouseFeature = feature;
+					outlineFeature( touch.where );
+					showTip( feature );
+					touch.moveTip = true;
+				}
+				else {
+					if( state == stateUS )
+						setState( feature );
+				}
+			},
+			touchcancel: function( event, where ) {
+				delete touch.where;
+				outlineFeature( null );
+				showTip( false );
+			},
 			click: function( event, where ) {
+				if( touch ) return;
 				mousedown = false;
 				var didDrag = dragged;
 				dragged = false;
@@ -939,12 +971,19 @@ function formatLegendTable( cells ) {
 	}
 	
 	var tipOffset = { x:10, y:20 };
-	var $maptip, tipHtml;
-	if( ! playType() )
+	var $maptip = $('#maptip'), tipHtml;
+	if( ! playType() ) {
 		$body.bind( 'click mousemove', moveTip );
+		$maptip.click( function() {
+			if( state == stateUS ) {
+				// Only touch devices for now
+				var feature = touch && touch.where && touch.where.feature;
+				if( feature ) setState( feature );
+			}
+		});
+	}
 	
 	function showTip( feature ) {
-		if( ! $maptip ) $maptip = $('#maptip');
 		tipHtml = formatTip( feature );
 		if( tipHtml ) {
 			$maptip.html( tipHtml ).show();
@@ -1479,6 +1518,10 @@ function formatLegendTable( cells ) {
 	
 	function moveTip( event ) {
 		if( ! tipHtml ) return;
+		if( touch ) {
+			if( ! touch.moveTip ) return;
+			delete touch.moveTip;
+		}
 		var x = event.pageX, y = event.pageY;
 		if(
 			x < mapPixBounds.left  ||
