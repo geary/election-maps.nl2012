@@ -105,7 +105,7 @@ var gm, gme;
 
 var $window = $(window), ww = $window.width(), wh = $window.height();
 
-var $map, mapPixBounds;
+var mapPixBounds;
 
 var debug = params.debug;
 opt.state = params.state;
@@ -418,7 +418,6 @@ function formatLegendTable( cells ) {
 				didLoadGeoJSON = true;
 				$('#outer').html( contentTable() );
 				initSelectors();
-				$map = $('#map');
 			}
 		}
 		var target = json.county ? 'county' : 'state';
@@ -686,8 +685,8 @@ function formatLegendTable( cells ) {
 		else {
 			if( ! bbox ) return;
 			z = PolyGonzo.Mercator.fitBbox( bbox, {
-				width: $map.width(),
-				height: $map.height()
+				width: $('#map').width(),
+				height: $('#map').height()
 			});
 		}
 		z = Math.floor( z );
@@ -1642,7 +1641,7 @@ function formatLegendTable( cells ) {
 	function initMap() {
 		if( map ) return;
 		gm = google.maps, gme = gm.event;
-		mapPixBounds = $map.bounds();
+		mapPixBounds = $('#map').bounds();
 		var mapopt = $.extend({
 			mapTypeControl: false,
 			mapTypeId: 'simple',
@@ -1658,7 +1657,7 @@ function formatLegendTable( cells ) {
 				style: gm.ZoomControlStyle.SMALL
 			}
 		});
-		map = new gm.Map( $map[0],  mapopt );
+		map = new gm.Map( $('#map')[0],  mapopt );
 		var mapType = new gm.StyledMapType( mapStyles );
 		map.mapTypes.set( 'simple', mapType );
 		addMapListeners( map );
@@ -1811,16 +1810,15 @@ function formatLegendTable( cells ) {
 			mapTop = topbarHeight;
 			mapHeight -= mapTop;
 		}
-		if( $map ) {
-			$map.css({
+		mapPixBounds = $('#map')
+			.css({
 				position: 'absolute',
 				left: mapLeft,
 				top: mapTop,
 				width: mapWidth,
 				height: mapHeight
-			});
-			mapPixBounds = $map.bounds();
-		}
+			})
+			.bounds();
 	}
 	
 	function resizeViewNow() {
