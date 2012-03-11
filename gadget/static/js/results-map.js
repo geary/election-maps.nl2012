@@ -1474,8 +1474,8 @@ function formatLegendTable( cells ) {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			fips.length == 2 ? 'noVotesYet'.T() :  // state
-			'noVotesHere'.T();  // locality
+			results ? 'noVotesHere'.T() :
+			'noVotesYet'.T();
 		
 		var clickForLocal = top.length && state == stateUS ? S(
 			'<div>',
