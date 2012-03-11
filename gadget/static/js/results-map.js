@@ -37,7 +37,7 @@ var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
-	noVotesHere: 'This location does not report voting results',
+	noVotesHere: 'This location reported no voting results',
 	testData: 'TEST DATA',
 	automaticUpdate: 'This page updates automatically',
 	cycle: 'Cycle Candidates',
