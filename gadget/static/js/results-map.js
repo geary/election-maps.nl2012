@@ -26,8 +26,8 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
-	clickForLocal: 'Click state for local results',
-	tapForLocal: 'Tap state again for local results',
+	clickForLocal: ' - click for local results',
+	tapForLocal: ' - tap for local results',
 	linkToMap: 'Link to this Map',
 	linkToMapTitle: 'Link to this Map on Google Politics & Elections',
 	topbarTitle: 'GOP Delegate Count',
@@ -1484,11 +1484,10 @@ function formatLegendTable( cells ) {
 			results ? 'noVotesHere'.T() :
 			'noVotesYet'.T();
 		
-		var clickForLocal = top.length && state == stateUS ? S(
-			'<div>',
-				( touch ? 'tapForLocal' : 'clickForLocal' ).T(),
-			'</div>'
-		) : '';
+		var clickForLocal =
+			top.length && state == stateUS ?
+				( touch ? 'tapForLocal' : 'clickForLocal' ).T() :
+				'';
 		// TODO
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
@@ -1517,9 +1516,8 @@ function formatLegendTable( cells ) {
 						'<span style="color:red; font-weight:bold; font-size:100%;"> ',
 							'testData'.T(),
 						'</span>'
-					) : '',
+					) : clickForLocal,
 				'</div>',
-				clickForLocal,
 			'</div>',
 			content,
 			top.length ? S(
