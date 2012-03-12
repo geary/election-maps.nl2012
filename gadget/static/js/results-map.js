@@ -1443,6 +1443,13 @@ function formatLegendTable( cells ) {
 		return S( prefix, feature.name, suffix );
 	}
 	
+	function mayHaveResults( row, col ) {
+		return(
+			row[col.TabTotal] > 0  ||
+			row[col.NumCountedBallotBoxes] < row[col.NumBallotBoxes]
+		);
+	}
+	
 	function formatTip( feature ) {
 		if( ! feature ) return null;
 		var fips = feature.id.split('US')[1];
@@ -1452,7 +1459,7 @@ function formatLegendTable( cells ) {
 		var results = state.results, col = results && results.colsById;
 		var row = featureResults( results, feature );
 		var top = [];
-		if( row && col ) {
+		if( row  &&  col  &&  mayHaveResults(row,col) ) {
 			row.fips = fips;
 			row.state = st;
 			top = getTopCandidates( row, 'votes', /*useSidebar ? 0 :*/ 4 );
