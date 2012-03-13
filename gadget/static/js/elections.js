@@ -162,6 +162,7 @@ var states = [
 		fips: '15',
 		abbr: 'HI',
 		name: 'Hawaii',
+		type: 'Caucus',
 		date: '2012-03-13',
 		electionid: '2541',
 		done: false
@@ -204,6 +205,7 @@ var states = [
 		fips: '20',
 		abbr: 'KS',
 		name: 'Kansas',
+		type: 'Caucus',
 		date: '2012-03-10',
 		electionid: '2539',
 		done: false
@@ -305,6 +307,7 @@ var states = [
 		fips: '30',
 		abbr: 'MT',
 		name: 'Montana',
+		type: 'Caucus',
 		date: '2012-06-16',
 		electionid: '',
 		done: false
@@ -313,6 +316,7 @@ var states = [
 		fips: '31',
 		abbr: 'NE',
 		name: 'Nebraska',
+		type: 'Caucus',
 		date: '2012-06-10',
 		electionid: '',
 		done: false
@@ -516,6 +520,7 @@ var states = [
 		fips: '56',
 		abbr: 'WY',
 		name: 'Wyoming',
+		type: 'Caucus',
 		date: '2012-03-10',
 		electionid: '2537',
 		votesby: 'state',
