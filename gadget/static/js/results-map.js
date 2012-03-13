@@ -1503,7 +1503,7 @@ function formatLegendTable( cells ) {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			results ? 'noVotesHere'.T() :
+			results  &&  state != stateUS ? 'noVotesHere'.T() :
 			'noVotesYet'.T();
 		
 		var clickForLocal =
