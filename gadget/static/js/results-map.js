@@ -640,8 +640,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function currentGeos() {
-		var fips = state.fips;
-		if( fips == '00' ) {
+		if( state == stateUS ) {
 			return [ state.geo.state ];
 		}
 		
