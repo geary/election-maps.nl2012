@@ -285,7 +285,7 @@ document.write(
 	'</a>',
 	'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="Data from the Nevada GOP">',
 	'</a>',
-	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections" title="Google Politics & Elections">',
+	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections/ed/us/home" title="Google Politics & Elections">',
 	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
