@@ -599,7 +599,7 @@ function formatLegendTable( cells ) {
 	var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
 	$body
 		.toggleClass( 'hidelogo', mapWidth < 140 )
-		.toggleClass( 'narrow', ww < 782 );
+		.toggleClass( 'narrow', ww < 770 );
 
 	var map;
 	
@@ -1202,15 +1202,15 @@ function formatLegendTable( cells ) {
 		var delegates = candidate.delegates;
 		if( params.triple ) delegates = 999;
 		return S(
-			'<div style="float:left; padding:1px 3px 1px 14px;">',
+			'<div style="float:left; padding:6px 5px 1px 12px;">',
 				'<table cellpadding="0" cellspacing="0">',
 					'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
 						'<td class="left">',
-							'<div class="topbar-delegates" style="text-align:center; margin-top:-1px;">',
+							'<div class="topbar-delegates" style="text-align:center; margin:-1px 0 0 2px;">',
 								candidate.delegates == null ? ' ' :
 									formatNumber( delegates ),
 							'</div>',
-							'<div>',
+							'<div style="margin-left:2px;">',
 								formatDivColorPatch(
 									candidate.color || 'white',
 									delegates < 100 ? 23 : 34,
@@ -1219,12 +1219,12 @@ function formatLegendTable( cells ) {
 							'</div>',
 						'</td>',
 						'<td>',
-							'<div style="padding:0 1px;">',
+							'<div style="padding:2px 1px;">',
 								formatCandidateIcon( candidate, 32 ),
 							'</div>',
 						'</td>',
 						'<td class="right">',
-							'<div class="candidate-name" style="">',
+							'<div class="candidate-name" style="margin-right:2px;">',
 								'<div class="first-name">',
 									candidate.firstName || '&nbsp;',
 								'</div>',
@@ -1836,7 +1836,7 @@ function formatLegendTable( cells ) {
 		$body
 			.css({ width: ww, height: wh })
 			.toggleClass( 'hidelogo', mapWidth < 140 )
-			.toggleClass( 'narrow', ww < 782 );
+			.toggleClass( 'narrow', ww < 770 );
 		
 		$('#spinner').css({
 			left: Math.floor( ww/2 - 64 ),
