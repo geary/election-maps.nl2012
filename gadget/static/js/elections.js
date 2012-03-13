@@ -60,6 +60,10 @@ var states = [
 		fips: '00',
 		abbr: 'US',
 		name: 'United States',
+		bounds: {
+			bbox: [ -13885233, 2819924, -7452828, 6340332 ],
+			centerLL: [ -95.841534, 38.004972 ]
+		},
 		type: 'Primaries',
 		date: '2012',
 		electionid: '2511',
@@ -162,6 +166,10 @@ var states = [
 		fips: '15',
 		abbr: 'HI',
 		name: 'Hawaii',
+		bounds: {
+			bbox: [ -17838905, 2145221, -17233301, 2539543 ],
+			centerLL: [ -157.529494, 20.575318 ]
+		},
 		type: 'Caucus',
 		date: '2012-03-13',
 		electionid: '2541',
