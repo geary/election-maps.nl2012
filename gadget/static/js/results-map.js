@@ -26,8 +26,8 @@ if( $.browser.msie ) {
 opt.randomized = params.randomize || params.zero;
 
 var strings = {
-	clickForLocal: ' - click for local results',
-	tapForLocal: ' - tap for local results',
+	clickForLocal: 'Click state for detailed results',
+	tapForLocal: 'Tap again for detailed results',
 	linkToMap: 'Link to this Map',
 	linkToMapTitle: 'Link to this Map on Google Politics & Elections',
 	topbarTitle: 'GOP Delegate Count',
@@ -51,7 +51,7 @@ var strings = {
 	noVotesYet: 'Waiting for results&hellip;',
 	candidate: 'Candidate',
 	delegates: 'Del.',
-	delegatesAttrib: 'Delegate projections from the Associated Press',
+	delegatesAttrib: 'Associated Press projections',
 	votes: 'Votes'
 };
 
@@ -212,7 +212,7 @@ document.write(
 		'#maptip div.candidate-delegates { font-size:130%; font-weight:bold; }',
 		'#maptip div.candidate-percent { font-weight:bold; }',
 		'#maptip div.candidate-votes { font-size:80%; }',
-		'#maptip div.delegates-attrib { text-align:center; padding:4px; }',
+		'#maptip div.click-for-local { padding:4px; }',
 		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
 		'#sidebar-footer { position:absolute; left:0; bottom:0; padding:4px; background-color:white; width:100%; }',
@@ -1166,6 +1166,9 @@ function formatLegendTable( cells ) {
 					'">',
 						test ? 'testData'.T() : 'topbarSubtitle'.T(),
 					'</div>',
+					'<div class="faint-text">',
+						'delegatesAttrib'.T(),
+					'</div>',
 				'</div>',
 				'<div id="topbar-candidates" style="position:relative; float:right;">',
 					candidatesHTML,
@@ -1517,9 +1520,11 @@ function formatLegendTable( cells ) {
 			'noVotesYet'.T();
 		
 		var clickForLocal =
-			top.length && state == stateUS ?
-				( touch ? 'tapForLocal' : 'clickForLocal' ).T() :
-				'';
+			top.length && state == stateUS ? S(
+				'<div class="click-for-local faint-text">',
+					( touch ? 'tapForLocal' : 'clickForLocal' ).T(),
+				'</div>'
+			) : '';
 		// TODO
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
@@ -1548,15 +1553,11 @@ function formatLegendTable( cells ) {
 						'<span style="color:red; font-weight:bold; font-size:100%;"> ',
 							'testData'.T(),
 						'</span>'
-					) : clickForLocal,
+					) : '',
 				'</div>',
 			'</div>',
 			content,
-			top.length ? S(
-				'<div class="delegates-attrib faint-text">',
-					'delegatesAttrib'.T(),
-				'</div>'
-			) : ''
+			clickForLocal
 		);
 	}
 	
