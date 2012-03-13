@@ -1003,8 +1003,12 @@ function formatLegendTable( cells ) {
 	var $maptip = $('#maptip'), tipHtml;
 	if( ! playType() ) {
 		$body.bind( 'click mousemove', moveTip );
-		$maptip.click( function() {
-			if( state == stateUS ) {
+		$maptip.click( function( event ) {
+			if( event.target.id == 'close-tip' ) {
+				showTip( false );
+				event.preventDefault();
+			}
+			else if( state == stateUS ) {
 				// Only touch devices for now
 				var feature = touch && touch.where && touch.where.feature;
 				if( feature ) setState( feature );
@@ -1514,6 +1518,14 @@ function formatLegendTable( cells ) {
 		
 		var test = testFlag( results );
 		
+		var closebox = touch ? S(
+			'<div style="position:absolute; right:6px; top:6px;">',
+				'<a href="#">',
+					'<img id="close-tip" border="0" style="width:24px; height:24px;" src="', imgUrl('close.png'), '" />',
+				'</a>',
+			'</div>'
+		) : '';
+		
 		return S(
 			'<div class="tiptitlebar">',
 				'<div style="float:left;">',
@@ -1526,6 +1538,7 @@ function formatLegendTable( cells ) {
 						' ',
 					'</span>',
 				'</div>',
+				closebox,
 				'<div style="clear:left;">',
 				'</div>',
 				parent ? ' ' + parent.name : '',
