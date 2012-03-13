@@ -812,6 +812,7 @@ function formatLegendTable( cells ) {
 			var overlay = new PolyGonzo.PgOverlay({
 				map: map,
 				geos: currentGeos(),
+				underlay: getInsetUnderlay,
 				events: events
 			});
 			overlay.setMap( map );
@@ -936,7 +937,39 @@ function formatLegendTable( cells ) {
 			}
 		}
 	}
-
+	
+	function useInset() {
+		return state == stateUS  &&  map.getZoom() == 4;
+	}
+	
+	function getInsetUnderlay() {
+		var features = stateUS.geo.state.features;
+		if( ! useInset() ) {
+			delete features.by.AK.zoom;
+			delete features.by.HI.zoom;
+			delete features.by.AK.offset;
+			delete features.by.HI.offset;
+			return null;
+		}
+		features.by.AK.zoom = 1;
+		features.by.HI.zoom = 4;
+		features.by.AK.offset = { x: -1122, y: -211 };
+		features.by.HI.offset = { x: 538, y: -89 };
+		return {
+			images: [{
+				src: imgUrl('ak-hi.png'),
+				width: 166, height: 84,
+				left: -1380, top: -370
+			}],
+			hittest: function( x, y ) {
+				return {
+					geo: stateUS.geo,
+					feature: x < 83 ? features.by.AK : features.by.HI
+				};
+			}
+		};
+	}
+	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
 	function outlineFeature( where ) {
