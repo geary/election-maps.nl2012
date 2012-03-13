@@ -40,9 +40,6 @@ var strings = {
 	noVotesHere: 'This location reported no voting results',
 	testData: 'TEST DATA',
 	automaticUpdate: 'This page updates automatically',
-	cycle: 'Cycle Candidates',
-	cycleTip: 'Cycle through the candidate maps automatically',
-	cycleStopTip: 'Stop cycling through the candidate maps',
 	//countdownHeading: 'Live results in:',
 	//countdownHours: '{{hours}} hours',
 	//countdownHour: '1 hour',
@@ -185,7 +182,6 @@ document.write(
 		'body.tv #election-title { font-size:24px; font-weight:bold; }',
 		'body.tv #election-date { font-size:16px; color:#222; }',
 		'body.tv #percent-reporting { font-size:20px; }',
-		'body.tv #button-row, body.tv #auto-update { display:none; }',
 		'body.tv div.candidate-name { margin-right:20px; }',
 		'body.tv div.candidate-name div { line-height:1.1em; }',
 		'body.tv div.first-name { font-size:20px; }',
@@ -216,7 +212,6 @@ document.write(
 		'#maptip div.click-for-local { padding:4px; }',
 		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
-		'#sidebar-footer { position:absolute; left:0; bottom:0; padding:4px; background-color:white; width:100%; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
@@ -1265,6 +1260,13 @@ function formatLegendTable( cells ) {
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			var test = testFlag( results );
+			var viewUSA = usEnabled() ? S(
+				'<div style="padding-bottom:6px;">',
+					'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
+						'viewUSA'.T(),
+					'</a>',
+				'</div>'
+			) : '';
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
 					'percentReporting'.T( totalReporting(state.results) ),
@@ -1274,19 +1276,7 @@ function formatLegendTable( cells ) {
 				'">',
 					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
-				'<div id="button-row" class="body-text" style="padding-top:4px; position:relative">',
-					none ? '' : S(
-						'<a class="button ',
-							opt.cycleTimer ? 'selected' : '',
-							'" id="btnCycle" title="',
-							opt.cycleTimer ? 'cycleStopTip'.T() : 'cycleTip'.T(),
-							'" style="float:left;">',
-								'cycle'.T(),
-						'</a>'
-					),
-					'<div style="clear:both;">',
-					'</div>',
-				'</div>'
+				viewUSA
 			);
 			var candidates = topCandidates.map( formatSidebarCandidate );
 			resultsScrollingHTML = none ? '' : S(
@@ -1311,13 +1301,6 @@ function formatLegendTable( cells ) {
 				'linkToMap'.T(),
 			'</a>'
 		) : '';
-		var footerHTML = usEnabled() ? S(
-			'<div id="sidebar-footer">',
-				'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
-					'viewUSA'.T(),
-				'</a>',
-			'</div>'
-		) : '';
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
@@ -1341,8 +1324,7 @@ function formatLegendTable( cells ) {
 				'<div xclass="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
 				'</div>',
-			'</div>',
-			footerHTML
+			'</div>'
 		);
 	}
 	
