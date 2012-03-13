@@ -933,6 +933,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function getInsetUnderlay() {
+		if( ! stateUS.geo ) return null;
 		var features = stateUS.geo.state.features;
 		if( ! useInset() ) {
 			delete features.by.AK.zoom;
