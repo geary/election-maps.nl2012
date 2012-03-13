@@ -37,7 +37,8 @@ var strings = {
 	allCandidates: 'All Candidates',
 	allCandidatesShort: 'All',
 	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
-	noVotesHere: 'This location reported no voting results',
+	neverVotesHere: 'This location does not report voting results',
+	noVotesHere: 'This location has not reported voting results',
 	testData: 'TEST DATA',
 	automaticUpdate: 'This page updates automatically',
 	//countdownHeading: 'Live results in:',
@@ -45,7 +46,7 @@ var strings = {
 	//countdownHour: '1 hour',
 	//countdownMinutes: '{{minutes}} minutes',
 	//countdownMinute: '1 minute',
-	noVotesYet: 'Waiting for results&hellip;',
+	waitingForVotes: 'Waiting for results&hellip;',
 	candidate: 'Candidate',
 	delegates: 'Del.',
 	delegatesAttrib: 'Associated Press projections',
@@ -1377,7 +1378,7 @@ function formatLegendTable( cells ) {
 	
 	function formatCandidateList( topCandidates, formatter, header ) {
 		if( ! topCandidates.length )
-			return 'noVotesYet'.T();
+			return 'waitingForVotes'.T();
 		var thead = header ? S(
 			'<tr>',
 				'<th colspan="3" style="text-align:left; padding-bottom:4px;">',
@@ -1497,8 +1498,9 @@ function formatLegendTable( cells ) {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			results  &&  state != stateUS ? 'noVotesHere'.T() :
-			'noVotesYet'.T();
+			state == stateUS  ||  ! results ? 'waitingForVotes'.T() :
+			row ? 'noVotesHere'.T() :
+			'neverVotesHere'.T();
 		
 		var clickForLocal =
 			top.length && state == stateUS ? S(
