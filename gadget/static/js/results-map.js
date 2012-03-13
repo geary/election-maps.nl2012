@@ -656,13 +656,7 @@ function formatLegendTable( cells ) {
 	}
 	
 	function moveToGeo() {
-		var json =
-			state != stateUS ?
-				state && state.geo && state.geo.county :
-				{
-					bbox: [ -13885233, 2819924, -7452828, 6340332 ],
-					centerLL: [ -95.841534, 38.004972 ]
-				};
+		var json = state.bounds || ( state && state.geo && state.geo.county );
 		$('#map').show();
 		initMap();
 		gme && map && gme.trigger( map, 'resize' );
