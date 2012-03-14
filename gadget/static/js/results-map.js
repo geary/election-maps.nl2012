@@ -236,7 +236,7 @@ document.write(
 		'a.logo { position:absolute; bottom:24px; width:48px; height:48px;}',
 		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
 		'body.source-ap #gop-logo { display:none; }',
-		'#ap-logo { right:64px; width:67px; background: url(', imgUrl('ap-logo-48x67.png'), ') no-repeat; }',
+		'#ap-logo { right:64px; width:41px; background: url(', imgUrl('ap-logo-48x41.png'), ') no-repeat; }',
 		'body.source-gop #ap-logo { display:none; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
 		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
