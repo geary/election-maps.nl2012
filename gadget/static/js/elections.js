@@ -533,7 +533,7 @@ var states = [
 		electionid: '2537',
 		votesby: 'state',
 		done: false
-	},
+	}/*,
 	{
 		fips: '72',
 		abbr: 'PR',
@@ -541,5 +541,5 @@ var states = [
 		date: '2012-03-18',
 		electionid: '',
 		done: false
-	}
+	}*/
 ];
