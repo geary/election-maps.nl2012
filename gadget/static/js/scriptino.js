@@ -177,6 +177,9 @@ jQuery.extend( jQuery.fn, {
 	},
 	
 	bounds: function() {
+		if( ! this.length ) return {
+			left: 0, right: 0, top: 0, bottom: 0
+		}
 		var offset = this.offset();
 		return {
 			left: offset.left,
