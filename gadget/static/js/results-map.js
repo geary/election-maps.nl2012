@@ -2035,7 +2035,11 @@ function formatLegendTable( cells ) {
 			return false;
 		}
 	}
-
+	
+	var missingOK = {
+		US: { AS:1, GU:1, MP:1, PR:1, VI:1 }
+	};
+	
 	function loadResultTable( json, loading ) {
 		var counties = isCountyTEMP( json );
 		if( loading )
@@ -2082,8 +2086,11 @@ function formatLegendTable( cells ) {
 			}
 			if( state.geo ) {
 				var feature = state.geo[kind].features.by[id];
-				if( ! feature  &&  id != 'SuperDelegates' )
-					missing.push( id );
+				if( ! feature ) {
+					var ok = missingOK[state.abbr];
+					if( !( ok  &&  id in ok ) )
+						missing.push( id );
+				}
 			}
 			rowsByID[id] = row;
 			var nCandidates = candidates.length;
