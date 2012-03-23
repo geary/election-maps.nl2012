@@ -143,7 +143,7 @@ var states = [
 		abbr: 'DC',
 		name: 'District of Columbia',
 		date: '2012-04-03',
-		electionid: '',
+		electionid: '2545',
 		done: false
 	},
 	{
@@ -231,7 +231,7 @@ var states = [
 		abbr: 'LA',
 		name: 'Louisiana',
 		date: '2012-03-24',
-		electionid: '',
+		electionid: '2544',
 		done: false
 	},
 	{
@@ -249,7 +249,7 @@ var states = [
 		abbr: 'MD',
 		name: 'Maryland',
 		date: '2012-04-03',
-		electionid: '',
+		electionid: '2546',
 		done: false
 	},
 	{
@@ -521,7 +521,7 @@ var states = [
 		abbr: 'WI',
 		name: 'Wisconsin',
 		date: '2012-04-03',
-		electionid: '',
+		electionid: '2547',
 		done: false
 	},
 	{
