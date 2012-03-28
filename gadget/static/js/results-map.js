@@ -356,6 +356,9 @@ function formatLegendTable( cells ) {
 		var kind = ( opt.counties ? 'counties' : 'states' );
 		if( kind == 'counties' ) level = '512';  // TEMP
 		var fips = state.fips;
+		if( state == stateUS  &&  params.view == 'county' ) {
+			fips = '00-county';
+		}
 		var json = jsonRegion[fips];
 		if( json ) {
 			loadGeoJSON( json );
@@ -410,7 +413,7 @@ function formatLegendTable( cells ) {
 	
 	function indexFeatures( geo ) {
 		var features = geo.features;
-		var usa = ( geo.id == '00' );  // TODO
+		var usa = ( geo.id == '00'  &&  params.view != 'county' );  // TODO
 		var by = features.by = {};
 		for( var feature, i = -1;  feature = features[++i]; ) {
 			var fips = feature.id.split('US')[1];
@@ -614,7 +617,7 @@ function formatLegendTable( cells ) {
 	
 	function currentGeos() {
 		if( state == stateUS ) {
-			return [ state.geo.state ];
+			return params.view == 'county' ? [ state.geo.county ] : [ state.geo.state ];
 		}
 		
 		if( state.votesby == 'state' ) {
@@ -811,6 +814,7 @@ function formatLegendTable( cells ) {
 			if(
 			   kind == 'coucou'  ||
 			   kind == 'gop2012'  ||  /*TEMP*/ 
+			   kind == 'county00'  ||  /*TEMP*/ 
 			   kind == 'fl'  ||  /*TEMP*/
 			   kind == 'sc'  /*TEMP*/
 			) {
@@ -905,12 +909,14 @@ function formatLegendTable( cells ) {
 	}
 	
 	function useInset() {
-		return state == stateUS  &&  map.getZoom() == 4;
+		return state == stateUS  &&  map.getZoom() == 4  &&  params.view != 'county';
 	}
 	
 	function getInsetUnderlay() {
 		if( ! stateUS.geo ) return null;
-		var features = stateUS.geo.state.features;
+		if( params.view == 'county' ) return null;
+		var kind = params.view == 'county' ? 'county' : 'state';
+		var features = stateUS.geo[kind].features;
 		if( ! useInset() ) {
 			delete features.by.AK.zoom;
 			delete features.by.HI.zoom;
@@ -1858,6 +1864,9 @@ function formatLegendTable( cells ) {
 			loadTestResults( state.fips, false );
 			return;
 		}
+		if( state == stateUS  &&  params.view == 'county' )
+			electionid = state.electionidCounties;
+		
 		//if( electionid == 'random' ) {
 		//	opt.randomized = params.randomize = true;
 		//	electionid += state.fips;
@@ -2045,6 +2054,7 @@ function formatLegendTable( cells ) {
 		var fix = state.fix || {};
 		
 		var kind = state.votesby || 'county';
+		if( state == stateUS  &&  params.view == 'county' ) kind = 'county';  // TEMP
 		if( kind == 'town'  ||  kind == 'district' ) kind = 'county';  // TEMP
 		
 		var missing = [];
