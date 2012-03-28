@@ -20,24 +20,41 @@ def simpleGeom( level ):
 
 def makeState():
 	db = pg.Database( database = 'usageo_20m' )
-	combineRegionTables( db, 'state' )
-	table = '%s.state00' %( schema )
+	kind = 'state'
+	combineRegionTables( db, kind )
+	table = '%s.%s00' %( schema, kind )
 	simplegeom = 'goog_geom00'
 	db.addGeometryColumn( table, simplegeom, 3857, True )
-	#addStateLevel( db, table, simplegeom, '99', '16384' )
-	#addStateLevel( db, table, simplegeom, '02', '65536' )
-	#addStateLevel( db, table, simplegeom, '15', '8192' )
-	addStateLevel( db, table, simplegeom, '99', '4096' )
-	addStateLevel( db, table, simplegeom, '02', '32768' )
-	addStateLevel( db, table, simplegeom, '15', '4096' )
+	#addStateLevel( db, kind, table, simplegeom, '99', '16384' )
+	#addStateLevel( db, kind, table, simplegeom, '02', '65536' )
+	#addStateLevel( db, kind, table, simplegeom, '15', '8192' )
+	addStateLevel( db, kind, table, simplegeom, '99', '4096' )
+	addStateLevel( db, kind, table, simplegeom, '02', '32768' )
+	addStateLevel( db, kind, table, simplegeom, '15', '4096' )
 	writeStatesOnly( db )
 	db.connection.commit()
 	db.connection.close()
 
 
-def combineRegionTables( db, table ):
-	county = ( '', 'county,' )[ table == 'county' ]
-	table = schema + '.' + table
+# TODO: refactor
+def makeCounty():
+	db = pg.Database( database = 'usageo_20m' )
+	kind = 'county'
+	combineRegionTables( db, kind )
+	table = '%s.%s00' %( schema, kind )
+	simplegeom = 'goog_geom00'
+	db.addGeometryColumn( table, simplegeom, 3857, True )
+	addStateLevel( db, kind, table, simplegeom, '99', '4096' )
+	addStateLevel( db, kind, table, simplegeom, '02', '32768' )
+	addStateLevel( db, kind, table, simplegeom, '15', '4096' )
+	writeCountiesOnly( db )
+	db.connection.commit()
+	db.connection.close()
+
+
+def combineRegionTables( db, kind ):
+	county = ( '', 'county,' )[ kind == 'county' ]
+	table = schema + '.' + kind
 	db.createLikeTable( table+'00', table )
 	
 	for fips in ( '02', '15', '99', ):
@@ -67,8 +84,9 @@ def makeGopDetail():
 	db.connection.close()
 
 
-def addStateLevel( db, table, simplegeom, fips, level ):
-	shpname = 'us2012-state%(fips)s-20m-%(level)s' %({
+def addStateLevel( db, kind, table, simplegeom, fips, level ):
+	shpname = 'us2012-%(kind)s%(fips)s-20m-%(level)s' %({
+		'kind': kind,
 		'fips': fips,
 		'level': level,
 	})
@@ -198,6 +216,21 @@ def writeStatesOnly( db ):
 	writeGeoJSON( db, fips, geom, geo )
 
 
+def writeCountiesOnly( db ):
+	geom = simpleGeom( '00' )
+	where = 'true'
+	fips = '00'
+	geoCounty = db.makeFeatureCollection(
+		schema + '.county00',
+		boxGeom, boxGeomLL, geom,
+		fips, 'United States', where
+	)
+	geo = {
+		'county': geoCounty,
+	}
+	writeGeoJSON( db, fips + '-county', geom, geo )
+
+
 def writeGeoJSON( db, fips, geom, geo ):
 	filename = '%s/%s-%s-%s.jsonp' %(
 		private.GEOJSON_PATH, schema, fips, geom
@@ -207,7 +240,7 @@ def writeGeoJSON( db, fips, geom, geo ):
 
 def main():
 	makeState()
-	#makeCounty()
+	makeCounty()
 	#makeGopCounty()
 	makeGopDetail()
 
