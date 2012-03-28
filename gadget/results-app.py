@@ -138,5 +138,6 @@ def test():
 
 
 if __name__ == '__main__':
-	#test()  # uncomment to run tests
+	if private.runtest:
+		test()
 	main()
