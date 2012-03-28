@@ -1,10 +1,10 @@
-var errors = [];
+var allErrors = [], errors = [];
 
 function Main() {
 	Clean();
 	ImportSimplifyExport();
-	if( errors.length ) {
-		Application.MessageBox( errors.join('\n'), 'Simplify' );
+	if( allErrors.length ) {
+		Application.MessageBox( allErrors.join('\n'), 'Simplify' );
 	}
 }
 
@@ -36,6 +36,10 @@ function ForAllShapes( callback ) {
 		callback( shpNameFull, shpNameSimple, tol );
 	}
 	
+	go( '20m', 'county99', '4096' );
+	go( '20m', 'county02', '32768' );
+	go( '20m', 'county15', '4096' );
+
 	go( '20m', 'state99', '4096' );
 	go( '20m', 'state02', '32768' );
 	go( '20m', 'state15', '4096' );
@@ -102,21 +106,22 @@ function Simplify( shpNameFull, shpNameSimple, tolerance ) {
 		var geom = geomSetSimple( i );
 		try {
 			objectSetSimple.Add( geom );
+			var recordFull =
+				GetByID( recordSetFull, object.ID );
+			var recordSimple =
+				GetByID( recordSetSimple, objectSetSimple.LastAdded.ID );
+			ForEach( colNames, function( name ) {
+				recordSimple.Data(name) = recordFull.Data(name);
+			});
 		}
 		catch( e ) {
+			var record = object.Record;
 			errors.push( S(
-				e.name, ' (', e.description, '): ', shpNameSimple, '[', i, ']'
+				e.name, ' (', e.description, '): ', shpNameSimple, '[', i, ']: ',
+				record.Data('GEO_ID'), ' ', record.Data('NAME')
 			) );
-			geom = Application.NewGeom( GeomArea );
+			//geom = Application.NewGeom( GeomArea );
 		}
-		
-		var recordFull =
-			GetByID( recordSetFull, object.ID );
-		var recordSimple =
-			GetByID( recordSetSimple, objectSetSimple.LastAdded.ID );
-		ForEach( colNames, function( name ) {
-			recordSimple.Data(name) = recordFull.Data(name);
-		});
 	}
 
 	return drawingSimple;
@@ -128,6 +133,11 @@ function ExportShape( drawing, shpNameExport ) {
 	DeleteFolder( folder );
 	CreateFolder( folder );
 	exp.Export( drawing, path, PromptNone );
+	if( errors ) {
+		WriteTextFile( S( folder, '\\errors.txt' ), errors.join('\r\n') );
+		allErrors.concat( errors );
+		errors.length = 0;
+	}
 }
 
 function GetByID( set, id ) {
@@ -170,6 +180,14 @@ function CreateFolder( folder ) {
 function DeleteFolder( folder ) {
 	var fso = FSO();
 	if( fso.FolderExists(folder) ) fso.DeleteFolder( folder );
+}
+
+function WriteTextFile( path, text ) {
+	var fso = FSO();
+	var fsoForWriting = 2;
+	var stream = fso.OpenTextFile( path, fsoForWriting, true );
+	stream.Write( text );
+	stream.Close();
 }
 
 function FSO() {
