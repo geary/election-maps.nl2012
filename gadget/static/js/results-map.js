@@ -25,34 +25,6 @@ if( $.browser.msie ) {
 
 opt.randomized = params.randomize || params.zero;
 
-var strings = {
-	clickForLocal: 'Click state for detailed results',
-	tapForLocal: 'Tap again for detailed results',
-	linkToMap: 'Link to this Map',
-	linkToMapTitle: 'Link to this Map on Google Politics & Elections',
-	topbarTitle: 'GOP Delegate Count',
-	topbarSubtitle: '1144 to win the nomination',
-	viewUSA: '&laquo; Back to U.S. Overview Map',
-	titleViewUSA: 'View state-by-state results',
-	allCandidates: 'All Candidates',
-	allCandidatesShort: 'All',
-	percentReporting: '{{percent}} reporting ({{counted}}/{{total}}{{kind}})',
-	neverVotesHere: 'This location does not report voting results',
-	noVotesHere: 'This location has not reported voting results',
-	testData: 'TEST DATA',
-	automaticUpdate: 'This page updates automatically',
-	//countdownHeading: 'Live results in:',
-	//countdownHours: '{{hours}} hours',
-	//countdownHour: '1 hour',
-	//countdownMinutes: '{{minutes}} minutes',
-	//countdownMinute: '1 minute',
-	waitingForVotes: 'Waiting for results&hellip;',
-	candidate: 'Candidate',
-	delegates: 'Del.',
-	delegatesAttrib: 'Associated Press projections',
-	votes: 'Votes'
-};
-
 var year = params.year in elections ? +params.year : 2012;
 var parties = elections[year];
 var party = params.party in parties ? params.party : 'gop';
@@ -73,7 +45,7 @@ function State( abbr ) {
 		states.by.abbr[abbr] ||
 		states.by.electionid[abbr] ||
 		stateUS;
-	state.electionTitle = S( state.name, ' ', state.type || 'Primary' );
+	state.electionTitle = S( state.name, ' ', state.type || 'primary'.T() );
 	return state;
 }
 
@@ -277,11 +249,11 @@ document.write(
 	'</div>',
 	'<div id="maptip">',
 	'</div>',
-	'<a id="ap-logo" class="logo" target="_blank" href="http://www.youtube.com/apelections" title="Data from the Associated Press">',
+	'<a id="ap-logo" class="logo" target="_blank" href="http://www.youtube.com/apelections" title="', 'dataAttribTitle'.T(), '">',
 	'</a>',
-	'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="Data from the Nevada GOP">',
+	'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="', 'dataAttribTitleGOP'.T(), '">',
 	'</a>',
-	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections/ed/us/home" title="Google Politics & Elections">',
+	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.com/elections/ed/us/home" title="', 'googlePoliticsTitle'.T(), '">',
 	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
@@ -1393,7 +1365,7 @@ function formatLegendTable( cells ) {
 					'votes'.T(),
 				'</th>',
 				'<th style="text-align:right; padding-bottom:4px;">',
-					state == stateUS ? 'delegates'.T() : '',
+					state == stateUS ? 'delegatesAbbr'.T() : '',
 				'</th>',
 			'</tr>'
 		) : '';
@@ -1991,13 +1963,13 @@ function formatLegendTable( cells ) {
 	};
 	
 	var lsadPrefixes = {
-		cd: 'District ',
-		shd: 'District '
+		cd: 'district'.T() + ' ',
+		shd: 'district'.T() + ' '
 	};
 	
 	var lsadSuffixes = {
-		city: ' City',
-		county: ' County'
+		city: ' ' + 'city'.T(),
+		county: ' ' + 'county'.T()
 	};
 	
 	function featureResults( results, feature ) {

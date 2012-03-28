@@ -39,6 +39,14 @@ opt.writeScript = function( url, nocache ) {
 		'<\/script>' );
 };
 
+var strings;
+function loadStrings( s ) {
+	strings = s;
+}
+
+params.hl = params.hl || 'en';
+opt.writeScript( 'locale/lang-' + params.hl + '.js' );
+
 opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
 opt.writeScript(
