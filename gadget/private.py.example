@@ -28,3 +28,6 @@ testlistbad = [
 	# Wrong cases - uncomment for deliberate errors to test the test code
 	#'http://www.google.com/elections/ed/us/results/',
 ]
+
+#runtest = True
+runtest = False
