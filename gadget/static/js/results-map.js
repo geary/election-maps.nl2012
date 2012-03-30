@@ -2093,7 +2093,8 @@ function usEnabled() {
 				if( ! feature ) {
 					var ok = missingOK[state.abbr];
 					if( !( ok  &&  id in ok ) )
-						missing.push( id );
+						if( ! features.didMissingCheck )
+							missing.push( id );
 				}
 			}
 			rowsByID[id] = row;
@@ -2122,6 +2123,7 @@ function usEnabled() {
 			}
 			row.candidateMax = candidateMax;
 		}
+		features.didMissingCheck = true;
 		
 		if( electionsPending.length == 0 )
 			geoReady();
