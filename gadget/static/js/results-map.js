@@ -618,7 +618,7 @@ function usEnabled() {
 		$('#view-usa').toggle( state.fips != '00' );
 		polys();
 		$('#spinner').hide();
-		if( ! opt.randomized  &&   opt.reloadTime ) {
+		if( ! opt.randomized  &&  opt.reloadTime  &&  params.refresh != 'false' ) {
 			clearInterval( reloadTimer );
 			reloadTimer = setInterval( function() {
 				loadView();
