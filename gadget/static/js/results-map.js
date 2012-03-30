@@ -724,6 +724,7 @@ function usEnabled() {
 	}
 	
 	var touch;
+	if( params.touch ) touch = { mouse: true };
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
 	function polys() {
 		var mousedown = false;
@@ -731,13 +732,13 @@ function usEnabled() {
 		var $container = $('#map');
 		var events = playType() ? {} : {
 			mousedown: function( event, where ) {
-				if( touch ) return;
+				if( touch  &&  ! touch.mouse ) return;
 				showTip( false );
 				mousedown = true;
 				dragged = false;
 			},
 			mouseup: function( event, where ) {
-				if( touch ) return;
+				if( touch  &&  ! touch.mouse ) return;
 				mousedown = false;
 			},
 			mousemove: function( event, where ) {
@@ -780,7 +781,7 @@ function usEnabled() {
 				showTip( false );
 			},
 			click: function( event, where ) {
-				if( touch ) return;
+				if( touch  && ! touch.mouse ) return;
 				mousedown = false;
 				var didDrag = dragged;
 				dragged = false;
@@ -788,8 +789,14 @@ function usEnabled() {
 				if( didDrag ) return;
 				var feature = where && where.feature;
 				if( ! feature ) return;
-				//if( feature.type == 'state'  || feature.type == 'cd' )
-					setState( feature );
+				if( touch && touch.mouse ) {
+					touch.where = where;
+					this.touchend( event, where );
+				}
+				else {
+					//if( feature.type == 'state'  || feature.type == 'cd' )
+						setState( feature );
+				}
 			}
 		};
 		//overlays.clear();
@@ -1019,7 +1026,8 @@ function usEnabled() {
 		}
 		else {
 			$maptip.hide();
-			mouseFeature = null;
+			if( !( touch && touch.mouse ) )
+				mouseFeature = null;
 		}
 	}
 	
