@@ -1386,7 +1386,7 @@ function usEnabled() {
 					'votes'.T(),
 				'</th>',
 				'<th style="text-align:right; padding-bottom:4px;">',
-					state == stateUS ? 'delegatesAbbr'.T() : '',
+					state == stateUS  &&  view != 'county' ? 'delegatesAbbr'.T() : '',
 				'</th>',
 			'</tr>'
 		) : '';
@@ -1437,7 +1437,7 @@ function usEnabled() {
 					) : '',
 				'</td>',
 				'<td class="right" style="text-align:right; padding-left:6px;">',
-					state == stateUS ? S(
+					state == stateUS  &&  view != 'county' ? S(
 						'<div class="candidate-delegates">',
 							candidate.delegates,
 						'</div>'
