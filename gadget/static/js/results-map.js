@@ -46,10 +46,21 @@ function State( abbr ) {
 		states.by.electionid[abbr] ||
 		stateUS;
 	state.electionTitle = S( state.name, ' ', state.type || 'primary'.T() );
+	state.getResults = function() {
+		return ( this == stateUS  &&  view == 'county' ) ?
+			this.resultsCounty :
+			this.results;
+	};
 	return state;
 }
 
 var stateUS = State('US'), state = State();
+
+if( PolyGonzo.isVML() ) {
+	delete params.view;  // too slow for all-county view
+}
+
+var view = ( params.view == 'county' || state != stateUS ? 'county' : 'state' );
 
 // Analytics
 var _gaq = _gaq || [];
@@ -323,6 +334,11 @@ function formatLegendTable( cells ) {
 	);
 }
 
+function usEnabled() {
+	return params.usa != 'false'  &&
+		( ! params.embed_state  ||  params.embed_state.toLowerCase() == 'us' );
+}
+
 (function( $ ) {
 	
 	// TODO: Refactor and use this exponential retry logic
@@ -351,20 +367,18 @@ function formatLegendTable( cells ) {
 	//}
 	
 	var jsonRegion = {};
-	function loadRegion() {
-		var level = params.level || state.level || '00';
-		var kind = ( opt.counties ? 'counties' : 'states' );
-		if( kind == 'counties' ) level = '512';  // TEMP
-		var fips = state.fips;
-		if( state == stateUS  &&  params.view == 'county' ) {
-			fips = '00-county';
-		}
-		var json = jsonRegion[fips];
+	function loadRegion( s, kind ) {
+		s = s || state;
+		var level = params.level || s.level || '00';
+		kind = kind || ( opt.counties ? 'county' : 'state' );
+		if( kind == 'county' ) level = '512';  // TEMP
+		var fips = s.fips;
+		var json = jsonRegion[fips+kind];
 		if( json ) {
 			loadGeoJSON( json );
 		}
 		else {
-			//var file = S( 'carto2010.', kind, '-', fips, '-goog_geom', level, '.jsonp' );
+			if( fips == '00'  &&  view == 'county' ) fips = '00-county';
 			var file = S( 'carto2010', '-', fips, '-goog_geom', level, '.jsonp' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
@@ -396,10 +410,11 @@ function formatLegendTable( cells ) {
 		}
 		var target = json.county ? 'county' : 'state';
 		var fips = json[target].id;
-		jsonRegion[fips] = json;
 		var state = State( fips );
 		state.geo = state.geo || {};
 		for( var kind in json ) {
+			if( state.geo[kind] ) continue;
+			jsonRegion[fips+kind] = json;
 			var geo = json[kind];
 			indexFeatures( geo );
 			state.geo[kind] = geo;
@@ -413,7 +428,7 @@ function formatLegendTable( cells ) {
 	
 	function indexFeatures( geo ) {
 		var features = geo.features;
-		var usa = ( geo.id == '00'  &&  params.view != 'county' );  // TODO
+		var usa = ( geo.id == '00'  &&  /state/.test(geo.table) );  // TODO
 		var by = features.by = {};
 		for( var feature, i = -1;  feature = features[++i]; ) {
 			var fips = feature.id.split('US')[1];
@@ -483,7 +498,7 @@ function formatLegendTable( cells ) {
 			setup: function() {
 			},
 			tick: function() {
-				var topCandidates = getTopCandidates( state.results.totals, 'votes' );
+				var topCandidates = getTopCandidates( state.results, -1, 'votes' );
 				if( ! currentCandidate ) {
 					i = 0;
 				}
@@ -617,7 +632,9 @@ function formatLegendTable( cells ) {
 	
 	function currentGeos() {
 		if( state == stateUS ) {
-			return params.view == 'county' ? [ state.geo.county ] : [ state.geo.state ];
+			return view == 'county' ?
+				[ state.geo.county, state.geo.state ] :
+				[ state.geo.state ];
 		}
 		
 		if( state.votesby == 'state' ) {
@@ -854,7 +871,8 @@ function formatLegendTable( cells ) {
 	}
 	
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
-		var results = state.results, col = results && results.cols;
+		var results = state.getResults();
+		var col = results && results.cols;
 		var candidates = results && results.candidates;
 		if( !( candidates && currentCandidate ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
@@ -909,13 +927,13 @@ function formatLegendTable( cells ) {
 	}
 	
 	function useInset() {
-		return state == stateUS  &&  map.getZoom() == 4  &&  params.view != 'county';
+		return state == stateUS  &&  map.getZoom() == 4  &&  view != 'county';
 	}
 	
 	function getInsetUnderlay() {
 		if( ! stateUS.geo ) return null;
-		if( params.view == 'county' ) return null;
-		var kind = params.view == 'county' ? 'county' : 'state';
+		if( view == 'county' ) return null;
+		var kind = view == 'county' ? 'county' : 'state';
 		var features = stateUS.geo[kind].features;
 		if( ! useInset() ) {
 			delete features.by.AK.zoom;
@@ -1074,10 +1092,9 @@ function formatLegendTable( cells ) {
 		};
 	}
 	
-	function getTopCandidates( result, sortBy, max ) {
+	function getTopCandidates( results, result, sortBy, max ) {
 		max = max || Infinity;
 		if( ! result ) return [];
-		var results = state.results;
 		if( result == -1 ) result = results.totals;
 		var col = results.colsById;
 		var top = results.candidates.slice();
@@ -1123,9 +1140,9 @@ function formatLegendTable( cells ) {
 	
 	function formatTopbar() {
 		var candidatesHTML = '';
-		var results = state.results;
+		var results = state.delegates;
 		if( results ) {
-			var topCandidates = getTopCandidates( results.totals, 'delegates', 4 );
+			var topCandidates = getTopCandidates( results, -1, 'delegates', 4 );
 			//var top = formatTopbarTopCandidates( topCandidates );
 			var candidates =
 				topCandidates.length ? topCandidates.map( formatTopbarCandidate ) :
@@ -1226,10 +1243,8 @@ function formatLegendTable( cells ) {
 		return params.debug && results && ( results.mode == 'test'  ||  opt.randomized );
 	}
 	
-	function usEnabled() {
-		return state != stateUS  &&
-			params.usa != 'false'  &&
-			( ! params.embed_state  ||  params.embed_state.toLowerCase() == 'us' );
+	function viewUsEnabled() {
+		return state != stateUS  &&  usEnabled();
 	}
 	
 	function formatSidebar() {
@@ -1238,7 +1253,7 @@ function formatLegendTable( cells ) {
 		var resultsScrollingHTML = '';
 		var results = state.results;
 		if( results ) {
-			var topCandidates = getTopCandidates( state.results.totals, 'votes' );
+			var topCandidates = getTopCandidates( state.results, -1, 'votes' );
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			var test = testFlag( results );
@@ -1434,13 +1449,16 @@ function formatLegendTable( cells ) {
 	
 	function formatFeatureName( feature ) {
 		if( ! feature ) return '';
-		var state = State( feature );
-		var prefixes = state.prefixes || lsadPrefixes;
-		var suffixes = state.suffixes || lsadSuffixes;
+		var s = State( feature );
+		var prefixes = s.prefixes || lsadPrefixes;
+		var suffixes = s.suffixes || lsadSuffixes;
 		var lsad = ( feature.lsad || '' ).toLowerCase();
 		var prefix = prefixes[lsad] || '';
 		var suffix = suffixes[lsad] || '';
-		return S( prefix, feature.name, suffix );
+		var andState = ( state == stateUS  &&  view == 'county' ) ?
+			S( ', ', s.abbr ) :
+			'';
+		return S( prefix, feature.name, suffix, andState );
 	}
 	
 	function mayHaveResults( row, col ) {
@@ -1456,13 +1474,13 @@ function formatLegendTable( cells ) {
 		var st = State( fips.slice(0,2) );
 		var date = dateFromYMD( st.date );
 		var future = ( date > now() );
-		var results = state.results, col = results && results.colsById;
+		var results = state.getResults(), col = results && results.colsById;
 		var row = featureResults( results, feature );
 		var top = [];
 		if( row  &&  col  &&  mayHaveResults(row,col) ) {
 			row.fips = fips;
 			row.state = st;
-			top = getTopCandidates( row, 'votes', /*useSidebar ? 0 :*/ 4 );
+			top = getTopCandidates( results, row, 'votes', /*useSidebar ? 0 :*/ 4 );
 			var content = S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, true ),
@@ -1481,7 +1499,7 @@ function formatLegendTable( cells ) {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			state == stateUS  ||  ! results ? 'waitingForVotes'.T() :
+			( state == stateUS  &&  view != 'county' )  ||  ! results ? 'waitingForVotes'.T() :
 			row ? 'noVotesHere'.T() :
 			'neverVotesHere'.T();
 		
@@ -1864,7 +1882,7 @@ function formatLegendTable( cells ) {
 			loadTestResults( state.fips, false );
 			return;
 		}
-		if( state == stateUS  &&  params.view == 'county' )
+		if( state == stateUS  &&  view == 'county' )
 			electionid = state.electionidCounties;
 		
 		//if( electionid == 'random' ) {
@@ -2009,7 +2027,7 @@ function formatLegendTable( cells ) {
 			var table = json.table, cols = table.cols, rows = table.rows;
 			var col = cols.index()['ID'];
 			var id = rows[0][col];
-			if( /^\d\d\d\d$/.test(id) ) fixShortFIPS( col, rows );
+			/*if( /^\d\d\d\d$/.test(id) )*/ fixShortFIPS( col, rows );
 			return ! /^[A-Z][A-Z]$/.test(id);
 		}
 		catch( e ) {
@@ -2028,8 +2046,11 @@ function formatLegendTable( cells ) {
 		
 		var state = State( json.electionid );
 		var results = json.table;
-		if( json.electionid == state.electionidDelegates )
+		var isDelegates = ( json.electionid == state.electionidDelegates );
+		if( isDelegates )
 			state.delegates = results;
+		else if( state == stateUS  &&  view == 'county' )
+			state.resultsCounty = results;
 		else
 			state.results = results;
 		results.mode = json.mode;
@@ -2054,8 +2075,9 @@ function formatLegendTable( cells ) {
 		var fix = state.fix || {};
 		
 		var kind = state.votesby || 'county';
-		if( state == stateUS  &&  params.view == 'county' ) kind = 'county';  // TEMP
+		if( state == stateUS  &&  view == 'county'  &&  ! isDelegates ) kind = 'county';  // TEMP
 		if( kind == 'town'  ||  kind == 'district' ) kind = 'county';  // TEMP
+		var features = state.geo[kind].features;
 		
 		var missing = [];
 		var rowsByID = results.rowsByID = {};
@@ -2067,7 +2089,7 @@ function formatLegendTable( cells ) {
 				id = row[col.ID] = fixed;
 			}
 			if( state.geo ) {
-				var feature = state.geo[kind].features.by[id];
+				var feature = features.by[id];
 				if( ! feature ) {
 					var ok = missingOK[state.abbr];
 					if( !( ok  &&  id in ok ) )
