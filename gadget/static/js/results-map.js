@@ -845,15 +845,15 @@ function usEnabled() {
 			var colorizers = {
 				state: function() {
 					if( state.votesby == 'state' )
-						colorVotes( features, '#666666', 1, 2 );
+						colorVotes( features, '#666666', 1, 1.5 );
 					else
-						colorSimple( features, '#FFFFFF', '#222222', 1, 2 );
+						colorSimple( features, '#FFFFFF', '#222222', 1, 1.5 );
 				},
 				county: function() {
-					colorSimple( features, '#FFFFFF', '#444444', .5, 1 );
+					colorSimple( features, '#FFFFFF', '#444444', .5, .5 );
 				},
 				cousub: function() {
-					colorVotes( features, '#666666', .5, 1 );
+					colorVotes( features, '#666666', .5, .5 );
 				}
 			};
 			colorizers[kind]();
@@ -971,7 +971,7 @@ function usEnabled() {
 		var feat = $.extend( {}, where.feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
-			strokeWidth: playCounties() ? 5 : opt.counties ? 2 : 3,
+			strokeWidth: playCounties() ? 5 : opt.counties ? 1.5 : 2.5,
 			strokeColor: '#000000',
 			strokeOpacity: 1
 		});
