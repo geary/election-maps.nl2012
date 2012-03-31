@@ -958,11 +958,48 @@ function usEnabled() {
 				src: imgUrl('ak-hi.png'),
 				width: 166, height: 84,
 				left: -1380, top: -370
+			}, {
+				abbr: 'CT',
+				width: 68, height: 14,
+				left: -823, top: -482
+			}, {
+				abbr: 'DC',
+				width: 55, height: 24,
+				left: -876, top: -410
+			}, {
+				abbr: 'DE',
+				width: 51, height: 14,
+				left: -820, top: -442
+			}, {
+				abbr: 'MA',
+				width: 81, height: 14,
+				left: -784, top: -516
+			}, {
+				abbr: 'MD',
+				width: 52, height: 14,
+				left: -839, top: -426
+			}, {
+				abbr: 'NH',
+				width: 61, height: 22,
+				left: -760, top: -544
+			}, {
+				abbr: 'NJ',
+				width: 64, height: 14,
+				left: -814, top: -462
+			}, {
+				abbr: 'RI',
+				width: 71, height: 14,
+				left: -799, top: -500
+			}, {
+				abbr: 'VT',
+				width: 49, height: 14,
+				left: -764, top: -558
 			}],
-			hittest: function( x, y ) {
+			hittest: function( image, x, y ) {
 				return {
 					geo: stateUS.geo,
-					feature: x < 83 ? features.by.AK : features.by.HI
+					feature: image.abbr ? features.by[image.abbr] :
+						x < 83 ? features.by.AK : features.by.HI
 				};
 			}
 		};
