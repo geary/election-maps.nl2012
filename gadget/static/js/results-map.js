@@ -915,12 +915,12 @@ function usEnabled() {
 				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
 				var candidate = row && candidates[row.candidateMax];
 				if( candidate ) {
-					feature.fillColor = today ? { src: candidate.pattern } : candidate.color;
+					feature.fillColor = today ? { image: candidate.pattern } : candidate.color;
 					feature.fillOpacity = .6;
 				}
 				else {
 					if( today ) {
-						feature.fillColor = { src: candidateZero.pattern };
+						feature.fillColor = { image: candidateZero.pattern };
 						feature.fillOpacity = .6;
 					}
 					else {
@@ -958,7 +958,7 @@ function usEnabled() {
 				var row = featureResults( results, feature );
 				var diff = feature && feature.state ? time - feature.state.dateUTC : -1;
 				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
-				feature.fillColor = today ? { src: candidate.pattern } : candidate.color;
+				feature.fillColor = today ? { image: candidate.pattern } : candidate.color;
 				feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
 				var complete = row &&
 					row[col.NumCountedBallotBoxes] ==
