@@ -1554,7 +1554,7 @@ function usEnabled() {
 		if( ! feature ) return null;
 		var fips = feature.id.split('US')[1];
 		var st = State( fips.slice(0,2) );
-		var diff = now() - st.dateUTC;
+		var diff = now() + times.offset - st.dateUTC;
 		var future = ( diff < 0 );
 		var results = state.getResults(), col = results && results.colsById;
 		var row = featureResults( results, feature );
