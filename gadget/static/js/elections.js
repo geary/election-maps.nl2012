@@ -39,6 +39,7 @@ var elections = {
 				IA: '2458834',
 				NH: '2568627'
 			},
+			tzHour: -4,
 			photos: true,
 			candidates: [
 				{ color: '#DE6310', id: 'bachmann', firstName: 'Michele', lastName: 'Bachmann', fullName: 'Michele Bachmann' },

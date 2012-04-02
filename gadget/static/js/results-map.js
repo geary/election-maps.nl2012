@@ -31,7 +31,16 @@ var party = params.party in parties ? params.party : 'gop';
 var election = parties[party];
 var currentCandidate;
 
+if( params.date ) {
+	var d = dateFromYMD( params.date, election.tzHour, election.tzMinute );
+	times.offset = d - times.gadgetLoaded;
+}
+
 states.index('abbr').index('electionid').index('fips');
+
+for( var state, i = -1;  state = states[++i]; ) {
+	state.dateUTC = dateFromYMD( state.date, election.tzHour, election.tzMinute );
+}
 
 params.state = params.state || params.embed_state;
 //params.state = params.state || 'zz';
@@ -116,6 +125,23 @@ String.prototype.T = function( args ) {
 }
 
 election.candidates.index('id');
+
+var candidateZero = { id: '0' };
+loadCandidatePatterns();
+
+function loadCandidatePatterns( callback ) {
+	var loading = 0;
+	election.candidates.forEach( loadPattern );
+	loadPattern( candidateZero );
+	function loadPattern( candidate ) {
+		++loading;
+		var pattern = candidate.pattern = new Image();
+		pattern.src = imgUrl( 'pattern-' + candidate.id + '.png' );
+		pattern.onload = function() {
+			if( --loading == 0 ) callback && callback();
+		};
+	}
+}
 
 function cacheUrl( url ) {
 	return opt.nocache ? S( url, '?q=', times.gadgetLoaded ) : url;
@@ -878,20 +904,29 @@ function usEnabled() {
 	}
 	
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
+		var time = now() + times.offset;
 		var results = state.getResults();
 		var col = results && results.cols;
 		var candidates = results && results.candidates;
 		if( !( candidates && currentCandidate ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
+				var diff = feature && feature.state ? time - feature.state.dateUTC : -1;
+				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
 				var candidate = row && candidates[row.candidateMax];
 				if( candidate ) {
-					feature.fillColor = candidate.color;
+					feature.fillColor = today ? { src: candidate.pattern } : candidate.color;
 					feature.fillOpacity = .6;
 				}
 				else {
-					feature.fillColor = '#FFFFFF';
-					feature.fillOpacity = 0;
+					if( today ) {
+						feature.fillColor = { src: candidateZero.pattern };
+						feature.fillOpacity = .6;
+					}
+					else {
+						feature.fillColor = '#FFFFFF';
+						feature.fillOpacity = 0;
+					}
 				}
 				var complete = row &&
 					row[col.NumCountedBallotBoxes] ==
@@ -921,7 +956,9 @@ function usEnabled() {
 			}
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
-				feature.fillColor = color;
+				var diff = feature && feature.state ? time - feature.state.dateUTC : -1;
+				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
+				feature.fillColor = today ? { src: candidate.pattern } : candidate.color;
 				feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
 				var complete = row &&
 					row[col.NumCountedBallotBoxes] ==
@@ -1517,8 +1554,8 @@ function usEnabled() {
 		if( ! feature ) return null;
 		var fips = feature.id.split('US')[1];
 		var st = State( fips.slice(0,2) );
-		var date = dateFromYMD( st.date );
-		var future = ( date > now() );
+		var diff = now() - st.dateUTC;
+		var future = ( diff < 0 );
 		var results = state.getResults(), col = results && results.colsById;
 		var row = featureResults( results, feature );
 		var top = [];
@@ -2049,6 +2086,7 @@ function usEnabled() {
 		var fips = feature.id.split('US')[1];
 		var state = fips.length == 2  &&  states.by.fips[fips];  // TEMP
 		var abbr = state && state.abbr;  // TEMP
+		feature.state = state || states.by.fips[ fips.slice(0,2) ]
 		return (
 			results.rowsByID[ fips ] ||
 			results.rowsByID[ abbr ] ||  // TEMP
