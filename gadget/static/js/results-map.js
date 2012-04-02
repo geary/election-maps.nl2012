@@ -877,10 +877,10 @@ function usEnabled() {
 			}
 			var colorizers = {
 				state: function() {
-					if( state.votesby == 'state' )
+					if( state.votesby == 'state'  && !( state == stateUS && view == 'county' ) )
 						colorVotes( features, '#666666', 1, 1.5 );
 					else
-						colorSimple( features, '#FFFFFF', '#222222', 1, 1.5 );
+						colorSimple( features, '#FFFFFF', '#444444', 1, 1.5 );
 				},
 				county: function() {
 					colorSimple( features, '#FFFFFF', '#444444', .5, .5 );
