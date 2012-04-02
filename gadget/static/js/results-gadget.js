@@ -47,6 +47,14 @@ function loadStrings( s ) {
 params.hl = params.hl || 'en';
 opt.writeScript( 'locale/lang-' + params.hl + '.js' );
 
+String.prototype.T = function( args ) {
+	return ( /*prefs.getMsg(this) ||*/ strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,
+		function( match, name ) {
+			var value = args[name];
+			return value != null ? value : match;
+		});
+}
+
 opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
 opt.writeScript(
