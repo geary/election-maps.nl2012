@@ -2,8 +2,6 @@
 // By Michael Geary - http://mg.to/
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
-function now() { return +new Date; }
-
 if( ! Array.prototype.forEach ) {
 	Array.prototype.forEach = function( fun /*, thisp*/ ) {
 		if( typeof fun != 'function' )
@@ -347,19 +345,30 @@ function throttle( time ) {
 	};
 }
 
+function now() {
+	return +new Date;
+}
+
+function nowTZ( tzoHour, tzoMinute ) {
+	var date = new Date;
+	var offset = ( ( tzoHour || 0 ) * 60 + ( tzoMinute || 0 ) ) - date.getTimezoneOffset();
+	return new Date( +date + offset * 60 * 1000 );
+}
+
+function dateFromYMD( yyyymmdd, tzoHour, tzoMinute ) {
+	var ymd = yyyymmdd.split('-');
+	var year = +ymd[0], month = +( ymd[1] || 1 ), day = +( ymd[2] || 1 );
+	var hms = ( ymd[3] || '0:0:0' ).split(':');
+	var hour = hms[0] || 0, minute = hms[1] || 0, second = hms[2] || 0;
+	hour -= tzoHour || 0;
+	minute -= tzoMinute || 0;
+	return Date.UTC( year, month-1, day, hour, minute, 0, 0 );
+}
+
 var monthNames = [
 	'January', 'February', 'March', 'April', 'May', 'June',
 	'July', 'August', 'September', 'October', 'November', 'December'
 ];
-
-function dateFromYMD( yyyymmdd ) {
-	var ymd = yyyymmdd.split('-');
-	return(
-		ymd.length == 1 ? new Date( +ymd[0], 0, 1 ) :
-		ymd.length == 2 ? new Date( +ymd[0], +ymd[1]-1, 1 ) :
-		new Date( +ymd[0], +ymd[1]-1, +ymd[2] )
-	);
-}
 
 function longDateFromYMD( yyyymmdd ) {
 	var ymd = yyyymmdd.split('-');
