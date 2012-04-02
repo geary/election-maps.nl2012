@@ -116,14 +116,6 @@ opt.reloadTime = 60 * 1000;
 
 var zoom;
 
-String.prototype.T = function( args ) {
-	return ( /*prefs.getMsg(this) ||*/ strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,
-		function( match, name ) {
-			var value = args[name];
-			return value != null ? value : match;
-		});
-}
-
 election.candidates.index('id');
 
 var candidateZero = { id: '0' };
