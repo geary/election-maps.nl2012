@@ -2032,6 +2032,8 @@ function usEnabled() {
 		col.index();
 		
 		var kind = state.votesby || 'county';
+		var isDelegates = ( electionid == state.electionidDelegates );  // TEMP
+		if( state == stateUS  &&  view == 'county'  &&  ! isDelegates ) kind = 'county';  // TEMP
 		if( kind == 'town'  ||  kind == 'district' ) kind = 'county';  // TEMP
 		var rows = state.geo[kind].features.map( function( feature ) {
 			var row = [];
@@ -2083,11 +2085,12 @@ function usEnabled() {
 	
 	function featureResults( results, feature ) {
 		if( !( results && feature ) ) return null;
-		var fips = feature.id.split('US')[1];
+		var id = feature.id, fips = id.split('US')[1];
 		var state = fips.length == 2  &&  states.by.fips[fips];  // TEMP
 		var abbr = state && state.abbr;  // TEMP
 		feature.state = state || states.by.fips[ fips.slice(0,2) ]
 		return (
+			results.rowsByID[ id ] ||
 			results.rowsByID[ fips ] ||
 			results.rowsByID[ abbr ] ||  // TEMP
 			results.rowsByID[ feature.name ]  ||
