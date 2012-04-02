@@ -912,14 +912,14 @@ function usEnabled() {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				var diff = feature && feature.state ? time - feature.state.dateUTC : -1;
-				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
+				var hatch = state == stateUS  &&  diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
 				var candidate = row && candidates[row.candidateMax];
 				if( candidate ) {
-					feature.fillColor = today ? { image: candidate.pattern } : candidate.color;
+					feature.fillColor = hatch ? { image: candidate.pattern } : candidate.color;
 					feature.fillOpacity = .6;
 				}
 				else {
-					if( today ) {
+					if( hatch ) {
 						feature.fillColor = { image: candidateZero.pattern };
 						feature.fillOpacity = .6;
 					}
@@ -957,8 +957,8 @@ function usEnabled() {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				var diff = feature && feature.state ? time - feature.state.dateUTC : -1;
-				var today = diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
-				feature.fillColor = today ? { image: candidate.pattern } : candidate.color;
+				var hatch = state == stateUS  &&  diff >= 0  &&  diff <= (24+9) * 60 * 60 * 1000;
+				feature.fillColor = hatch ? { image: candidate.pattern } : candidate.color;
 				feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
 				var complete = row &&
 					row[col.NumCountedBallotBoxes] ==
