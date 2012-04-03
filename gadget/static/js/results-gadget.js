@@ -44,14 +44,28 @@ function loadStrings( s ) {
 	strings = s;
 }
 
-var defaultLanguage = 'en';
-var supportedLanguages = {
-	en: true,
-	es: true,
-	fr: true
-};
-if( !( params.hl in supportedLanguages ) ) params.hl = defaultLanguage;
-opt.writeScript( 'locale/lang-' + params.hl + '.js' );
+function setLanguage() {
+	var defaultLanguage = 'en';
+	var supportedLanguages = {
+		en: true,
+		es: true,
+		fr: true
+	};
+	var hl = ( params.hl || '' ).toLowerCase();
+	if( ! hl  &&  acceptLanguageHeader != '{{acceptLanguageHeader}}' ) {
+		var langs = acceptLanguageHeader.split(';')[0].split(',');
+		for( var lang, i = -1;  lang = langs[++i]; ) {
+			hl = lang.split('-')[0].toLowerCase();
+			if( hl in supportedLanguages )
+				break;
+		}
+	}
+	if( !( hl in supportedLanguages ) )
+		hl = defaultLanguage;
+	params.hl = hl;
+	opt.writeScript( 'locale/lang-' + params.hl + '.js' );
+}
+setLanguage();
 
 String.prototype.T = function( args ) {
 	return ( /*prefs.getMsg(this) ||*/ strings[this] || '' ).replace( /\{\{(\w+)\}\}/g,

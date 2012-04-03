@@ -106,6 +106,8 @@ class HtmlHandler( webapp.RequestHandler ):
 		f = open( 'static/%s' % name, 'r' )
 		content = f.read()
 		f.close()
+		# Poor man's template
+		content = content.replace( '{{acceptLanguageHeader}}', self.request.headers['Accept-Language'] )
 		self.response.out.write( content )
 		self.response.headers['Content-Type'] = 'text/html'
 
