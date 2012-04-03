@@ -3,7 +3,8 @@
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
 var times = {
-	gadgetLoaded: now()
+	gadgetLoaded: now(),
+	offset: 0
 };
 
 // Default params
@@ -2082,7 +2083,7 @@ function usEnabled() {
 		var id = feature.id, fips = id.split('US')[1];
 		var state = fips.length == 2  &&  states.by.fips[fips];  // TEMP
 		var abbr = state && state.abbr;  // TEMP
-		feature.state = state || states.by.fips[ fips.slice(0,2) ]
+		feature.state = state || states.by.fips[ fips.slice(0,2) ];
 		return (
 			results.rowsByID[ id ] ||
 			results.rowsByID[ fips ] ||
