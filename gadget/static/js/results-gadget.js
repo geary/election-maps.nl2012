@@ -44,7 +44,13 @@ function loadStrings( s ) {
 	strings = s;
 }
 
-params.hl = params.hl || 'en';
+var defaultLanguage = 'en';
+var supportedLanguages = {
+	en: true,
+	es: true,
+	fr: true
+};
+if( !( params.hl in supportedLanguages ) ) params.hl = defaultLanguage;
 opt.writeScript( 'locale/lang-' + params.hl + '.js' );
 
 String.prototype.T = function( args ) {
