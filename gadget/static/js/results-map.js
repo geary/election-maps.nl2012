@@ -736,7 +736,7 @@ function usEnabled() {
 		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
 			if( zoom <= 4  &&  state != stateUS )
-				setState( '00' );
+				setState( '00', 'zoom' );
 		});
 */
 	}
@@ -790,7 +790,7 @@ function usEnabled() {
 				}
 				else {
 					if( state == stateUS )
-						setState( feature );
+						setState( feature, 'tap' );
 				}
 			},
 			touchcancel: function( event, where ) {
@@ -813,7 +813,7 @@ function usEnabled() {
 				}
 				else {
 					//if( feature.type == 'state'  || feature.type == 'cd' )
-						setState( feature );
+						setState( feature, 'click' );
 				}
 			}
 		};
@@ -1080,7 +1080,7 @@ function usEnabled() {
 			else if( state == stateUS ) {
 				// Only touch devices for now
 				var feature = touch && touch.where && touch.where.feature;
-				if( feature ) setState( feature );
+				if( feature ) setState( feature, 'tap' );
 			}
 		});
 	}
@@ -1698,7 +1698,7 @@ function usEnabled() {
 		return leaders;
 	}
 	
-	function setState( s ) {
+	function setState( s, why ) {
 		if( ! s ) return;
 		s = State( s );
 		if( ! s.abbr ) return;
@@ -1711,6 +1711,7 @@ function usEnabled() {
 		opt.state = state.abbr.toLowerCase();
 		geoMoveNext = true;
 		setCounties( state.fips != '00' );
+		if( why ) analytics( why, 'state', state.abbr );
 	}
 	
 	var mapStyles = [
@@ -1817,7 +1818,7 @@ function usEnabled() {
 				if( id == 'top'  ||  id == currentCandidate ) id = null;
 				$('#chkCycle').prop({ checked:false });
 				stopCycle();
-				setCandidate( id );
+				setCandidate( id, 'click' );
 			}
 		});
 		
@@ -1832,7 +1833,7 @@ function usEnabled() {
 		
 		$legend.delegate( '#viewUSA', {
 			click: function( event ) {
-				setState('00');
+				setState( '00', 'return' );
 				event.preventDefault();
 			}
 		});
@@ -1843,9 +1844,10 @@ function usEnabled() {
 			}
 		});
 		
-		setCandidate = function( id ) {
+		setCandidate = function( id, why ) {
 			currentCandidate = id;
 			loadView();
+			if( why ) analytics( why, 'candidate', id || 'all' );
 		}
 	}
 	
