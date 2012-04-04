@@ -440,7 +440,6 @@ function usEnabled() {
 		}
 		oneTime();
 		//setCounties( true );
-		geoReady();
 		getResults();
 		//analytics( 'data', 'counties' );
 	};
