@@ -635,6 +635,7 @@ function usEnabled() {
 		}
 		$('#view-usa').toggle( state.fips != '00' );
 		polys();
+		mapIdled = false;
 		$('#spinner').hide();
 		if( ! opt.randomized  &&  opt.reloadTime  &&  params.refresh != 'false' ) {
 			clearInterval( reloadTimer );
@@ -725,12 +726,14 @@ function usEnabled() {
 	}
 	
 	var dragged = false;
+	var mapIdled;
 	function addMapListeners( map ) {
 		gme.addListener( map, 'dragstart', function() {
 			dragged = true;
 		});
 		gme.addListener( map, 'idle', function() {
-			polys();
+			if( mapIdled ) polys();
+			mapIdled = true;
 		});
 /*
 		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
