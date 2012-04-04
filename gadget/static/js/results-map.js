@@ -1315,7 +1315,7 @@ function usEnabled() {
 	}
 	
 	function testFlag( results ) {
-		return params.debug && results && ( results.mode == 'test'  ||  opt.randomized );
+		return debug && results && ( results.mode == 'test'  ||  opt.randomized );
 	}
 	
 	function viewUsEnabled() {
@@ -2135,7 +2135,7 @@ function usEnabled() {
 		else
 			state.results = results;
 		results.mode = json.mode;
-		var zero = ( json.mode == 'test'  &&  ! params.debug );
+		var zero = ( json.mode == 'test'  &&  ! debug );
 		
 		var col = results.colsById = {};
 		col.candidates = 0;
@@ -2209,7 +2209,7 @@ function usEnabled() {
 		if( electionsPending.length == 0 )
 			geoReady();
 		
-		if( missing.length && params.debug ) {
+		if( missing.length  &&  debug != 'quiet' ) {
 			alert( S( 'Missing locations:\n', missing.sort().join( '\n' ) ) );
 		}
 	}
