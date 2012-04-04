@@ -66,9 +66,9 @@ function State( abbr ) {
 
 var stateUS = State('US'), state = State();
 
-if( PolyGonzo.isVML() ) {
-	delete params.view;  // too slow for all-county view
-}
+//if( PolyGonzo.isVML() ) {
+//	delete params.view;  // too slow for all-county view
+//}
 
 var view = ( params.view == 'county' || state != stateUS ? 'county' : 'state' );
 
