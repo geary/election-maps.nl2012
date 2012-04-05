@@ -635,7 +635,7 @@ function usEnabled() {
 		}
 		$('#view-usa').toggle( state.fips != '00' );
 		polys();
-		mapIdled = false;
+		//mapIdled = false;
 		$('#spinner').hide();
 		if( ! opt.randomized  &&  opt.reloadTime  &&  params.refresh != 'false' ) {
 			clearInterval( reloadTimer );
