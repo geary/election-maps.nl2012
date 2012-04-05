@@ -732,7 +732,8 @@ function usEnabled() {
 			dragged = true;
 		});
 		gme.addListener( map, 'idle', function() {
-			if( mapIdled ) polys();
+			//if( mapIdled )
+				polys();
 			mapIdled = true;
 		});
 /*
