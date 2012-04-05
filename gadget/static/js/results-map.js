@@ -2211,7 +2211,7 @@ function usEnabled() {
 		if( electionsPending.length == 0 )
 			geoReady();
 		
-		if( missing.length  &&  debug != 'quiet' ) {
+		if( missing.length  &&  debug  &&  debug != 'quiet' ) {
 			alert( S( 'Missing locations:\n', missing.sort().join( '\n' ) ) );
 		}
 	}
