@@ -24,38 +24,22 @@ def cartoFileName(
 
 
 def process():
-	for resolution in ( '20m', '500k', ):
-		database = 'usageo_' + resolution
-		createDatabase( database)
-		db = openDatabase( database )
-		#addSimplificationFunction( db )
-		createSchema( db )
-		loadStates( db, resolution )
-		loadCounties( db, resolution )
-		for table in ( 'state', 'county', ):
-			makeRegionTables( db, table )
-			saveShapefile( db, resolution, table )
-			saveShapefile( db, resolution, table+'99' )
-			saveShapefile( db, resolution, table+'02' )
-			saveShapefile( db, resolution, table+'15' )
-		if resolution == '500k':
-			loadCongressional( db, resolution )
-			loadCountySubdivisions( db, resolution )
-			loadCustom( db, resolution )
-			makeGopDetailTable( db )
-			saveShapefile( db, resolution, 'gop2012' )
-		closeDatabase( db )
-
-
-def processNew():
-	for resolution in ( '500k', ):
-		database = 'usageo_' + resolution
-		db = openDatabase( database )
-		if resolution == '500k':
-			#loadCustom( db, resolution )
-			makeGopDetailTable( db )
-			saveShapefile( db, resolution, 'gop2012' )
-		closeDatabase( db )
+	resolution = '500k'
+	database = 'usageo_' + resolution
+	createDatabase( database)
+	db = openDatabase( database )
+	#addSimplificationFunction( db )
+	createSchema( db )
+	loadStates( db, resolution )
+	loadCounties( db, resolution )
+	loadCongressional( db, resolution )
+	loadCountySubdivisions( db, resolution )
+	loadCustom( db, resolution )
+	makeGopNationalTable( db )
+	makeGopLocalTable( db )
+	saveShapefile( db, resolution, 'gop2012nat' )
+	saveShapefile( db, resolution, 'gop2012loc' )
+	closeDatabase( db )
 
 
 def createDatabase( database ):
@@ -77,6 +61,7 @@ def closeDatabase( db ):
 
 def addSimplificationFunction( db ):
 	db.execute( file( 'map_simplification_program/func.sql').read() )
+
 
 def createSchema( db ):
 	print 'Creating schema %s' % schema
@@ -141,67 +126,24 @@ def loadForStates(
 		create = False
 
 
-def makeRegionTables( db, table ):
-	county = ( '', 'county,' )[ table == 'county' ]
-	table = schema + '.' + table
-	# AK and HI get their own tables
-	whereAK = '''
-		( state = '02' )
-	'''
-	whereHI = '''
-		( state = '15' )
-	'''
-	db.createLikeTable( table+'99', table )
-	db.createLikeTable( table+'02', table )
-	db.createLikeTable( table+'15', table )
-	
-	db.execute( '''
-		INSERT INTO %(table)s99
-			SELECT nextval('%(table)s99_gid_seq'),
-				geo_id, state, %(county)s
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(table)s
-			WHERE NOT %(whereAK)s AND NOT %(whereHI)s;
-		
-		INSERT INTO %(table)s02
-			SELECT nextval('%(table)s02_gid_seq'),
-				geo_id, state, %(county)s
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(table)s
-			WHERE %(whereAK)s;
-		
-		INSERT INTO %(table)s15
-			SELECT nextval('%(table)s15_gid_seq'),
-				geo_id, state, %(county)s
-				name, lsad, censusarea, full_geom, goog_geom
-			FROM %(table)s
-			WHERE %(whereHI)s;
-	''' %({
-		'table': table,
-		'county': county,
-		'whereAK': whereAK,
-		'whereHI': whereHI,
-	}) )
-	db.connection.commit()
-
-
-def makeGopDetailTable( db ):
+# TODO: refactor
+def makeGopLocalTable( db ):
 	# CT, MA, NH, VT report votes by county subdivision ("town")
 	whereCousub = '''
 		( state = '09' OR state = '25' OR state = '33' OR state = '50' )
 	'''
-	 # ND reports votes by state house district
+	# ND reports votes by state house district
 	whereSHD = '''
 		( state = '38' )
 	'''
-	 # AK and ME report statewide votes only
+	# AK, ME, and WY report statewide votes only
 	whereState = '''
-		( state = '02' OR state = '23' )
+		( state = '02' OR state = '23' OR state = '56' )
 	'''
-	db.createLikeTable( schema+'.gop2012', schema+'.cousub' )
+	db.createLikeTable( schema+'.gop2012loc', schema+'.cousub' )
 	db.execute( '''
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+		INSERT INTO %(schema)s.gop2012loc
+			SELECT nextval('%(schema)s.gop2012loc_gid_seq'),
 				geo_id, state, county, '' AS cousub,
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.county
@@ -209,20 +151,20 @@ def makeGopDetailTable( db ):
 				NOT %(whereCousub)s
 				AND NOT %(whereSHD)s
 				AND NOT %(whereState)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+		INSERT INTO %(schema)s.gop2012loc
+			SELECT nextval('%(schema)s.gop2012loc_gid_seq'),
 				geo_id, state, county, cousub,
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.cousub
 			WHERE %(whereCousub)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+		INSERT INTO %(schema)s.gop2012loc
+			SELECT nextval('%(schema)s.gop2012loc_gid_seq'),
 				geo_id, state, '' AS county, '' AS cousub,
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.state
 			WHERE %(whereState)s;
-		INSERT INTO %(schema)s.gop2012
-			SELECT nextval('%(schema)s.gop2012_gid_seq'),
+		INSERT INTO %(schema)s.gop2012loc
+			SELECT nextval('%(schema)s.gop2012loc_gid_seq'),
 				geo_id, state, sldl AS county, '' AS cousub,
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.shd
@@ -230,6 +172,47 @@ def makeGopDetailTable( db ):
 	''' %({
 		'schema': schema,
 		'whereCousub': whereCousub,
+		'whereSHD': whereSHD,
+		'whereState': whereState,
+	}) )
+	db.connection.commit()
+
+
+# TODO: refactor
+def makeGopNationalTable( db ):
+	# ND reports votes by state house district
+	# Commented out for now, showing ND statewide in national county view
+	whereSHD = '''
+		( FALSE ) -- ( state = '38' )
+	'''
+	# AK, ME, ND, and WY display statewide votes only in national county view
+	whereState = '''
+		( state = '02' OR state = '23' OR state = '38' OR state = '56' )
+	'''
+	db.createLikeTable( schema+'.gop2012nat', schema+'.county' )
+	db.execute( '''
+		INSERT INTO %(schema)s.gop2012nat
+			SELECT nextval('%(schema)s.gop2012nat_gid_seq'),
+				geo_id, state, county,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.county
+			WHERE
+				NOT %(whereSHD)s AND
+				NOT %(whereState)s;
+		INSERT INTO %(schema)s.gop2012nat
+			SELECT nextval('%(schema)s.gop2012nat_gid_seq'),
+				geo_id, state, '' AS county,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.state
+			WHERE %(whereState)s;
+		INSERT INTO %(schema)s.gop2012nat
+			SELECT nextval('%(schema)s.gop2012nat_gid_seq'),
+				geo_id, state, sldl AS county,
+				name, lsad, censusarea, full_geom, goog_geom
+			FROM %(schema)s.shd
+			WHERE %(whereSHD)s;
+	''' %({
+		'schema': schema,
 		'whereSHD': whereSHD,
 		'whereState': whereState,
 	}) )
