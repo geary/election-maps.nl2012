@@ -17,9 +17,9 @@ function Clean() {
 }
 
 function ImportSimplifyExport() {
-	ForAllShapes( function( shpNameFull, shpNameSimple, tolerance ) {
+	ForAllShapes( function( shpNameFull, shpNameSimple, tolerance, tolerance2 ) {
 		ImportShape( shpNameFull );
-		var drawingSimple = Simplify( shpNameFull, shpNameSimple, tolerance );
+		var drawingSimple = Simplify( shpNameFull, shpNameSimple, tolerance, tolerance2 );
 		if( drawingSimple ) ExportShape( drawingSimple, shpNameSimple );
 
 		RemoveDrawing( shpNameFull );
@@ -29,22 +29,21 @@ function ImportSimplifyExport() {
 
 function ForAllShapes( callback ) {
 
-	function go( res, table, tol ) {
+	function go( res, table, tol, tol2 ) {
 		var shpNameBase = S( 'us2012-', table, '-', res, '-' );
 		var shpNameFull = S( shpNameBase, 'full' );
 		var shpNameSimple = S( shpNameBase, tol );
-		callback( shpNameFull, shpNameSimple, tol );
+		callback( shpNameFull, shpNameSimple, tol, tol2 );
 	}
 	
-	go( '20m', 'county99', '4096' );
-	go( '20m', 'county02', '32768' );
-	go( '20m', 'county15', '4096' );
+/*
+	go( '500k', 'county99', '4096' );
+	go( '500k', 'county02', '32768' );
+	go( '500k', 'county15', '4096' );
+*/
 
-	go( '20m', 'state99', '4096' );
-	go( '20m', 'state02', '32768' );
-	go( '20m', 'state15', '4096' );
-	
-	go( '500k', 'gop2012', '512' );
+	go( '500k', 'gop2012nat', '4096', '32768' );
+	go( '500k', 'gop2012loc', '512', '4096' );
 }
 
 function RemoveDrawing( shpName ) {
@@ -68,51 +67,100 @@ function CopyColumn( columnSetTo, columnSetFrom, name ) {
 	columnSetTo.Add( columnTo );
 }
 
-function Simplify( shpNameFull, shpNameSimple, tolerance ) {
-	var colNames = 'GEO_ID,STATE,NAME,LSAD,CENSUSAREA,FULL_GEOM'.split(',');
+function SplitGeomSet( geomSet, recordSet ) {
+	var objectSets = {
+		AK: Document.NewObjectSet(),
+		US: Document.NewObjectSet()
+	};
+	ForEach( recordSet, function( record, i ) {
+		objectSets[
+			record.Data('STATE') == '02' ? 'AK' : 'US'
+		].Add( CopyGeom( geomSet(i) ) );
+	});
+	return geomSets;
+}
 
-	var drawingFull = GetDrawing( shpNameFull );
-	var objectSetFull = drawingFull.ObjectSet;
-	var tableFull = drawingFull.OwnedTable;
-	var columnSetFull = tableFull.ColumnSet;
-	var recordSetFull = tableFull.RecordSet;
-	var geomSetFull = objectSetFull.GeomSet;
+function CombineGeomSets( geomSets, recordSet ) {
+	var geomSet = Document.NewObjectSet().GeomSet;
+	var iAK = 0, iUS = 0;
+	ForEach( recordSet, function( record, i ) {
+		geomSet.Add( CopyGeom(
+			record.Data('STATE') == '02' ?
+				geomSets.AK(iAK++) :
+				geomSets.US(iUS++)
+		) );
+	});
+}
 
-	var drawingSimple = Document.NewDrawing(
-		DrawingName(shpNameSimple),
-		drawingFull.CoordinateSystem,
-		false
-	);
-	var objectSetSimple = drawingSimple.ObjectSet;
-	var tableSimple = drawingSimple.OwnedTable;
-	var columnSetSimple = tableSimple.ColumnSet;
-	var recordSetSimple = tableSimple.RecordSet;
-	var geomSetSimple = geomSetFull.NormalizeTopology( tolerance );
+function CopyGeom( geom ) {
+	return Application.NewGeomFromTextWKT( geom.ToTextWKT() );
+}
+
+function Drawing( drawing ) {
+	this.drawing = drawing;
+	this.objectSet = drawing.ObjectSet;
+	this.geomSet = this.objectSet.GeomSet;
+	this.table = drawing.OwnedTable;
+	this.columnSet = this.table.ColumnSet;
+	this.recordSet = this.table.RecordSet;
+}
+
+function SelectState( objs, state ) {
+	ForEach( objs.recordSet, function( record, i ) {
+		objs.objectSet( i ).Selected = ( record.Data('STATE') == state );
+	});
+}
+
+function Simplify( shpNameFull, shpNameSimple, tolerance, toleranceAK ) {
+	var fullDrawing = GetDrawing( shpNameFull );
+	var full = new Drawing( fullDrawing );
 	
+	var simple = new Drawing( Document.NewDrawing(
+		DrawingName(shpNameSimple),
+		full.drawing.CoordinateSystem,
+		false
+	) );
+	
+	var colNames = 'GEO_ID,STATE,NAME,LSAD,CENSUSAREA,FULL_GEOM'.split(',');
 	ForEach( colNames, function( name ) {
-		CopyColumn( columnSetSimple, columnSetFull, name );
+		CopyColumn( simple.columnSet, full.columnSet, name );
 	});
 	
-	if( objectSetFull.Count != geomSetSimple.Count ) {
+	var shpNameTemp = shpNameFull + '-Temp';
+	var temp = new Drawing( Document.NewDrawing(
+		DrawingName(shpNameTemp),
+		full.drawing.CoordinateSystem,
+		false
+	) );
+	
+	SelectState( full, '02' );
+	full.drawing.Cut( true );
+	full = new Drawing( fullDrawing );  // TODO: better way to update this?
+	temp.drawing.Paste();
+	
+	SimplifyPart( temp, simple, shpNameSimple, colNames, toleranceAK );
+	SimplifyPart( full, simple, shpNameSimple, colNames, tolerance );
+	
+	RemoveDrawing( shpNameTemp );
+	
+	return simple.drawing;
+}
+
+function SimplifyPart( source, simple, shpNameSimple, colNames, tolerance ) {
+	var geomSetSimple = source.geomSet.NormalizeTopology( tolerance );
+	if( source.objectSet.Count != geomSetSimple.Count ) {
 		errors.push( S(
 			'Object set length mismatch: ', shpNameSimple
 		) );
 		return null;
 	}
 
-	// I am assuming that objectSetFull and geomSetSimple are in the same order!
+	// I am assuming that source.objectSet and geomSetSimple are in the same order!
 	for( var i = 0, n = geomSetSimple.Count;  i < n;  ++i ) {
-		var object = objectSetFull( i );
+		var object = source.objectSet( i );
 		var geom = geomSetSimple( i );
 		try {
-			objectSetSimple.Add( geom );
-			var recordFull =
-				GetByID( recordSetFull, object.ID );
-			var recordSimple =
-				GetByID( recordSetSimple, objectSetSimple.LastAdded.ID );
-			ForEach( colNames, function( name ) {
-				recordSimple.Data(name) = recordFull.Data(name);
-			});
+			simple.objectSet.Add( geom );
 		}
 		catch( e ) {
 			var record = object.Record;
@@ -120,11 +168,23 @@ function Simplify( shpNameFull, shpNameSimple, tolerance ) {
 				e.name, ' (', e.description, '): ', shpNameSimple, '[', i, ']: ',
 				record.Data('GEO_ID'), ' ', record.Data('NAME')
 			) );
-			//geom = Application.NewGeom( GeomArea );
+			var center = source.geomSet( i ).Center;
+			var points = Application.NewPointSet();
+			points.Add( center );
+			points.Add( center );
+			points.Add( center );
+			points.Add( center );
+			geom = Application.NewGeom( GeomArea, points );
+			simple.objectSet.Add( geom );
 		}
+		var recordFull =
+			GetByID( source.recordSet, object.ID );
+		var recordSimple =
+			GetByID( simple.recordSet, simple.objectSet.LastAdded.ID );
+		ForEach( colNames, function( name ) {
+			recordSimple.Data(name) = recordFull.Data(name);
+		});
 	}
-
-	return drawingSimple;
 }
 
 function ExportShape( drawing, shpNameExport ) {
