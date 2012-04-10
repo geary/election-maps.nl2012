@@ -968,31 +968,52 @@ function usEnabled() {
 	}
 	
 	function useInset() {
-		return state == stateUS  &&  map.getZoom() == 4  &&  view != 'county';
+		return state == stateUS  &&  map.getZoom() == 4;
+	}
+	
+	function insetFeatures( abbr, callback ) {
+		var sf = stateUS.geo.state.features.by;
+		var cf = ( view == 'county' ) && stateUS.geo.county.features.by;
+		if( abbr == 'AK' ) {
+			callback( sf.AK || sf['02'] );
+			cf && callback( cf['02'] );
+		}
+		else {  // HI
+			callback( sf.HI || sf['15'] );
+			cf && '15001 15003 15005 15007 15009'.words( function( fips ) {
+				callback( cf[fips] );
+			});
+		}
 	}
 	
 	function getInsetUnderlay() {
+		function clear( feature ) {
+			delete feature.zoom;
+			delete feature.offset;
+		}
 		if( ! stateUS.geo ) return null;
-		if( view == 'county' ) return null;
 		var kind = view == 'county' ? 'county' : 'state';
 		var features = stateUS.geo[kind].features;
 		if( ! useInset() ) {
-			delete features.by.AK.zoom;
-			delete features.by.HI.zoom;
-			delete features.by.AK.offset;
-			delete features.by.HI.offset;
+			insetFeatures( 'AK', clear );
+			insetFeatures( 'HI', clear );
 			return null;
 		}
-		features.by.AK.zoom = 1;
-		features.by.HI.zoom = 4;
-		features.by.AK.offset = { x: -1122, y: -211 };
-		features.by.HI.offset = { x: 538, y: -89 };
-		return {
-			images: [{
-				src: imgUrl('ak-hi.png'),
-				width: 166, height: 84,
-				left: -1380, top: -370
-			}, {
+		insetFeatures( 'AK', function( feature ) {
+			feature.zoom = 1;
+			feature.offset = { x: -1122, y: -211 };
+		});
+		insetFeatures( 'HI', function( feature ) {
+			feature.zoom = 4;
+			feature.offset = { x: 538, y: -89 };
+		});
+		var images = [{
+			src: imgUrl('ak-hi.png'),
+			width: 166, height: 84,
+			left: -1380, top: -370
+		}];
+		if( view != 'county' )
+			images = images.concat([{
 				abbr: 'CT',
 				width: 68, height: 14,
 				left: -823, top: -482
@@ -1028,13 +1049,21 @@ function usEnabled() {
 				abbr: 'VT',
 				width: 49, height: 14,
 				left: -764, top: -558
-			}],
+			}]);
+		return {
+			images: images,
 			hittest: function( image, x, y ) {
-				return {
-					geo: stateUS.geo,
-					feature: image.abbr ? features.by[image.abbr] :
-						x < 83 ? features.by.AK : features.by.HI
-				};
+				if( image.abbr )
+					return {
+						geo: stateUS.geo,
+						feature: features.by[image.abbr]
+					}
+				if( view != 'county' )
+					return {
+						geo: stateUS.geo,
+						feature: x < 81 ? features.by.AK : features.by.HI
+					}
+				return null;
 			}
 		};
 	}
