@@ -398,7 +398,7 @@ function usEnabled() {
 		}
 		else {
 			if( fips == '00'  &&  view == 'county' ) fips = '00-county';
-			var file = S( 'carto2010', '-', fips, '-goog_geom', level, '.jsonp' );
+			var file = S( 'carto2010', '-', fips, '-goog_geom', level, '.js' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
