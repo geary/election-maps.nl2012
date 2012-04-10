@@ -388,7 +388,7 @@ function usEnabled() {
 	var jsonRegion = {};
 	function loadRegion( s, kind ) {
 		s = s || state;
-		var level = params.level || s.level || '00';
+		var level = params.level || s.level || '4096';
 		kind = kind || ( opt.counties ? 'county' : 'state' );
 		if( kind == 'county' ) level = '512';  // TEMP
 		var fips = s.fips;
@@ -451,6 +451,7 @@ function usEnabled() {
 		for( var feature, i = -1;  feature = features[++i]; ) {
 			var fips = feature.id.split('US')[1];
 			by[feature.id] = by[fips] = by[feature.name] = feature;
+			if( fips.length == 2 ) by[fips+'000'] = feature;
 			if( usa ) {
 				if( fips == '72' )
 					features.splice( i--, 1 );  // remove PR
@@ -861,8 +862,8 @@ function usEnabled() {
 			   kind == 'coucou'  ||
 			   kind == 'gop2012'  ||  /*TEMP*/ 
 			   kind == 'county00'  ||  /*TEMP*/ 
-			   kind == 'fl'  ||  /*TEMP*/
-			   kind == 'sc'  /*TEMP*/
+			   kind == 'gop2012nat'  ||  /*TEMP*/
+			   kind == 'gop2012loc'  /*TEMP*/
 			) {
 				kind = 'cousub';
 			}
@@ -1533,10 +1534,14 @@ function usEnabled() {
 		var lsad = ( feature.lsad || '' ).toLowerCase();
 		var prefix = prefixes[lsad] || '';
 		var suffix = suffixes[lsad] || '';
-		var andState = ( state == stateUS  &&  view == 'county' ) ?
+		var andState = ( state == stateUS  &&  ! featureIsState(feature) ) ?
 			S( ', ', s.abbr ) :
 			'';
 		return S( prefix, feature.name, suffix, andState );
+	}
+	
+	function featureIsState( feature ) {
+		return /^0400000US/.test( feature.id );
 	}
 	
 	function mayHaveResults( row, col ) {
@@ -2182,6 +2187,7 @@ function usEnabled() {
 				}
 			}
 			rowsByID[id] = row;
+			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var nCandidates = candidates.length;
 			var max = 0,  candidateMax = -1;
 			if( zero ) {
