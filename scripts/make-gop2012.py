@@ -238,7 +238,7 @@ def writeAllStates( db, table, level ):
 
 
 def writeGeoJSON( db, fips, geom, geo ):
-	filename = '%s/%s-%s-%s.jsonp' %(
+	filename = '%s/%s-%s-%s.js' %(
 		private.GEOJSON_PATH, schema, fips, geom
 	)
 	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
