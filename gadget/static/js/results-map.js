@@ -452,12 +452,7 @@ function usEnabled() {
 			var fips = feature.id.split('US')[1];
 			by[feature.id] = by[fips] = by[feature.name] = feature;
 			if( fips.length == 2 ) by[fips+'000'] = feature;
-			if( usa ) {
-				if( fips == '72' )
-					features.splice( i--, 1 );  // remove PR
-				else
-					by[ states.by.fips[fips].abbr ] = feature;
-			}
+			if( usa ) by[ states.by.fips[fips].abbr ] = feature;
 		}
 	}
 	
