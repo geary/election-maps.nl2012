@@ -91,10 +91,12 @@ def loadCartoFileName( db, filename, table, create=True ):
 
 def loadStates( db, resolution ):
 	loadCartoFile( db, resolution, '2010', 'us', '040', '00', 'state' )
+	deletePR( db, 'state' )
 
 
 def loadCounties( db, resolution ):
 	loadCartoFile( db, resolution, '2010', 'us', '050', '00', 'county' )
+	deletePR( db, 'county' )
 
 
 def loadCongressional( db, resolution ):
@@ -126,6 +128,16 @@ def loadForStates(
 		create = False
 
 
+def deletePR( db, table ):
+	db.execute( '''
+		DELETE FROM carto2010.%(table)s
+		WHERE state = '72'
+	''' %({
+		'table': table,
+	}) )
+	db.connection.commit()
+
+
 # TODO: refactor
 def makeGopLocalTable( db ):
 	# CT, MA, NH, VT report votes by county subdivision ("town")
@@ -140,6 +152,10 @@ def makeGopLocalTable( db ):
 	whereState = '''
 		( state = '02' OR state = '23' OR state = '56' )
 	'''
+	# PR is not reported in the primary
+	whereNone = '''
+		( state = '72' )
+	'''
 	db.createLikeTable( schema+'.gop2012loc', schema+'.cousub' )
 	db.execute( '''
 		INSERT INTO %(schema)s.gop2012loc
@@ -148,7 +164,8 @@ def makeGopLocalTable( db ):
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.county
 			WHERE
-				NOT %(whereCousub)s
+				NOT %(whereNone)s
+				AND NOT %(whereCousub)s
 				AND NOT %(whereSHD)s
 				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012loc
@@ -171,6 +188,7 @@ def makeGopLocalTable( db ):
 			WHERE %(whereSHD)s;
 	''' %({
 		'schema': schema,
+		'whereNone': whereNone,
 		'whereCousub': whereCousub,
 		'whereSHD': whereSHD,
 		'whereState': whereState,
@@ -189,6 +207,10 @@ def makeGopNationalTable( db ):
 	whereState = '''
 		( state = '02' OR state = '23' OR state = '38' OR state = '56' )
 	'''
+	# PR is not reported in the primary
+	whereNone = '''
+		( state = '72' )
+	'''
 	db.createLikeTable( schema+'.gop2012nat', schema+'.county' )
 	db.execute( '''
 		INSERT INTO %(schema)s.gop2012nat
@@ -197,8 +219,9 @@ def makeGopNationalTable( db ):
 				name, lsad, censusarea, full_geom, goog_geom
 			FROM %(schema)s.county
 			WHERE
-				NOT %(whereSHD)s AND
-				NOT %(whereState)s;
+				NOT %(whereNone)s
+				AND NOT %(whereSHD)s
+				AND NOT %(whereState)s;
 		INSERT INTO %(schema)s.gop2012nat
 			SELECT nextval('%(schema)s.gop2012nat_gid_seq'),
 				geo_id, state, '' AS county,
@@ -213,6 +236,7 @@ def makeGopNationalTable( db ):
 			WHERE %(whereSHD)s;
 	''' %({
 		'schema': schema,
+		'whereNone': whereNone,
 		'whereSHD': whereSHD,
 		'whereState': whereState,
 	}) )
