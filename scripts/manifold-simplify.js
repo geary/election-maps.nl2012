@@ -105,10 +105,26 @@ function Drawing( drawing ) {
 	this.recordSet = this.table.RecordSet;
 }
 
-function SelectState( objs, state ) {
-	ForEach( objs.recordSet, function( record, i ) {
-		objs.objectSet( i ).Selected = ( record.Data('STATE') == state );
+var colNames = 'GEO_ID,STATE,NAME,LSAD,CENSUSAREA,FULL_GEOM'.split(',');
+
+function SelectStateInto( dest, source, state ) {
+	ForEach( source.recordSet, function( record, i ) {
+		source.objectSet( i ).Selected = ( record.Data('STATE') == state );
 	});
+/*
+	var query = Document.NewQuery( 'SelectState', true );
+	query.Text = S(
+		'INSERT INTO [',
+			dest.drawing.Name,
+		'] SELECT [', colNames.join('],['), '] FROM [',
+			source.drawing.Name,
+		'] WHERE [STATE] = "',
+			state,
+		'";'
+	);
+	query.Run();
+	var i = 1;
+*/
 }
 
 function Simplify( shpNameFull, shpNameSimple, tolerance, toleranceAK ) {
@@ -121,7 +137,6 @@ function Simplify( shpNameFull, shpNameSimple, tolerance, toleranceAK ) {
 		false
 	) );
 	
-	var colNames = 'GEO_ID,STATE,NAME,LSAD,CENSUSAREA,FULL_GEOM'.split(',');
 	ForEach( colNames, function( name ) {
 		CopyColumn( simple.columnSet, full.columnSet, name );
 	});
@@ -133,7 +148,13 @@ function Simplify( shpNameFull, shpNameSimple, tolerance, toleranceAK ) {
 		false
 	) );
 	
-	SelectState( full, '02' );
+/*
+	ForEach( colNames, function( name ) {
+		CopyColumn( temp.columnSet, full.columnSet, name );
+	});
+*/
+	
+	SelectStateInto( temp, full, '02' );
 	full.drawing.Cut( true );
 	full = new Drawing( fullDrawing );  // TODO: better way to update this?
 	temp.drawing.Paste();
@@ -161,6 +182,13 @@ function SimplifyPart( source, simple, shpNameSimple, colNames, tolerance ) {
 		var geom = geomSetSimple( i );
 		try {
 			simple.objectSet.Add( geom );
+			var recordFull =
+				GetByID( source.recordSet, object.ID );
+			var recordSimple =
+				GetByID( simple.recordSet, simple.objectSet.LastAdded.ID );
+			ForEach( colNames, function( name ) {
+				recordSimple.Data(name) = recordFull.Data(name);
+			});
 		}
 		catch( e ) {
 			var record = object.Record;
@@ -168,15 +196,15 @@ function SimplifyPart( source, simple, shpNameSimple, colNames, tolerance ) {
 				e.name, ' (', e.description, '): ', shpNameSimple, '[', i, ']: ',
 				record.Data('GEO_ID'), ' ', record.Data('NAME')
 			) );
+/*
 			var center = source.geomSet( i ).Center;
-			var points = Application.NewPointSet();
-			points.Add( center );
-			points.Add( center );
-			points.Add( center );
-			points.Add( center );
-			geom = Application.NewGeom( GeomArea, points );
+			var xy = S( center.X, ' ', center.Y );
+			var wkt = S( 'MULTIPOLYGON (((', xy, ', ', xy, ', ', xy, ', ', xy, ')))' );
+			geom = Application.NewGeomFromTextWKT( wkt );
 			simple.objectSet.Add( geom );
+*/
 		}
+/*
 		var recordFull =
 			GetByID( source.recordSet, object.ID );
 		var recordSimple =
@@ -184,6 +212,7 @@ function SimplifyPart( source, simple, shpNameSimple, colNames, tolerance ) {
 		ForEach( colNames, function( name ) {
 			recordSimple.Data(name) = recordFull.Data(name);
 		});
+*/
 	}
 }
 
