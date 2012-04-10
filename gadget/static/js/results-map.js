@@ -1058,15 +1058,32 @@ function usEnabled() {
 						geo: stateUS.geo,
 						feature: features.by[image.abbr]
 					}
-				if( view != 'county' )
-					return {
-						geo: stateUS.geo,
-						feature: x < 81 ? features.by.AK : features.by.HI
-					}
+				var feature =
+					x < 81 ? features.by.AK || features.by['02'] :
+					view != 'county' ? features.by.HI :
+					hittestBboxes( features, bboxesInsetHI, x, y );
+				if( feature )
+					return { geo: stateUS.geo, feature: feature }
 				return null;
 			}
 		};
 	}
+	
+	function hittestBboxes( features, places, x, y ) {
+		for( var place, i = -1;  place = places[++i]; ) {
+			var b = place.bbox;
+			if( x >= b[0]  &&  x < b[2]  &&  y >= b[1]  &&  y < b[3] )
+				return features.by[place.id];
+		}
+		return null;
+	}
+	
+	var bboxesInsetHI = [
+		{ id: '15001', bbox: [ 138,44, 163,67 ] },  // Hawaii
+		{ id: '15003', bbox: [ 112,21, 129,47 ] },  // Honolulu
+		{ id: '15007', bbox: [ 90,15, 112,42 ] },  // Kauai
+		{ id: '15009', bbox: [ 129,29, 151,54 ] }  // Maui
+	];
 	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
