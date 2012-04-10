@@ -429,7 +429,6 @@ class Database:
 
 
 	def makeFeatureCollection( self, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where ):
-		
 		print 'makeFeatureCollection'
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
@@ -496,7 +495,7 @@ class Database:
 --			AND
 				%(where)s
 			ORDER BY
-				name
+				geo_id
 			;
 		''' % {
 			'table': table,
