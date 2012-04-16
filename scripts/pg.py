@@ -80,7 +80,7 @@ class Database:
 		self.executeCommit('''
 			CREATE DATABASE %(database)s
 				WITH ENCODING = 'UTF8'
-			TEMPLATE = template_postgis20
+			TEMPLATE = template_postgis_20
 			CONNECTION LIMIT = -1;
 		''' % {
 			'database': database,
