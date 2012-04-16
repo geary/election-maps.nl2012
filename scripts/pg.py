@@ -154,8 +154,12 @@ class Database:
 		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
-		command = '"%s/psql" -q -U postgres -d %s -f %s' %(
-			private.POSTGRES_BIN, self.database, sqlfile
+		command = '"%s/psql" -h %s -p %s -q -U %s -d %s -f %s' %(
+			private.POSTGRES_BIN,
+			private.POSTGRES_HOST,
+			private.POSTGRES_PORT,
+			private.POSTGRES_USERNAME,
+			self.database, sqlfile
 		)
 		print 'Running psql:\n%s' % command
 		os.system( command )
