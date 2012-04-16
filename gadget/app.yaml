@@ -1,5 +1,5 @@
 application: election-maps
-version: us2012
+version: fr2012
 runtime: python
 api_version: 1
 
