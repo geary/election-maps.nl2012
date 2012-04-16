@@ -128,7 +128,7 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True ):
+	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True, shpfilename=None ):
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		if encoding is None: encoding = 'LATIN1'
@@ -141,7 +141,7 @@ class Database:
 		if ext.lower() == '.zip':
 			print 'Unzipping %s to %s' %( zipname, unzipdir )
 			ZipFile( zipfile, 'r' ).extractall( unzipdir )
-			shpfile = os.path.join( unzipdir, shpname )
+			shpfile = os.path.join( unzipdir, shpfilename or shpname )
 		print 'loadShapefile %s' % shpfile
 		sqlfile = os.path.join( unzipdir, sqlname )
 		t1 = time.clock()
