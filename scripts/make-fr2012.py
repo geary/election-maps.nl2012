@@ -4,7 +4,7 @@ import pg, private
 
 #import cProfile
 
-schema = 'carto2010'
+schema = 'france'
 fullGeom = 'full_geom'
 googGeom = 'goog_geom'
 boxGeom = googGeom
@@ -52,66 +52,68 @@ def simpleGeom( level ):
 #	db.connection.close()
 
 
-def makeGopNational():
-	db = pg.Database( database = 'usageo_500k' )
-	table = 'gop2012nat'
-	level = '4096'
+def makeDepartments():
+	db = pg.Database( database = 'france2012' )
+	table = 'departement'
+	#level = '4096'
+	level = None
 	if level is not None:
 		addLevel( db, table, level )
-	mergeStates( db, table, level )
-	#writeEachState( db, table, level )
-	writeAllStates( db, table, level )
+	#mergeGeometries( db, table, level )
+	#writeEachDepartment( db, table, level )
+	writeAllDepartments( db, table, level )
 	db.connection.commit()
 	db.connection.close()
 
 
-def makeGopDetail():
-	db = pg.Database( database = 'usageo_500k' )
-	table = 'gop2012loc'
-	level = '512'
+def makeCommunes():
+	db = pg.Database( database = 'france2012' )
+	table = 'commune'
+	#level = '512'
+	level = None
 	if level is not None:
 		addLevel( db, table, level )
-	mergeStates( db, table, level )
-	writeEachState( db, table, level )
-	writeAllStates( db, table, level )
+	mergeGeometries( db, table, 'code_dept', 'departement', 'code_dept', level )
+	writeEachDepartment( db, table, level )
+	writeAllDepartments( db, table, level )
 	db.connection.commit()
 	db.connection.close()
 
 
-def addStateLevel( db, kind, table, simplegeom, fips, level ):
-	shpname = 'us2012-%(kind)s%(fips)s-20m-%(level)s' %({
-		'kind': kind,
-		'fips': fips,
-		'level': level,
-	})
-	shpfile = '%(path)s/%(shpname)s/%(shpname)s.shp' %({
-		'path': private.OUTPUT_SHAPEFILE_PATH,
-		'shpname': shpname,
-	})
-	temptable = '%s_%s'  %( table, level )
-	db.dropTable( temptable )
-	db.loadShapefile(
-		shpfile, private.TEMP_PATH, temptable,
-		simplegeom, '3857', 'LATIN1', True
-	)
-	db.execute( '''
-		UPDATE
-			%(table)s
-		SET
-			%(simplegeom)s =
-				ST_MakeValid(
-					%(temptable)s.%(simplegeom)s
-				)
-		FROM %(temptable)s
-		WHERE %(table)s.geo_id = %(temptable)s.geo_id
-		;
-	''' %({
-		'table': table,
-		'temptable': temptable,
-		'simplegeom': simplegeom,
-	}) )
-	db.connection.commit()
-	db.dropTable( temptable )
+#def addStateLevel( db, kind, table, simplegeom, fips, level ):
+#	shpname = 'us2012-%(kind)s%(fips)s-20m-%(level)s' %({
+#		'kind': kind,
+#		'fips': fips,
+#		'level': level,
+#	})
+#	shpfile = '%(path)s/%(shpname)s/%(shpname)s.shp' %({
+#		'path': private.OUTPUT_SHAPEFILE_PATH,
+#		'shpname': shpname,
+#	})
+#	temptable = '%s_%s'  %( table, level )
+#	db.dropTable( temptable )
+#	db.loadShapefile(
+#		shpfile, private.TEMP_PATH, temptable,
+#		simplegeom, '3857', 'LATIN1', True
+#	)
+#	db.execute( '''
+#		UPDATE
+#			%(table)s
+#		SET
+#			%(simplegeom)s =
+#				ST_MakeValid(
+#					%(temptable)s.%(simplegeom)s
+#				)
+#		FROM %(temptable)s
+#		WHERE %(table)s.geo_id = %(temptable)s.geo_id
+#		;
+#	''' %({
+#		'table': table,
+#		'temptable': temptable,
+#		'simplegeom': simplegeom,
+#	}) )
+#	db.connection.commit()
+#	db.dropTable( temptable )
 
 
 def addLevel( db, table, level ):
@@ -149,69 +151,63 @@ def addLevel( db, table, level ):
 	pass
 
 
-def mergeStates( db, table, level ):
+def mergeGeometries( db, sourceTable, sourceIdCol, targetTable, targetIdCol, level ):
 	geom = simpleGeom( level )
 	db.mergeGeometry(
-		schema+'.'+table, 'state', geom,
-		schema+'.state', 'state', geom
+		schema+'.'+sourceTable, sourceIdCol, geom,
+		schema+'.'+targetTable, targetIdCol, geom
 	)
 
 
-def writeEachState( db, table, level ):
-	db.execute( 'SELECT geo_id, name FROM %s.state ORDER BY geo_id;' %( schema ) )
-	for geo_id, name in db.cursor.fetchall():
-		fips = geo_id.split('US')[1]
-		writeState( db, table, level, fips, name )
+def writeEachDepartment( db, table, level ):
+	db.execute( 'SELECT code_dept, nom_dept FROM %s.departement ORDER BY code_dept;' %( schema ) )
+	for code_dept, nom_dept in db.cursor.fetchall():
+		writeDepartment( db, table, level, code_dept, nom_dept )
 
 
-def writeState( db, table, level, fips, name ):
+def writeDepartment( db, table, level, code_dept, nom_dept ):
 	geom = simpleGeom( level )
-	where = "( state = '%s' )" %( fips )
+	where = "( code_dept = '%s' )" %( code_dept )
 	
-	geoState = makeFeatureCollection( db, schema+'.state', boxGeom, boxGeomLL, geom, '00', 'United States', where )
-	geoCounty = makeFeatureCollection( db, schema+'.'+table, boxGeom, boxGeomLL, geom, fips, name, where )
-	#geoTown = makeFeatureCollection( db, schema+'.cousub', boxGeom, boxGeomLL, geom, fips, name, where )
+	geoDepartment = db.makeFeatureCollection(
+		schema+'.departement',
+		boxGeom, boxGeomLL, geom, 'FR', 'France',
+		'code_dept', 'nom_dept', 'code_reg', where
+	)
+	geoCommune = db.makeFeatureCollection(
+		schema+'.'+table,
+		boxGeom, boxGeomLL, geom, code_dept, nom_dept,
+		'code_comm', 'nom_comm', 'code_dept', where
+	)
 	
 	geo = {
-		'state': geoState,
-		'county': geoCounty,
-		#'town': geoTown,
+		'departement': geoDepartment,
+		'commune': geoCommune,
 	}
 	
-	writeGeoJSON( db, fips, geom, geo )
+	writeGeoJSON( db, code_dept, geom, geo )
 
 
-def writeAllStates( db, table, level ):
+def writeAllDepartments( db, table, level ):
 	geom = simpleGeom( level )
 	where = 'true'
-	fips = '00'
-	geoState = makeFeatureCollection( db,
-		schema + '.state',
-		boxGeom, boxGeomLL, geom,
-		fips, 'United States', where
+	geoid = 'FR'  # TODO
+	geoDepartment = db.makeFeatureCollection(
+		schema + '.departement',
+		boxGeom, boxGeomLL, geom, geoid, 'France',
+		'code_dept', 'nom_dept', 'code_reg', where
 	)
 	geo = {
-		'state': geoState,
+		'departement': geoDepartment,
 	}
-	writeGeoJSON( db, fips, geom, geo )
-	
-	geoGOP = makeFeatureCollection( db,
-		schema + '.' + table,
-		boxGeom, boxGeomLL, geom,
-		fips, 'United States', where
-	)
-	geo = {
-		'state': geoState,
-		'county': geoGOP,
-	}
-	writeGeoJSON( db, fips+'-county', geom, geo )
+	writeGeoJSON( db, geoid, geom, geo )
 
 
 #def writeStatesOnly( db ):
 #	geom = simpleGeom( '00' )
 #	where = 'true'
 #	fips = '00'
-#	geoState = makeFeatureCollection( db,
+#	geoState = db.makeFeatureCollection(
 #		schema + '.state00',
 #		boxGeom, boxGeomLL, geom,
 #		fips, 'United States', where
@@ -226,7 +222,7 @@ def writeAllStates( db, table, level ):
 #	geom = simpleGeom( '00' )
 #	where = 'true'
 #	fips = '00'
-#	geoCounty = makeFeatureCollection( db,
+#	geoCounty = db.makeFeatureCollection(
 #		schema + '.county00',
 #		boxGeom, boxGeomLL, geom,
 #		fips, 'United States', where
@@ -237,16 +233,6 @@ def writeAllStates( db, table, level ):
 #	writeGeoJSON( db, fips + '-county', geom, geo )
 
 
-def makeFeatureCollection( db,
-	table, boxGeom, boxGeomLL, polyGeom,
-	geoid, name, idCol, nameCol, extraCol, where
-):
-	return db.makeFeatureCollection(
-		table, boxGeom, boxGeomLL, polyGeom,
-		geoid, name, 'geo_id', 'name', 'lsad', where
-	)
-
-
 def writeGeoJSON( db, fips, geom, geo ):
 	filename = '%s/%s-%s-%s.js' %(
 		private.GEOJSON_PATH, schema, fips, geom
@@ -255,10 +241,8 @@ def writeGeoJSON( db, fips, geom, geo ):
 
 
 def main():
-	#makeState()
-	#makeCounty()
-	makeGopNational()
-	makeGopDetail()
+	makeDepartments()
+	makeCommunes()
 
 
 if __name__ == "__main__":

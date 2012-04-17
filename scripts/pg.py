@@ -416,10 +416,16 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
-	def makeGeoJSON( self, filename, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where, jsonp ):
+	def makeGeoJSON( self,
+		filename, table, boxGeom, boxGeomLL, polyGeom,
+		geoid, name, idCol, nameCol, extraCol, where, jsonp
+	):
 		print 'makeGeoJSON', filename
 		t1 = time.clock()
-		featurecollection = self.makeFeatureCollection( table, boxGeom, boxGeomLL, polyGeom, geoid, name, where )
+		featurecollection = self.makeFeatureCollection(
+			table, boxGeom, boxGeomLL, polyGeom,
+			geoid, name, idCol, nameCol, extraCol, where
+		)
 		self.writeGeoJSON( filename, featurecollection, jsonp )
 		t2 = time.clock()
 		print 'makeGeoJSON %.1f seconds' %( t2 - t1 )
@@ -435,7 +441,10 @@ class Database:
 		file( filename, 'wb' ).write( geojson )
 
 
-	def makeFeatureCollection( self, table, boxGeom, boxGeomLL, polyGeom, geoid, name, where ):
+	def makeFeatureCollection( self,
+		table, boxGeom, boxGeomLL, polyGeom,
+		geoid, name, idCol, nameCol, extraCol, where
+	):
 		print 'makeFeatureCollection'
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
@@ -492,7 +501,7 @@ class Database:
 		
 		self.execute('''
 			SELECT
-				geo_id, name, lsad,
+				%(idCol)s, %(nameCol)s, %(extraCol)s, 
 				ST_AsGeoJSON( ST_Centroid( %(polyGeom)s ), %(digits)s, 1 ),
 				ST_AsGeoJSON( %(polyGeom)s, %(digits)s, 1 )
 			FROM
@@ -502,22 +511,25 @@ class Database:
 --			AND
 				%(where)s
 			ORDER BY
-				geo_id
+				%(idCol)s
 			;
 		''' % {
 			'table': table,
 			'polyGeom': polyGeom,
 			'digits': digits,
+			'idCol': idCol,
+			'nameCol': nameCol,
+			'extraCol': extraCol, 
 			'where': where,
 		})
 		t3 = time.clock()
 		print 'SELECT rows %.1f seconds' %( t3 - t2 )
 		
 		features = []
-		for featuregeoid, featurename, featurelsad, centroidjson, geomjson in self.cursor.fetchall():
+		for featuregeoid, featurename, featureextra, centroidjson, geomjson in self.cursor.fetchall():
 			#print featurename
 			if not centroidjson or not geomjson:
-				print 'NO GEOMETRY for %s %s %s' %( featuregeoid, featurename, featurelsad )
+				print 'NO GEOMETRY for %s %s %s' %( featuregeoid, featurename, featureextra )
 				continue
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
@@ -526,7 +538,7 @@ class Database:
 				'bbox': geometry['bbox'],
 				'id': featuregeoid,
 				'name': featurename,
-				'lsad': featurelsad,
+				extraCol: featureextra,
 				'centroid': centroid['coordinates'],
 				'geometry': geometry,
 			}
