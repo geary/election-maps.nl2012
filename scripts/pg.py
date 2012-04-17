@@ -177,9 +177,12 @@ class Database:
 		os.mkdir( outdir )
 		print 'saveShapefile %s' % shpfile
 		t1 = time.clock()
-		command = '"%s/pgsql2shp" -f %s/%s -u %s -P %s -g %s %s %s' %(
+		command = '"%s/pgsql2shp" -f %s/%s -h %s -p %s -u %s -P %s -g %s %s %s' %(
 			private.POSTGRES_BIN, outdir, shpfile,
-			private.POSTGRES_USERNAME, private.POSTGRES_PASSWORD,
+			private.POSTGRES_HOST,
+			private.POSTGRES_PORT,
+			private.POSTGRES_USERNAME,
+			private.POSTGRES_PASSWORD,
 			column, self.database, tablename
 		)
 		print 'Running pgsql2shp:\n%s' % command
