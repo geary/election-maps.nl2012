@@ -194,11 +194,6 @@ def updateDepartmentNames( db ):
 		FROM france.depts2012
 		WHERE (
 			france.departement.code_dept = france.depts2012.dep
-		) OR (
-			france.departement.code_dept = '97' AND
-			( '97' || france.departement.code_chf ) = france.depts2012.cheflieu
-		) OR (
-			france.departement.code_dept = '985' AND france.depts2012.dep = '976'
 		)
 	'''
 	db.execute( '''
@@ -210,6 +205,18 @@ def updateDepartmentNames( db ):
 			ON france.depts2012(dep);
 		CREATE INDEX france_depts2012_cheflieu_idx
 			ON france.depts2012(cheflieu);
+		
+		UPDATE france.departement
+		SET code_dept = '97', code_reg = '06'
+		WHERE code_dept = '985';
+		
+		UPDATE france.departement
+		SET code_dept = 'Z' || substring( code_reg from 2 for 1 )
+		WHERE code_dept = '97';
+		
+		UPDATE france.depts2012
+		SET dep = 'Z' || substring( region from 2 for 1 )
+		WHERE dep = '97';
 		
 		UPDATE france.departement
 		SET nom_dept = (
@@ -279,6 +286,14 @@ def updateCommuneNames( db ):
 			ON france.comsimp2012(dep);
 		CREATE INDEX france_comsimp2012_com_idx
 			ON france.comsimp2012(com);
+		
+		UPDATE france.commune
+		SET code_dept = 'Z' || substring( code_reg from 2 for 1 )
+		WHERE code_dept = '97';
+		
+		UPDATE france.comsimp2012
+		SET dep = 'Z' || substring( reg from 2 for 1 )
+		WHERE dep = '97';
 		
 		UPDATE france.commune
 		SET nom_comm = (
