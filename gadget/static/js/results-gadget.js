@@ -75,7 +75,7 @@ String.prototype.T = function( args ) {
 		});
 }
 
-opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
+opt.writeScript( '//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery' + ( opt.debug ? '.js' : '.min.js' ) );
 
 opt.writeScript(
 	'//maps.google.com/maps/api/js?v=3.5&sensor=false' + (
