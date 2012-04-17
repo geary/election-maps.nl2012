@@ -21,15 +21,15 @@ def process():
 	createSchema( db )
 	loadRegionTable( db )
 	loadDepartmentTable( db )
-	loadDepartmentShapes( db )
-	makeDepartmentView( db )
 	loadArrondTable( db )
 	loadCantonTable( db )
 	loadCommuneTable( db )
+	loadDepartmentShapes( db )
 	loadCommuneShapes( db )
-	makeCommuneView( db )
-	#saveShapefile( db, resolution, 'gop2012nat' )
-	#saveShapefile( db, resolution, 'gop2012loc' )
+	updateDepartmentNames( db )
+	updateCommuneNames( db )
+	saveShapefile( db, 'departement'  )
+	saveShapefile( db, 'commune'  )
 	closeDatabase( db )
 
 
@@ -189,7 +189,18 @@ def loadDepartmentShapes( db ):
 	db.indexGeometryColumn( table, googGeom )
 
 
-def makeDepartmentView( db ):
+def updateDepartmentNames( db ):
+	fromWhere = '''
+		FROM france.depts2012
+		WHERE (
+			france.departement.code_dept = france.depts2012.dep
+		) OR (
+			france.departement.code_dept = '97' AND
+			( '97' || france.departement.code_chf ) = france.depts2012.cheflieu
+		) OR (
+			france.departement.code_dept = '985' AND france.depts2012.dep = '976'
+		)
+	'''
 	db.execute( '''
 		CREATE INDEX france_departement_code_dept_idx
 			ON france.departement(code_dept);
@@ -200,41 +211,65 @@ def makeDepartmentView( db ):
 		CREATE INDEX france_depts2012_cheflieu_idx
 			ON france.depts2012(cheflieu);
 		
-		CREATE VIEW france.dept
-		AS SELECT
-			france.depts2012.gid,
-			region, dep, cheflieu, tncc, ncc, nccenr,
-			id_geofla, code_dept, nom_dept, code_chf, nom_chf,
-			x_chf_lieu, y_chf_lieu, x_centroid, y_centroid, code_reg,
-			nom_region, full_geom, goog_geom
-		FROM france.depts2012, france.departement
-		WHERE (
-			france.departement.code_dept = france.depts2012.dep
-		) OR (
-			france.departement.code_dept = '97' AND
-			( '97' || france.departement.code_chf ) = france.depts2012.cheflieu
-		) OR (
-			france.departement.code_dept = '985' AND france.depts2012.dep = '976'
+		UPDATE france.departement
+		SET nom_dept = (
+			SELECT nccenr %(fromWhere)s
+		)	
+		WHERE EXISTS (
+			SELECT NULL %(fromWhere)s
 		);
-	''')
+	''' % {
+		'fromWhere': fromWhere,
+	})
 	db.connection.commit()
 
 
 def loadCommuneShapes( db ):
 	table = schema + '.commune'
-	zipfile = 'GEOFLA_1-1_SHP_LAMB93_FR-ED111'
-	filename = '../shapes/geofla/%s.zip' % zipfile
-	print 'Loading %s' % filename
-	db.loadShapefile(
-		filename, private.TEMP_PATH, table,
-		fullGeom, '2154', 'LATIN1', True,
-		'%s/COMMUNES/COMMUNE.shp' % zipfile
-	)
+	def load( zipfile, suffix, srid, create=False ):
+		filename = '../shapes/geofla/%s.zip' % zipfile
+		srctable = table + '_' + suffix
+		print 'Loading %s' % filename
+		db.loadShapefile(
+			filename, private.TEMP_PATH, srctable,
+			fullGeom, srid, 'LATIN1', True,
+			'%s/COMMUNES/COMMUNE.shp' % zipfile
+		)
+		if create:
+			db.createLikeTable( table, srctable )
+			db.addGeometryColumn( table, fullGeom, 4326, True )
+		db.executeCommit('''
+			INSERT INTO %(table)s
+				SELECT nextval('%(table)s_gid_seq'),
+					id_geofla, code_comm, insee_com, nom_comm, statut,
+					x_chf_lieu, y_chf_lieu, x_centroid, y_centroid, z_moyen, superficie,
+					population, code_cant, code_arr, code_dept, nom_dept, code_reg,
+					nom_region,
+					ST_Transform( ST_SetSRID( full_geom, %(srid)s ), 4326 )
+				FROM %(srctable)s;
+		''' %({
+			'table': table,
+			'srctable': srctable,
+			'srid': srid,
+		}) )
+	load( 'GEOFLA_1-1_SHP_LAMB93_FR-ED111', 'fr', '2154', True )
+	load( 'GEOFLA_1-1_SHP_RGM04UTM38S_YT-ED111', 'yt', '32738' ) # '6892'
+	load( 'GEOFLA_1-1_SHP_RGR92UTM40S_RE-ED111', 're', '2975' )
+	load( 'GEOFLA_1-1_SHP_UTM20W84_GP-ED111', 'gp', '32620' )
+	load( 'GEOFLA_1-1_SHP_UTM20W84_MQ-ED111', 'mq', '2973' )
+	load( 'GEOFLA_1-1_SHP_UTM22RGFG95_GF-ED111', 'gf', '2972' )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
 
 
-def makeCommuneView( db ):
+def updateCommuneNames( db ):
+	fromWhere = '''
+			FROM france.comsimp2012
+			WHERE
+				france.commune.code_dept = france.comsimp2012.dep
+			AND
+				france.commune.code_comm = france.comsimp2012.com
+	'''
 	db.execute( '''
 		CREATE INDEX france_commune_code_dept_idx
 			ON france.commune(code_dept);
@@ -245,21 +280,16 @@ def makeCommuneView( db ):
 		CREATE INDEX france_comsimp2012_com_idx
 			ON france.comsimp2012(com);
 		
-		CREATE VIEW france.comm
-		AS SELECT
-			france.comsimp2012.gid,
-			cdc, cheflieu, reg, dep, com, ar, ct, tncc, artmaj, ncc, artmin, nccenr,
-			id_geofla, code_comm, insee_com, nom_comm, statut,
-			x_chf_lieu, y_chf_lieu, x_centroid, y_centroid, z_moyen, superficie,
-			population, code_cant, code_arr, code_dept, nom_dept, code_reg,
-			nom_region, full_geom, goog_geom
-		FROM france.comsimp2012, france.commune
-		WHERE
-			france.commune.code_dept = france.comsimp2012.dep
-		AND
-			france.commune.code_comm = france.comsimp2012.com
-		;
-	''')
+		UPDATE france.commune
+		SET nom_comm = (
+			SELECT nccenr %(fromWhere)s
+		)	
+		WHERE EXISTS (
+			SELECT NULL %(fromWhere)s
+		);
+	''' % {
+		'fromWhere': fromWhere,
+	})
 	db.connection.commit()
 
 
@@ -368,8 +398,8 @@ def makeGopNationalTable( db ):
 	db.connection.commit()
 
 
-def saveShapefile( db, resolution, table ):
-	shpfile = 'us2012-%s-%s-full' %( table, resolution )
+def saveShapefile( db, table ):
+	shpfile = 'fr2012-%s-full' %( table )
 	table = schema + '.' + table
 	db.saveShapefile(
 		shpfile, private.OUTPUT_SHAPEFILE_PATH,
