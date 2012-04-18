@@ -24,6 +24,8 @@ if( $.browser.msie ) {
 		$body.addClass( 'ie7' );
 }
 
+params.randomize = params.debug = true;  // TEMP
+
 opt.randomized = params.randomize || params.zero;
 
 var year = params.year in elections ? +params.year : 2012;
