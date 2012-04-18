@@ -1122,7 +1122,7 @@ function formatLegendTable( cells ) {
 			border = '#C2C2C2';
 			photo = S(
 				'background:url(',
-					imgUrl( S( 'candidate-photos-', year, '-', size, '.png' ) ),
+					imgUrl( S( 'candidate-photos-fr-', year, '-', size, '.png' ) ),
 				'); ',
 				'background-position:-',
 				election.candidates.by.id[candidate.id].index * size, 'px 0px; '
@@ -1443,7 +1443,7 @@ function formatLegendTable( cells ) {
 					'votes'.T(),
 				'</th>',
 				'<th style="text-align:right; padding-bottom:4px;">',
-					current.national  &&  view != 'county' ? 'delegatesAbbr'.T() : '',
+					//current.national  &&  view != 'county' ? 'delegatesAbbr'.T() : '',
 				'</th>',
 			'</tr>'
 		) : '';
@@ -1494,11 +1494,11 @@ function formatLegendTable( cells ) {
 					) : '',
 				'</td>',
 				'<td class="right" style="text-align:right; padding-left:6px;">',
-					current.national  &&  view != 'county' ? S(
-						'<div class="candidate-delegates">',
-							candidate.delegates,
-						'</div>'
-					) : '',
+					//current.national  &&  view != 'county' ? S(
+					//	'<div class="candidate-delegates">',
+					//		candidate.delegates,
+					//	'</div>'
+					//) : '',
 				'</td>',
 			'</tr>'
 		);
@@ -1926,7 +1926,7 @@ function formatLegendTable( cells ) {
 	
 	function getResults() {
 		if( true ) {
-			loadTestResults( current.geoid, false );
+			loadTestResults( current.geoid, params.randomize );
 			return;
 		}
 		var json = geoJSON[current.geoid];
