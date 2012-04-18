@@ -19,6 +19,7 @@ def process():
 	db = openDatabase( database )
 	#addSimplificationFunction( db )
 	createSchema( db )
+	loadNationTable( db )
 	loadRegionTable( db )
 	loadDepartmentTable( db )
 	loadArrondTable( db )
@@ -58,6 +59,18 @@ def createSchema( db ):
 	print 'Creating schema %s' % schema
 	db.createSchema( schema )
 	db.connection.commit()
+
+
+def loadNationTable( db ):
+	loadTable( db,
+		'france2012',
+		'nation, ncc, nccenr',
+		'''
+			nation varchar(2),
+			ncc varchar(70),
+			nccenr varchar(70)
+		'''
+	)
 
 
 def loadRegionTable( db ):
