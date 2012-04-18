@@ -25,6 +25,16 @@ def makeDepartments():
 	level = None
 	if level is not None:
 		addLevel( db, table, level )
+	mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
+		WHERE
+			france.departement.code_reg = france.reg2012.region
+		GROUP BY
+			france.departement.code_reg
+	''' )
+	mergeGeometries( db, 'france.reg2012', 'france.france2012', level, '''
+		WHERE
+			true
+	''' )
 	#mergeGeometries( db, table, level )
 	#writeEachDepartment( db, table, level )
 	writeAllDepartments( db, table, level )
@@ -34,14 +44,18 @@ def makeDepartments():
 
 def makeCommunes():
 	db = pg.Database( database = 'france2012' )
-	table = 'commune'
 	#level = '512'
 	level = None
 	if level is not None:
 		addLevel( db, table, level )
-	mergeGeometries( db, table, 'code_dept', 'departement', 'code_dept', level )
-	writeEachDepartment( db, table, level )
-	writeAllDepartments( db, table, level )
+	mergeGeometries( db, 'france.commune', 'france.departement', level, '''
+		WHERE
+			france.commune.code_dept = france.departement.code_dept
+		GROUP BY
+			france.commune.code_dept
+	''' )
+	writeEachDepartment( db, 'commune', level )
+	writeAllDepartments( db, 'commune', level )
 	db.connection.commit()
 	db.connection.close()
 
@@ -81,12 +95,9 @@ def addLevel( db, table, level ):
 	pass
 
 
-def mergeGeometries( db, sourceTable, sourceIdCol, targetTable, targetIdCol, level ):
+def mergeGeometries( db, sourceTable, targetTable, level, whereGroupBy ):
 	geom = simpleGeom( level )
-	db.mergeGeometry(
-		schema+'.'+sourceTable, sourceIdCol, geom,
-		schema+'.'+targetTable, targetIdCol, geom
-	)
+	db.mergeGeometry( sourceTable, geom, targetTable, geom, whereGroupBy )
 
 
 def writeEachDepartment( db, table, level ):
@@ -127,7 +138,19 @@ def writeAllDepartments( db, table, level ):
 		boxGeom, boxGeomLL, geom, geoid, 'France',
 		'code_dept', 'nom_dept', 'code_reg', where
 	)
+	geoRegion = db.makeFeatureCollection(
+		schema + '.reg2012',
+		None, None, geom, geoid, 'France',
+		'region', 'nccenr', 'tncc', where
+	)
+	geoNation = db.makeFeatureCollection(
+		schema + '.france2012',
+		None, None, geom, geoid, 'France',
+		'nation', 'nccenr', 'nation', where
+	)
 	geo = {
+		'nation': geoNation,
+		'region': geoRegion,
 		'departement': geoDepartment,
 	}
 	writeGeoJSON( db, geoid, geom, geo )

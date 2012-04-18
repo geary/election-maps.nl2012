@@ -330,12 +330,14 @@ class Database:
 		print 'UPDATE ST_Transform %.1f seconds' %( t2 - t1 )
 	
 	def mergeGeometry( self,
-		sourceTable, sourceIdCol, sourceGeom,
-		targetTable, targetIdCol, targetGeom
+		sourceTable, sourceGeom,
+		targetTable, targetGeom,
+		whereGroupBy
 	):
-		print 'mergeGeometry %s %s %s %s %s %s' %(
-			sourceTable, sourceIdCol, sourceGeom,
-			targetTable, targetIdCol, targetGeom
+		print 'mergeGeometry %s %s %s %s %s' %(
+			sourceTable, sourceGeom,
+			targetTable, targetGeom,
+			whereGroupBy
 		)
 		t1 = time.clock()
 		srid = self.getSRID( sourceTable, sourceGeom )
@@ -359,21 +361,16 @@ class Database:
 						)
 					FROM
 						%(sourceTable)s
-					WHERE
-						%(targetTable)s.%(targetIdCol)s = %(sourceTable)s.%(sourceIdCol)s
-					GROUP BY
-						%(sourceTable)s.%(sourceIdCol)s
-						-- %(targetTable)s.%(targetIdCol)s
+					%(whereGroupBy)s
 				);
 			
 			SELECT Populate_Geometry_Columns();
 		''' % {
 			'sourceTable': sourceTable,
-			'sourceIdCol': sourceIdCol,
 			'sourceGeom': sourceGeom,
 			'targetTable': targetTable,
-			'targetIdCol': targetIdCol,
 			'targetGeom': targetGeom,
+			'whereGroupBy': whereGroupBy,
 		})
 		self.connection.commit()
 		t2 = time.clock()
@@ -449,55 +446,58 @@ class Database:
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
-		t1 = time.clock()
-		self.execute('''
-			SELECT
-				ST_AsGeoJSON(
-					ST_Centroid(
-						ST_Extent( %(boxGeom)s )
-					),
-					%(digits)s
-				),
-				ST_AsGeoJSON(
-					ST_Transform(
-						ST_SetSRID(
-							ST_Centroid(
-								ST_Extent( %(boxGeom)s )
-							),
-							3857
+		if boxGeom is not None:
+			t1 = time.clock()
+			self.execute('''
+				SELECT
+					ST_AsGeoJSON(
+						ST_Centroid(
+							ST_Extent( %(boxGeom)s )
 						),
-						4326
+						%(digits)s
 					),
-					6, 1
-				),
-				ST_AsGeoJSON(
-					ST_Extent( %(boxGeom)s ),
-					%(digits)s, 1
-				),
-				ST_AsGeoJSON(
-					ST_Extent( %(boxGeomLL)s ),
-					6, 1
-				)
-			FROM 
-				%(table)s
-			WHERE
-				%(where)s
-			;
-		''' % {
-			'table': table,
-			'boxGeom': boxGeom,
-			'boxGeomLL': boxGeomLL,
-			'polyGeom': polyGeom,
-			'where': where,
-			'digits': digits,
-		})
-		( centerjson, centerjsonll, extentjson, extentjsonll ) = self.cursor.fetchone()
-		center = json.loads( centerjson )
-		centerLL = json.loads( centerjsonll )
-		extent = json.loads( extentjson )
-		extentLL = json.loads( extentjsonll )
-		t2 = time.clock()
-		print 'ST_Extent %.1f seconds' %( t2 - t1 )
+					ST_AsGeoJSON(
+						ST_Transform(
+							ST_SetSRID(
+								ST_Centroid(
+									ST_Extent( %(boxGeom)s )
+								),
+								3857
+							),
+							4326
+						),
+						6, 1
+					),
+					ST_AsGeoJSON(
+						ST_Extent( %(boxGeom)s ),
+						%(digits)s, 1
+					),
+					ST_AsGeoJSON(
+						ST_Extent( %(boxGeomLL)s ),
+						6, 1
+					)
+				FROM 
+					%(table)s
+				WHERE
+					%(where)s
+				;
+			''' % {
+				'table': table,
+				'boxGeom': boxGeom,
+				'boxGeomLL': boxGeomLL,
+				'polyGeom': polyGeom,
+				'where': where,
+				'digits': digits,
+			})
+			( centerjson, centerjsonll, extentjson, extentjsonll ) = self.cursor.fetchone()
+			center = json.loads( centerjson )
+			centerLL = json.loads( centerjsonll )
+			extent = json.loads( extentjson )
+			extentLL = json.loads( extentjsonll )
+			t2 = time.clock()
+			print 'ST_Extent %.1f seconds' %( t2 - t1 )
+		else:
+			t2 = time.clock()
 		
 		self.execute('''
 			SELECT
@@ -546,15 +546,18 @@ class Database:
 			del geometry['bbox']
 		featurecollection = {
 			'type': 'FeatureCollection',
-			'bbox': extent['bbox'],
-			'bboxLL': extentLL['bbox'],
 			'id': geoid,
 			'name': name,
-			'center': center['coordinates'],
-			'centerLL': centerLL['coordinates'],
 			'features': features,
 			'table': table,
 		}
+		if boxGeom is not None:
+			featurecollection.update({
+				'bbox': extent['bbox'],
+				'bboxLL': extentLL['bbox'],
+				'center': center['coordinates'],
+				'centerLL': centerLL['coordinates'],
+			})
 		if srid != -1:
 			featurecollection['crs'] = {
 				'type': 'name',
