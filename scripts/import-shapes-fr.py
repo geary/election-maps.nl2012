@@ -276,7 +276,7 @@ def loadCommuneShapes( db ):
 	load( 'GEOFLA_1-1_SHP_RGM04UTM38S_YT-ED111', 'yt', '32738' ) # '6892'
 	load( 'GEOFLA_1-1_SHP_RGR92UTM40S_RE-ED111', 're', '2975' )
 	load( 'GEOFLA_1-1_SHP_UTM20W84_GP-ED111', 'gp', '32620' )
-	load( 'GEOFLA_1-1_SHP_UTM20W84_MQ-ED111', 'mq', '2973' )
+	load( 'GEOFLA_1-1_SHP_UTM20W84_MQ-ED111', 'mq', '32620' )
 	load( 'GEOFLA_1-1_SHP_UTM22RGFG95_GF-ED111', 'gf', '2972' )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
