@@ -655,6 +655,13 @@ function formatLegendTable( cells ) {
 		//if( json.status == 'later' ) return;
 		
 		outlineFeature( null );
+		
+		if( current.geoid == 'FR' ) {
+			geo = {
+				bbox: [ -571432, 5032100, 1063003, 6596437 ],
+				centerLL: [ 2.2104, 46.2260 ]
+			};
+		}
 		geo && fitBbox( geo.bbox, geo.centerLL );
 	}
 	
