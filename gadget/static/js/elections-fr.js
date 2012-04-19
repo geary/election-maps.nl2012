@@ -5,6 +5,7 @@
 var elections = {
 	2012: {
 		fr: {
+			date: '2012-04-22',
 			tzHour: +2,
 			photos: true,
 			candidates: [
