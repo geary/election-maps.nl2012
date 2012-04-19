@@ -6,7 +6,7 @@ loadStrings({
 "caucus": "Caucus", 
 "caucuses": "Caucuses", 
 "city": "City", 
-"clickForLocal": "Click state for detailed results", 
+"clickForLocal": "Click for detailed results", 
 "countdownHeading": "Live results in:", 
 "countdownHour": "1 hour", 
 "countdownHours": "{{hours}} hours", 

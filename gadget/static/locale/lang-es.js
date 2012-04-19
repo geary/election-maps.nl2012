@@ -6,7 +6,7 @@ loadStrings({
 "caucus": "Comit\u00e9 electoral", 
 "caucuses": "Comit\u00e9s electorales", 
 "city": "Ciudad", 
-"clickForLocal": "Haz clic en un estado para obtener resultados detallados.", 
+"clickForLocal": "Haz clic para obtener resultados detallados.", 
 "countdownHeading": "Resultados actualizados en:", 
 "countdownHour": "1 hora", 
 "countdownHours": "{{hours}} horas", 

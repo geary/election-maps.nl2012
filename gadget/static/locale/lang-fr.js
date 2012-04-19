@@ -6,7 +6,7 @@ loadStrings({
 "caucus": "Comit\u00e9 \u00e9lectoral", 
 "caucuses": "Comit\u00e9s \u00e9lectoraux", 
 "city": "Ville", 
-"clickForLocal": "Cliquez sur un \u00c9tat pour obtenir des r\u00e9sultats d\u00e9taill\u00e9s.", 
+"clickForLocal": "Cliquez pour obtenir des r\u00e9sultats d\u00e9taill\u00e9s.", 
 "countdownHeading": "R\u00e9sultats en direct dans\u00a0:", 
 "countdownHour": "1\u00a0heure", 
 "countdownHours": "{{hours}}\u00a0heures", 
