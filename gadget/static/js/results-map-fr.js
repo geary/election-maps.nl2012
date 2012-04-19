@@ -550,7 +550,7 @@ function nationalEnabled() {
 			//		var use = row && row[col.NumCountedBallotBoxes];
 			//		if( use ) {
 			//			outlineFeature({ geo:geo, feature:feature });
-			//			showTip( feature );
+			//			showTip({ geo:geo, feature:feature });
 			//			break;
 			//		}
 			//	}
@@ -639,8 +639,10 @@ function nationalEnabled() {
 	
 	function currentGeos() {
 		var json = geoJSON[current.geoid];
+		var jsonFR = geoJSON['FR'];
+		jsonFR.departement.draw = ! json.commune;
 		return json.commune ?
-				[ json.commune, json.departement ] :
+				[ json.commune, json.departement, jsonFR.departement ] :
 				[ json.departement, json.region, json.nation ];
 	}
 	
@@ -745,11 +747,11 @@ function nationalEnabled() {
 					mouseFeature = feature;
 					var cursor =
 						! feature ? null :
-						current.national ? 'pointer' :
+						where.geo.id == 'FR' ? 'pointer' :
 						'default';
 					map.setOptions({ draggableCursor: cursor });
 					outlineFeature( where );
-					showTipThrottle( function() { showTip(feature); });
+					showTipThrottle( function() { showTip(where); });
 				});
 			},
 			touchstart: function( event, where ) {
@@ -767,11 +769,11 @@ function nationalEnabled() {
 				if( feature != mouseFeature ) {
 					mouseFeature = feature;
 					outlineFeature( touch.where );
-					showTip( feature );
+					showTip( touch.where );
 					touch.moveTip = true;
 				}
 				else {
-					if( current.national )
+					if( where.geo.id == 'FR' )
 						gotoGeo( feature, 'tap' );
 				}
 			},
@@ -794,7 +796,7 @@ function nationalEnabled() {
 					this.touchend( event, where );
 				}
 				else {
-					if( current.national )
+					if( where.geo.id == 'FR' )
 						gotoGeo( feature, 'click' );
 				}
 			}
@@ -1040,12 +1042,13 @@ function nationalEnabled() {
 			outlineOverlay.setMap( null );
 		outlineOverlay = null;
 		if( !( where && where.feature ) ) return;
+		var faint = ( where.geo.draw === false );
 		var feat = $.extend( {}, where.feature, {
 			fillColor: '#000000',
 			fillOpacity: 0,
 			strokeWidth: playCounties() ? 5 : opt.counties ? 1.5 : 2.5,
 			strokeColor: '#000000',
-			strokeOpacity: 1
+			strokeOpacity: faint ? .25 : 1
 		});
 		outlineOverlay = new PolyGonzo.PgOverlay({
 			map: map,
@@ -1084,8 +1087,8 @@ function nationalEnabled() {
 		});
 	}
 	
-	function showTip( feature ) {
-		tipHtml = formatTip( feature );
+	function showTip( where ) {
+		tipHtml = formatTip( where );
 		if( tipHtml ) {
 			$maptip.html( tipHtml ).show();
 		}
@@ -1533,12 +1536,13 @@ function nationalEnabled() {
 		);
 	}
 	
-	function formatTip( feature ) {
+	function formatTip( where ) {
+		var feature = where && where.feature;
 		if( ! feature ) return null;
-		var geoid = feature.id;
+		var geoid = where.feature.id;
 		var future = false;
-		var geo = currentGeo(), results = geo.results, col = results && results.colsById;
-		var row = featureResults( results, feature );
+		var geo = where.geo, results = geo.results, col = results && results.colsById;
+		var row = geo.draw !== false  &&  featureResults( results, where.feature );
 		var top = [];
 		if( row  &&  col  &&  mayHaveResults(row,col) ) {
 			row.geoid = geoid;
@@ -1562,6 +1566,7 @@ function nationalEnabled() {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
+			geo.draw === false ? 'clickForLocal'.T() :
 			( current.national  &&  view != 'county' )  ||  ! results ? 'waitingForVotes'.T() :
 			row ? 'noVotesHere'.T() :
 			'neverVotesHere'.T();
