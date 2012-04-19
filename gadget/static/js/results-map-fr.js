@@ -668,6 +668,7 @@ function nationalEnabled() {
 		geo && fitBbox( geo.bbox, geo.centerLL );
 	}
 	
+	var setCenter = 'setCenter';
 	function fitBbox( bbox, centerLL ) {
 		var z;
 		if( params.zoom  &&  params.zoom != 'auto' ) {
@@ -682,8 +683,9 @@ function nationalEnabled() {
 		}
 		z = Math.floor( z );
 		
-		map.setCenter( new gm.LatLng( centerLL[1], centerLL[0] ) );
 		map.setZoom( z );
+		map[setCenter]( new gm.LatLng( centerLL[1], centerLL[0] ) );
+		setCenter = 'panTo';
 		zoom = map.getZoom();
 	}
 	
