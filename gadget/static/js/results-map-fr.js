@@ -825,7 +825,7 @@ function formatLegendTable( cells ) {
 		var json = geoJSON[current.geoid];
 		if( json.commune ) {
 			colorVotes( json.commune.features, '#666666', 1, 1 );
-			colorSimple( json.departement.features, '#FFFFFF', '#444444', 1, 1.5 );
+			colorSimple( json.departement.features, '#FFFFFF', '#444444', 1, 2 );
 		}
 		else {
 			colorVotes( json.departement.features, '#666666', 1, 1 );
