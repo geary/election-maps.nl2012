@@ -1997,7 +1997,7 @@ function formatLegendTable( cells ) {
 		opt.reloadTime = false;
 		clearInterval( reloadTimer );
 		reloadTimer = null;
-		delete params.randomize;
+		//delete params.randomize;
 		
 		var col = [];
 		election.candidates.forEach( function( candidate ) {
