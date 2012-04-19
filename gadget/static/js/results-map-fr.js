@@ -394,7 +394,9 @@ function formatLegendTable( cells ) {
 	
 	var geoJSON = {};
 	function loadRegion( geoid ) {
-		var level = params.level || '';
+		var level =
+			params.level != null ? params.level :
+			geoid == 'FR' ? '4096' : '';
 		geoid = geoid || current.geoid;
 		var json = geoJSON[geoid];
 		if( json ) {

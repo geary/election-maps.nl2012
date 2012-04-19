@@ -21,47 +21,45 @@ def simpleGeom( level ):
 def makeDepartments():
 	db = pg.Database( database = 'france2012' )
 	table = 'departement'
-	#level = '4096'
-	level = None
-	if level is not None:
-		addLevel( db, table, level )
-	mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
-		WHERE
-			france.departement.code_reg = france.reg2012.region
-		GROUP BY
-			france.departement.code_reg
-	''' )
-	mergeGeometries( db, 'france.reg2012', 'france.france2012', level, '''
-		WHERE
-			true
-	''' )
-	#mergeGeometries( db, table, level )
-	#writeEachDepartment( db, table, level )
-	writeAllDepartments( db, table, level )
+	for level in ( None, '512', '1024', '2048', '4096', '8192', ):
+		if level is not None:
+			addLevel( db, table, 'id_geofla', level )
+		mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
+			WHERE
+				france.departement.code_reg = france.reg2012.region
+			GROUP BY
+				france.departement.code_reg
+		''' )
+		mergeGeometries( db, 'france.reg2012', 'france.france2012', level, '''
+			WHERE
+				true
+		''' )
+		#mergeGeometries( db, table, level )
+		#writeEachDepartment( db, table, level )
+		writeAllDepartments( db, table, level )
 	db.connection.commit()
 	db.connection.close()
 
 
 def makeCommunes():
 	db = pg.Database( database = 'france2012' )
-	#level = '512'
-	level = None
-	if level is not None:
-		addLevel( db, table, level )
-	mergeGeometries( db, 'france.commune', 'france.departement', level, '''
-		WHERE
-			france.commune.code_dept = france.departement.code_dept
-		GROUP BY
-			france.commune.code_dept
-	''' )
-	writeEachDepartment( db, 'commune', level )
-	writeAllDepartments( db, 'commune', level )
+	table = 'commune'
+	for level in ( None, ):
+		if level is not None:
+			addLevel( db, table, 'id_geofla', level )
+		mergeGeometries( db, 'france.commune', 'france.departement', level, '''
+			WHERE
+				france.commune.code_dept = france.departement.code_dept
+			GROUP BY
+				france.commune.code_dept
+		''' )
+		writeEachDepartment( db, table, level )
 	db.connection.commit()
 	db.connection.close()
 
 
-def addLevel( db, table, level ):
-	shpfile = '%(path)s/us2012-%(table)s-500k-%(level)s/us2012-%(table)s-500k-%(level)s.shp' %({
+def addLevel( db, table, idcol, level ):
+	shpfile = '%(path)s/fr2012-%(table)s-%(level)s/fr2012-%(table)s-%(level)s.shp' %({
 		'path': private.OUTPUT_SHAPEFILE_PATH,
 		'table': table,
 		'level': level,
@@ -84,12 +82,13 @@ def addLevel( db, table, level ):
 					%(temptable)s.%(simplegeom)s
 				)
 		FROM %(temptable)s
-		WHERE %(fulltable)s.geo_id = %(temptable)s.geo_id
+		WHERE %(fulltable)s.%(idcol)s = %(temptable)s.%(idcol)s
 		;
 	''' %({
 		'fulltable': fulltable,
 		'temptable': temptable,
 		'simplegeom': simplegeom,
+		'idcol': idcol,
 	}) )
 	#db.dropTable( temptable )
 	pass
