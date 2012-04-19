@@ -208,7 +208,7 @@ document.write(
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#selectors, #legend { width:100%; border-bottom:1px solid #C2C2C2; }',
+		'#selectors, #legend { width:100%; /*border-bottom:1px solid #C2C2C2;*/ }',
 		'#legend { background-color:white; }',
 		'body.tv #legend { margin-top:8px; }',
 		'body.sidebar #legend { width:', sidebarWidth, 'px; }',
@@ -1399,6 +1399,9 @@ function nationalEnabled() {
 				'</div>',
 				'<div xclass="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
+				'</div>',
+				'<div style="padding:8px; border-top:1px solid #C2C2C2;">',
+					'frSource'.T(),
 				'</div>',
 			'</div>'
 		);
