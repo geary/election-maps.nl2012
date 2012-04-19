@@ -743,7 +743,11 @@ function formatLegendTable( cells ) {
 					var feature = where && where.feature;
 					if( feature == mouseFeature ) return;
 					mouseFeature = feature;
-					map.setOptions({ draggableCursor: feature ? 'pointer' : null });
+					var cursor =
+						! feature ? null :
+						current.national ? 'pointer' :
+						'default';
+					map.setOptions({ draggableCursor: cursor });
 					outlineFeature( where );
 					showTipThrottle( function() { showTip(feature); });
 				});
@@ -790,7 +794,7 @@ function formatLegendTable( cells ) {
 					this.touchend( event, where );
 				}
 				else {
-					//if( feature.type == 'state'  || feature.type == 'cd' )
+					if( current.national )
 						gotoGeo( feature, 'click' );
 				}
 			}
