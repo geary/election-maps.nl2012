@@ -360,10 +360,9 @@ function formatLegendTable( cells ) {
 	);
 }
 
-//function usEnabled() {
-//	return params.usa != 'false'  &&
-//		( ! params.embed_state  ||  params.embed_state.toLowerCase() == 'us' );
-//}
+function nationalEnabled() {
+	return ! current.national;
+}
 
 (function( $ ) {
 	
@@ -612,7 +611,7 @@ function formatLegendTable( cells ) {
 	function geoReady() {
 		// TODO: refactor with duplicate code in resizeViewNow()
 		setSidebar();
-		//setLegend();
+		setLegend();
 		resizeViewOnly();
 		if( geoMoveNext ) {
 			geoMoveNext = false;
@@ -711,7 +710,7 @@ function formatLegendTable( cells ) {
 			mapIdled = true;
 		});
 /*
-		usEnabled() && gme.addListener( map, 'zoom_changed', function() {
+		nationalEnabled() && gme.addListener( map, 'zoom_changed', function() {
 			var zoom = map.getZoom();
 			if( zoom <= 4  &&  ! current.national )
 				gotoGeo( '00', 'zoom' );
@@ -1316,37 +1315,38 @@ function formatLegendTable( cells ) {
 		return debug && results && ( results.mode == 'test'  ||  opt.randomized );
 	}
 	
-	function viewUsEnabled() {
-		return ! current.national  &&  usEnabled();
+	function viewNationalEnabled() {
+		return ! current.national  &&  nationalEnabled();
 	}
 	
 	function formatSidebar() {
 		// TODO: refactor with formatTopbar()
 		var resultsHeaderHTML = '';
 		var resultsScrollingHTML = '';
-		var results = state.results;
+		var geo = currentGeo();
+		var results = geo.results;
 		if( results ) {
-			var topCandidates = getTopCandidates( state.results, -1, 'votes' );
+			var topCandidates = getTopCandidates( results, -1, 'votes' );
 			var none = ! topCandidates.length;
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			var test = testFlag( results );
-			var viewUSA = usEnabled() ? S(
-				'<div style="padding-bottom:6px;">',
-					'<a href="#" id="viewUSA" title="', 'titleViewUSA'.T(), '" style="">',
-						'viewUSA'.T(),
-					'</a>',
-				'</div>'
-			) : '';
+			var viewNational = nationalEnabled() ? S(
+				'<a href="#" id="viewNational" title="', 'titleViewNational-fr'.T(), '" style="">',
+					'viewNational-fr'.T(),
+				'</a>'
+			) : '&nbsp;';
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
-					'percentReporting'.T( totalReporting(state.results) ),
+					'percentReporting'.T( totalReporting(results) ),
 				'</div>',
 				'<div id="auto-update" class="subtitle-text" style="margin-bottom:8px; ',
 					test ? 'color:red; font-weight:bold;' : '',
 				'">',
 					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
-				viewUSA
+				'<div style="padding-bottom:6px;">',
+					viewNational,
+				'</div>'
 			);
 			var candidates = topCandidates.map( formatSidebarCandidate );
 			resultsScrollingHTML = none ? '' : S(
@@ -1359,30 +1359,31 @@ function formatLegendTable( cells ) {
 				)
 			);
 		}
-		var linkHTML = !(
-			params.usa ||
-			params.hide_links ||
-			params.embed_state
-		) ? S(
-			'<a href="http://www.google.com/elections/ed/us/results/2012/gop-primary/',
-					state.abbr.toLowerCase(),
-					'" target="_parent" id="linkToMap" class="small-text" title="',
-					'linkToMapTitle'.T(), '">',
-				'linkToMap'.T(),
-			'</a>'
-		) : '';
+		//var linkHTML = !(
+		//	params.usa ||
+		//	params.hide_links ||
+		//	params.embed_state
+		//) ? S(
+		//	'<a href="http://www.google.com/elections/ed/us/results/2012/gop-primary/',
+		//			state.abbr.toLowerCase(),
+		//			'" target="_parent" id="linkToMap" class="small-text" title="',
+		//			'linkToMapTitle'.T(), '">',
+		//		'linkToMap'.T(),
+		//	'</a>'
+		//) : '';
 		return S(
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
 					'<div id="election-title" class="title-text">',
-						state.electionTitle,
+						//geo.nation ? geo.nation.name : geo.commune.name,
+						geo.name,
 					'</div>',
 					'<div id="election-date-row" class="" style="margin-bottom:8px; position:relative;">',
 						'<div id="election-date" class="subtitle-text" style="float:left;">',
-							longDateFromYMD( state.date ),
+							longDateFromYMD( election.date ),
 						'</div>',
 						'<div id="map-link" class="small-text" style="float:right; padding-right:3px;">',
-							linkHTML,
+							//linkHTML,
 						'</div>',
 						'<div style="clear:both;">',
 						'</div>',
@@ -1815,9 +1816,9 @@ function formatLegendTable( cells ) {
 			}
 		});
 		
-		$legend.delegate( '#viewUSA', {
+		$legend.delegate( '#viewNational', {
 			click: function( event ) {
-				gotoGeo( '00', 'return' );
+				gotoGeo( 'FR', 'return' );
 				event.preventDefault();
 			}
 		});
