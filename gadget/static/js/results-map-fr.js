@@ -723,6 +723,7 @@ function formatLegendTable( cells ) {
 	if( params.touch ) touch = { mouse: true };
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
 	function polys() {
+		outlineFeature( null );
 		var mousedown = false;
 		colorize();
 		var $container = $('#map');
