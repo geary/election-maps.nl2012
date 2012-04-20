@@ -1400,7 +1400,7 @@ function nationalEnabled() {
 				'<div xclass="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
 				'</div>',
-				'<div style="padding:4px 8px 0; border-top:1px solid #C2C2C2;">',
+				'<div class="faint-text" style="padding:4px 8px 0; border-top:1px solid #C2C2C2;">',
 					'frSource'.T(),
 				'</div>',
 			'</div>'
