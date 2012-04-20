@@ -19,496 +19,117 @@ var elections = {
 				{ color: '#7700FF', id: 'melenchon', firstName: 'Jean-Luc', lastName: 'M&eacute;lenchon', fullName: 'Jean-Luc M&eacute;lenchon' },
 				{ color: '#00FF77', id: 'poutou', firstName: 'Philippe', lastName: 'Poutou', fullName: 'Philippe Poutou' },
 				{ color: '#77FF00', id: 'sarkozy', firstName: 'Nicolas', lastName: 'Sarkozy', fullName: 'Nicolas Sarkozy' }
-			]
+			],
+			electionids: {
+				'FR': 2548,
+				'001': 2549,
+				'002': 2550,
+				'003': 2551,
+				'004': 2552,
+				'005': 2553,
+				'006': 2554,
+				'007': 2555,
+				'008': 2556,
+				'009': 2557,
+				'010': 2558,
+				'011': 2559,
+				'012': 2560,
+				'013': 2561,
+				'014': 2562,
+				'015': 2563,
+				'016': 2564,
+				'017': 2565,
+				'018': 2566,
+				'019': 2567,
+				'021': 2570,
+				'022': 2571,
+				'023': 2572,
+				'024': 2573,
+				'025': 2574,
+				'026': 2575,
+				'027': 2576,
+				'028': 2577,
+				'029': 2578,
+				'02A': 2568,
+				'02B': 2569,
+				'030': 2579,
+				'031': 2580,
+				'032': 2581,
+				'033': 2582,
+				'034': 2583,
+				'035': 2584,
+				'036': 2585,
+				'037': 2586,
+				'038': 2587,
+				'039': 2588,
+				'040': 2589,
+				'041': 2590,
+				'042': 2591,
+				'043': 2592,
+				'044': 2593,
+				'045': 2594,
+				'046': 2595,
+				'047': 2596,
+				'048': 2597,
+				'049': 2598,
+				'050': 2599,
+				'051': 2600,
+				'052': 2601,
+				'053': 2602,
+				'054': 2603,
+				'055': 2604,
+				'056': 2605,
+				'057': 2606,
+				'058': 2607,
+				'059': 2608,
+				'060': 2609,
+				'061': 2610,
+				'062': 2611,
+				'063': 2612,
+				'064': 2613,
+				'065': 2614,
+				'066': 2615,
+				'067': 2616,
+				'068': 2617,
+				'069': 2618,
+				'070': 2619,
+				'071': 2620,
+				'072': 2621,
+				'073': 2622,
+				'074': 2623,
+				'075': 2624,
+				'076': 2625,
+				'077': 2626,
+				'078': 2627,
+				'079': 2628,
+				'080': 2629,
+				'081': 2630,
+				'082': 2631,
+				'083': 2632,
+				'084': 2633,
+				'085': 2634,
+				'086': 2635,
+				'087': 2636,
+				'088': 2637,
+				'089': 2638,
+				'090': 2639,
+				'091': 2640,
+				'092': 2641,
+				'093': 2642,
+				'094': 2643,
+				'095': 2644,
+				'099': 2655,
+				'971': 2645,
+				'972': 2646,
+				'973': 2647,
+				'974': 2648,
+				'975': 2649,
+				'976': 2650,
+				'977': 2651,
+				'986': 2652,
+				'987': 2653,
+				'988': 2654
+			}
 		}
 	}
 };
-
-//var states = [
-//	{
-//		abbr: 'FR',
-//		name: 'France',
-//		bounds: {
-//			bbox: [ -13885233, 2819924, -7452828, 6340332 ],
-//			centerLL: [ -95.841534, 38.004972 ]
-//		},
-//		type: 'Primaries',
-//		date: '2012',
-//		electionid: '2511',
-//		electionidCounties: '2508',
-//		electionidDelegates: '2510',
-//		votesby: 'state',
-//		done: false
-//	},
-//	{
-//		fips: '01',
-//		abbr: 'AL',
-//		name: 'Alabama',
-//		date: '2012-03-13',
-//		electionid: '2540',
-//		done: false
-//	},
-//	{
-//		fips: '02',
-//		abbr: 'AK',
-//		name: 'Alaska',
-//		type: 'Caucus',
-//		date: '2012-03-06',
-//		electionid: '2524',
-//		done: false
-//	},
-//	{
-//		fips: '04',
-//		abbr: 'AZ',
-//		name: 'Arizona',
-//		date: '2012-02-28',
-//		electionid: '2522',
-//		done: false
-//	},
-//	{
-//		fips: '05',
-//		abbr: 'AR',
-//		name: 'Arkansas',
-//		date: '2012-05-22',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '06',
-//		abbr: 'CA',
-//		name: 'California',
-//		date: '2012-06-05',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '08',
-//		abbr: 'CO',
-//		name: 'Colorado',
-//		type: 'Caucus',
-//		date: '2012-02-07',
-//		electionid: '2518',
-//		done: false
-//	},
-//	{
-//		fips: '09',
-//		abbr: 'CT',
-//		name: 'Connecticut',
-//		votesby: 'town',
-//		date: '2012-04-24',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '10',
-//		abbr: 'DE',
-//		name: 'Delaware',
-//		date: '2012-04-24',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '11',
-//		abbr: 'DC',
-//		name: 'District of Columbia',
-//		date: '2012-04-03',
-//		electionid: '2545',
-//		done: false
-//	},
-//	{
-//		fips: '12',
-//		abbr: 'FL',
-//		name: 'Florida',
-//		date: '2012-01-31',
-//		electionid: '2516',
-//		done: true
-//	},
-//	{
-//		fips: '13',
-//		abbr: 'GA',
-//		name: 'Georgia',
-//		date: '2012-03-06',
-//		electionid: '2525',
-//		done: false
-//	},
-//	{
-//		fips: '15',
-//		abbr: 'HI',
-//		name: 'Hawaii',
-//		bounds: {
-//			bbox: [ -17838905, 2145221, -17233301, 2539543 ],
-//			centerLL: [ -157.529494, 20.575318 ]
-//		},
-//		type: 'Caucus',
-//		date: '2012-03-13',
-//		electionid: '2541',
-//		done: false
-//	},
-//	{
-//		fips: '16',
-//		abbr: 'ID',
-//		name: 'Idaho',
-//		type: 'Caucus',
-//		date: '2012-03-06',
-//		electionid: '2526',
-//		done: false
-//	},
-//	{
-//		fips: '17',
-//		abbr: 'IL',
-//		name: 'Illinois',
-//		date: '2012-03-20',
-//		electionid: '2543',
-//		done: false
-//	},
-//	{
-//		fips: '18',
-//		abbr: 'IN',
-//		name: 'Indiana',
-//		date: '2012-05-08',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '19',
-//		abbr: 'IA',
-//		name: 'Iowa',
-//		type: 'Caucus',
-//		date: '2012-01-03',
-//		electionid: '2512',
-//		done: true
-//	},
-//	{
-//		fips: '20',
-//		abbr: 'KS',
-//		name: 'Kansas',
-//		type: 'Caucus',
-//		date: '2012-03-10',
-//		electionid: '2539',
-//		done: false
-//	},
-//	{
-//		fips: '21',
-//		abbr: 'KY',
-//		name: 'Kentucky',
-//		date: '2012-05-22',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '22',
-//		abbr: 'LA',
-//		name: 'Louisiana',
-//		date: '2012-03-24',
-//		electionid: '2544',
-//		done: false
-//	},
-//	{
-//		fips: '23',
-//		abbr: 'ME',
-//		name: 'Maine',
-//		type: 'Caucus',
-//		date: '2012-02-11',
-//		electionid: '2521',
-//		votesby: 'state',
-//		done: false
-//	},
-//	{
-//		fips: '24',
-//		abbr: 'MD',
-//		name: 'Maryland',
-//		date: '2012-04-03',
-//		electionid: '2546',
-//		done: false
-//	},
-//	{
-//		fips: '25',
-//		abbr: 'MA',
-//		name: 'Massachusetts',
-//		date: '2012-03-06',
-//		electionid: '2528',
-//		votesby: 'town',
-//		fix: {
-//			"Agawam": "Agawam Town",
-//			"Amesbury": "Amesbury Town",
-//			"Barnstable": "Barnstable Town",
-//			"Braintree": "Braintree Town",
-//			"Easthampton": "Easthampton Town",
-//			"Franklin": "Franklin Town",
-//			"Greenfield": "Greenfield Town",
-//			"Manchester": "Manchester-by-the-Sea",
-//			"Methuen": "Methuen Town",
-//			"Palmer": "Palmer Town",
-//			"Southbridge": "Southbridge Town",
-//			"Watertown": "Watertown Town",
-//			"West Springfield": "West Springfield Town",
-//			"Weymouth": "Weymouth Town",
-//			"Winthrop": "Winthrop Town"
-//		},
-//		done: false
-//	},
-//	{
-//		fips: '26',
-//		abbr: 'MI',
-//		name: 'Michigan',
-//		date: '2012-02-28',
-//		electionid: '2523',
-//		done: false
-//	},
-//	{
-//		fips: '27',
-//		abbr: 'MN',
-//		name: 'Minnesota',
-//		type: 'Caucus',
-//		date: '2012-02-07',
-//		electionid: '2519',
-//		done: false
-//	},
-//	{
-//		fips: '28',
-//		abbr: 'MS',
-//		name: 'Mississippi',
-//		date: '2012-03-13',
-//		electionid: '2542',
-//		done: false
-//	},
-//	{
-//		fips: '29',
-//		abbr: 'MO',
-//		name: 'Missouri',
-//		date: '2012-02-07',
-//		electionid: '2520',
-//		done: false
-//	},
-//	{
-//		fips: '30',
-//		abbr: 'MT',
-//		name: 'Montana',
-//		type: 'Caucus',
-//		date: '2012-06-16',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '31',
-//		abbr: 'NE',
-//		name: 'Nebraska',
-//		type: 'Caucus',
-//		date: '2012-06-10',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '32',
-//		abbr: 'NV',
-//		name: 'Nevada',
-//		type: 'Caucus',
-//		date: '2012-02-04',
-//		electionid: '2517',
-//		done: true
-//	},
-//	{
-//		fips: '33',
-//		abbr: 'NH',
-//		name: 'New Hampshire',
-//		fix: {
-//			"Harts Location": "Hart's Location",
-//			"Waterville": "Waterville Valley",
-//			"Wentworth's Location": "3300780740"
-//		},
-//		votesby: 'town',
-//		date: '2012-01-10',
-//		electionid: '2513',
-//		suffixes: {},
-//		done: true
-//	},
-//	{
-//		fips: '34',
-//		abbr: 'NJ',
-//		name: 'New Jersey',
-//		date: '2012-06-05',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '35',
-//		abbr: 'NM',
-//		name: 'New Mexico',
-//		date: '2012-06-05',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '36',
-//		abbr: 'NY',
-//		name: 'New York',
-//		date: '2012-04-24',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '37',
-//		abbr: 'NC',
-//		name: 'North Carolina',
-//		date: '2012-05-08',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '38',
-//		abbr: 'ND',
-//		name: 'North Dakota',
-//		type: 'Caucus',
-//		date: '2012-03-06',
-//		electionid: '2538',
-//		votesby: 'district',
-//		done: false
-//	},
-//	{
-//		fips: '39',
-//		abbr: 'OH',
-//		name: 'Ohio',
-//		date: '2012-03-06',
-//		electionid: '2530',
-//		done: false
-//	},
-//	{
-//		fips: '40',
-//		abbr: 'OK',
-//		name: 'Oklahoma',
-//		date: '2012-03-06',
-//		electionid: '2531',
-//		done: false
-//	},
-//	{
-//		fips: '41',
-//		abbr: 'OR',
-//		name: 'Oregon',
-//		date: '2012-05-15',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '42',
-//		abbr: 'PA',
-//		name: 'Pennsylvania',
-//		date: '2012-04-24',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '44',
-//		abbr: 'RI',
-//		name: 'Rhode Island',
-//		date: '2012-04-24',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '45',
-//		abbr: 'SC',
-//		name: 'South Carolina',
-//		date: '2012-01-21',
-//		electionid: '2515',
-//		done: true
-//	},
-//	{
-//		fips: '46',
-//		abbr: 'SD',
-//		name: 'South Dakota',
-//		date: '2012-06-05',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '47',
-//		abbr: 'TN',
-//		name: 'Tennessee',
-//		date: '2012-03-06',
-//		electionid: '2532',
-//		done: false
-//	},
-//	{
-//		fips: '48',
-//		abbr: 'TX',
-//		name: 'Texas',
-//		date: '2012-05-29',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '49',
-//		abbr: 'UT',
-//		name: 'Utah',
-//		date: '2012-06-26',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '50',
-//		abbr: 'VT',
-//		name: 'Vermont',
-//		fix: {
-//			"Barre Town": "5002303250",
-//			"Enosburgh": "Enosburg",
-//			"Ferrisburg": "Ferrisburgh",
-//			"Newport Town": "5001948925",
-//			"Rutland Town": "5002161300",
-//			"St. Albans Town": "5001161750"
-//		},
-//		date: '2012-03-06',
-//		electionid: '2534',
-//		done: false
-//	},
-//	{
-//		fips: '51',
-//		abbr: 'VA',
-//		name: 'Virginia',
-//		date: '2012-03-06',
-//		electionid: '2535',
-//		done: false
-//	},
-//	{
-//		fips: '53',
-//		abbr: 'WA',
-//		name: 'Washington',
-//		type: 'Caucus',
-//		date: '2012-03-03',
-//		electionid: '2536',
-//		done: false
-//	},
-//	{
-//		fips: '54',
-//		abbr: 'WV',
-//		name: 'West Virginia',
-//		date: '2012-05-08',
-//		electionid: '',
-//		done: false
-//	},
-//	{
-//		fips: '55',
-//		abbr: 'WI',
-//		name: 'Wisconsin',
-//		date: '2012-04-03',
-//		electionid: '2547',
-//		done: false
-//	},
-//	{
-//		fips: '56',
-//		abbr: 'WY',
-//		name: 'Wyoming',
-//		type: 'Caucus',
-//		date: '2012-03-10',
-//		electionid: '2537',
-//		votesby: 'state',
-//		done: false
-//	}/*,
-//	{
-//		fips: '72',
-//		abbr: 'PR',
-//		name: 'Puerto Rico',
-//		date: '2012-03-18',
-//		electionid: '',
-//		done: false
-//	}*/
-//];
