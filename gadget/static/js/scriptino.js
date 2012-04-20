@@ -274,9 +274,14 @@ function randomInt( n ) {
 })( jQuery );
 
 function htmlEscape( str ) {
+	//return $('<div />').text(str).html();
 	var div = document.createElement( 'div' );
 	div.appendChild( document.createTextNode( str ) );
 	return div.innerHTML;
+}
+
+function htmlUnescape( html ) {
+	return $('<div />').html(html).text();
 }
 
 function percent0( n ) {
