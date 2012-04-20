@@ -1813,7 +1813,7 @@ function nationalEnabled() {
 				$(this).removeClass( 'hover' );
 			},
 			click: function( event ) {
-				var id = this.id.split('-')[2];
+				var id = this.id.replace(/^legend-candidate-/,'');
 				if( id == 'top'  ||  id == currentCandidate ) id = null;
 				$('#chkCycle').prop({ checked:false });
 				stopCycle();
@@ -2085,7 +2085,8 @@ function nationalEnabled() {
 		
 		var candidates = results.candidates = [];
 		for( var i = 0, colID = col.ID;  i < colID;  ++i ) {
-			var id = cols[i].split('-')[1].toLowerCase(), candidate = election.candidates.by.id[id];
+			var id = cols[i].replace(/^TabCount-/,'').toLowerCase(),
+				candidate = election.candidates.by.id[id];
 			candidates.push( $.extend( {}, candidate ) );
 		}
 		candidates.index('id');
