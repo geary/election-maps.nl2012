@@ -154,7 +154,7 @@ document.body.scroll = 'no';
 document.write(
 	'<style type="text/css">',
 		'html, body { width:', ww, 'px; height:', wh, 'px; margin:0; padding:0; overflow:hidden; color:#222; background-color:white; }',
-		'* { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
+		'#legend, #maptip { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
 		'a { font-size:13px; text-decoration:none; color:#1155CC; }',
 		'a:hover { text-decoration:underline; }',
 		//'a:visited { color:#6611CC; }',
