@@ -9,16 +9,16 @@ var elections = {
 			tzHour: +2,
 			photos: true,
 			candidates: [
+				{ color: '#900AF7', id: 'aignan', firstName: 'Nicolas', lastName: 'Dupont-Aignan', fullName: 'Nicolas Dupont-Aignan' },
 				{ color: '#FF0000', id: 'arthaud', firstName: 'Nathalie', lastName: 'Arthaud', fullName: 'Nathalie Arthaud' },
-				{ color: '#00FF00', id: 'bayrou', firstName: 'Fran&ccedil;ois', lastName: 'Bayrou', fullName: 'Fran&ccedil;ois Bayrou' },
-				{ color: '#0000FF', id: 'cheminade', firstName: 'Jacques', lastName: 'Cheminade', fullName: 'Jacques Cheminade' },
-				{ color: '#FFFF00', id: 'aignan', firstName: 'Nicolas', lastName: 'Dupont-Aignan', fullName: 'Nicolas Dupont-Aignan' },
-				{ color: '#FF00FF', id: 'hollande', firstName: 'Fran&ccedil;ois', lastName: 'Hollande', fullName: 'Fran&ccedil;ois Hollande' },
-				{ color: '#00FFFF', id: 'joly', firstName: 'Eva', lastName: 'Joly', fullName: 'Eva Joly' },
-				{ color: '#FF7700', id: 'lepen', firstName: 'Marine', lastName: 'Le Pen', fullName: 'Marine Le Pen' },
-				{ color: '#7700FF', id: 'melenchon', firstName: 'Jean-Luc', lastName: 'M&eacute;lenchon', fullName: 'Jean-Luc M&eacute;lenchon' },
-				{ color: '#00FF77', id: 'poutou', firstName: 'Philippe', lastName: 'Poutou', fullName: 'Philippe Poutou' },
-				{ color: '#77FF00', id: 'sarkozy', firstName: 'Nicolas', lastName: 'Sarkozy', fullName: 'Nicolas Sarkozy' }
+				{ color: '#F58522', id: 'bayrou', firstName: 'Fran&ccedil;ois', lastName: 'Bayrou', fullName: 'Fran&ccedil;ois Bayrou' },
+				{ color: '#D8F70A', id: 'cheminade', firstName: 'Jacques', lastName: 'Cheminade', fullName: 'Jacques Cheminade' },
+				{ color: '#E30B3D', id: 'hollande', firstName: 'Fran&ccedil;ois', lastName: 'Hollande', fullName: 'Fran&ccedil;ois Hollande' },
+				{ color: '#4DC706', id: 'joly', firstName: 'Eva', lastName: 'Joly', fullName: 'Eva Joly' },
+				{ color: '#1006C7', id: 'lepen', firstName: 'Marine', lastName: 'Le Pen', fullName: 'Marine Le Pen' },
+				{ color: '#E30B0B', id: 'melenchon', firstName: 'Jean-Luc', lastName: 'M&eacute;lenchon', fullName: 'Jean-Luc M&eacute;lenchon' },
+				{ color: '#B00000', id: 'poutou', firstName: 'Philippe', lastName: 'Poutou', fullName: 'Philippe Poutou' },
+				{ color: '#0B65E3', id: 'sarkozy', firstName: 'Nicolas', lastName: 'Sarkozy', fullName: 'Nicolas Sarkozy' }
 			],
 			electionids: {
 				'FR': 2548,
