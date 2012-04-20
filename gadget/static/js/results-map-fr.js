@@ -220,8 +220,10 @@ document.write(
 		'#maptip div.click-for-local { padding:4px; }',
 		'body.tv #maptip div.candidate-percent { font-size:20px; font-weight:bold; }',
 		'#sidebar-scroll { padding:0 4px; }',
+		'#election-title { padding-bottom:2px; }',
+		'#election-date-row { display:none; }',
 		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
-		'div.legend-candidate, div.legend-filler { font-size:13px; padding:4px; }',
+		'div.legend-candidate, div.legend-filler { font-size:13px; padding:3px 0 3px 3px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
 		'body.web div.legend-candidate { color:#333; }',
 		'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:21px; font-weight:bold; }',
@@ -1347,7 +1349,7 @@ function nationalEnabled() {
 				'">',
 					test ? 'testData'.T() : 'automaticUpdate'.T(),
 				'</div>',
-				'<div style="padding-bottom:6px;">',
+				'<div style="padding-bottom:3px;">',
 					viewNational,
 				'</div>'
 			);
@@ -1398,7 +1400,7 @@ function nationalEnabled() {
 				'<div xclass="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
 				'</div>',
-				'<div style="padding:8px; border-top:1px solid #C2C2C2;">',
+				'<div style="padding:4px 8px 0; border-top:1px solid #C2C2C2;">',
 					'frSource'.T(),
 				'</div>',
 			'</div>'
