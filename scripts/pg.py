@@ -440,9 +440,11 @@ class Database:
 
 	def makeFeatureCollection( self,
 		table, boxGeom, boxGeomLL, polyGeom,
-		geoid, name, idCol, nameCol, extraCol, where
+		geoid, name, idCol, nameCol, extraCol, where, fixid=None
 	):
 		print 'makeFeatureCollection'
+		if fixid is None: geoidfix = geoid
+		else: geoidfix = fixid(geoid)
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
@@ -528,15 +530,17 @@ class Database:
 		features = []
 		for featuregeoid, featurename, featureextra, centroidjson, geomjson in self.cursor.fetchall():
 			#print featurename
+			if fixid is None: featuregeoidfix = featuregeoid
+			else: featuregeoidfix = fixid(featuregeoid)
 			if not centroidjson or not geomjson:
-				print 'NO GEOMETRY for %s %s %s' %( featuregeoid, featurename, featureextra )
+				print 'NO GEOMETRY for %s %s %s' %( featuregeoidfix, featurename, featureextra )
 				continue
 			geometry = json.loads( geomjson )
 			centroid = json.loads( centroidjson )
 			feature = {
 				'type': 'Feature',
 				'bbox': geometry['bbox'],
-				'id': featuregeoid,
+				'id': featuregeoidfix,
 				'name': featurename,
 				extraCol: featureextra,
 				'centroid': centroid['coordinates'],
@@ -546,7 +550,7 @@ class Database:
 			del geometry['bbox']
 		featurecollection = {
 			'type': 'FeatureCollection',
-			'id': geoid,
+			'id': geoidfix,
 			'name': name,
 			'features': features,
 			'table': table,

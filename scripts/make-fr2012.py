@@ -112,12 +112,12 @@ def writeDepartment( db, table, level, code_dept, nom_dept ):
 	geoDepartment = db.makeFeatureCollection(
 		schema+'.departement',
 		boxGeom, boxGeomLL, geom, 'FR', 'France',
-		'code_dept', 'nom_dept', 'code_reg', where
+		'code_dept', 'nom_dept', 'code_reg', where, fixGeoID
 	)
 	geoCommune = db.makeFeatureCollection(
 		schema+'.'+table,
 		boxGeom, boxGeomLL, geom, code_dept, nom_dept,
-		'code_comm', 'nom_comm', 'code_dept', where
+		'code_comm', 'nom_comm', 'code_dept', where, fixGeoID
 	)
 	
 	geo = {
@@ -135,17 +135,17 @@ def writeAllDepartments( db, table, level ):
 	geoDepartment = db.makeFeatureCollection(
 		schema + '.departement',
 		boxGeom, boxGeomLL, geom, geoid, 'France',
-		'code_dept', 'nom_dept', 'code_reg', where
+		'code_dept', 'nom_dept', 'code_reg', where, fixGeoID
 	)
 	geoRegion = db.makeFeatureCollection(
 		schema + '.reg2012',
 		None, None, geom, geoid, 'France',
-		'region', 'nccenr', 'tncc', where
+		'region', 'nccenr', 'tncc', where, fixGeoID
 	)
 	geoNation = db.makeFeatureCollection(
 		schema + '.france2012',
 		None, None, geom, geoid, 'France',
-		'nation', 'nccenr', 'nation', where
+		'nation', 'nccenr', 'nation', where, fixGeoID
 	)
 	geo = {
 		'nation': geoNation,
@@ -155,9 +155,17 @@ def writeAllDepartments( db, table, level ):
 	writeGeoJSON( db, geoid, geom, geo )
 
 
-def writeGeoJSON( db, fips, geom, geo ):
+def fixGeoID( geoid ):
+	if geoid == 'FR':
+		return geoid
+	if geoid[0] == 'Z':
+		return '97' + geoid[1]
+	return '0' + geoid
+
+
+def writeGeoJSON( db, geoid, geom, geo ):
 	filename = '%s/%s-%s-%s.js' %(
-		private.GEOJSON_PATH, schema, fips, geom
+		private.GEOJSON_PATH, schema, fixGeoID(geoid), geom
 	)
 	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
 
