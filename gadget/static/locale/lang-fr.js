@@ -47,7 +47,7 @@ loadStrings({
 "monthName12": "D\u00e9cembre", 
 "neverVotesHere": "Ce lieu ne transmet pas de r\u00e9sultats de vote.", 
 "noVotesHere": "Ce lieu n'a pas transmis de r\u00e9sultats de vote.", 
-"percentReporting": "{{percent}} de r\u00e9sultats transmis ({{counted}}/{{total}} {{kind}})", 
+"percentReporting": "{{percent}} de r\u00e9sultats transmis ({{counted}}/{{total}}{{kind}})", 
 "primaries": "Primaires", 
 "primary": "Primaire", 
 "tapForLocal": "Appuyez de nouveau pour obtenir des r\u00e9sultats d\u00e9taill\u00e9s.", 
