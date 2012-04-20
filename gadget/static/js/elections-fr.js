@@ -9,10 +9,11 @@ var elections = {
 			tzHour: +2,
 			photos: true,
 			candidates: [
-				{ color: '#900AF7', id: 'aignan', firstName: 'Nicolas', lastName: 'Dupont-Aignan', fullName: 'Nicolas Dupont-Aignan' },
+				// Candidate order must match the candidate-photos image for this election
 				{ color: '#FF0000', id: 'arthaud', firstName: 'Nathalie', lastName: 'Arthaud', fullName: 'Nathalie Arthaud' },
 				{ color: '#F58522', id: 'bayrou', firstName: 'Fran&ccedil;ois', lastName: 'Bayrou', fullName: 'Fran&ccedil;ois Bayrou' },
 				{ color: '#D8F70A', id: 'cheminade', firstName: 'Jacques', lastName: 'Cheminade', fullName: 'Jacques Cheminade' },
+				{ color: '#900AF7', id: 'aignan', firstName: 'Nicolas', lastName: 'Dupont-Aignan', fullName: 'Nicolas Dupont-Aignan' },
 				{ color: '#E30B3D', id: 'hollande', firstName: 'Fran&ccedil;ois', lastName: 'Hollande', fullName: 'Fran&ccedil;ois Hollande' },
 				{ color: '#4DC706', id: 'joly', firstName: 'Eva', lastName: 'Joly', fullName: 'Eva Joly' },
 				{ color: '#1006C7', id: 'lepen', firstName: 'Marine', lastName: 'Le Pen', fullName: 'Marine Le Pen' },
