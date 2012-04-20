@@ -1165,7 +1165,7 @@ function nationalEnabled() {
 		return {
 			counted: counted,
 			total: total,
-			percent: percent1( counted / total ),
+			percent: formatPercent( counted / total ),
 			kind: ''  // TODO
 		};
 	}
@@ -1444,7 +1444,7 @@ function nationalEnabled() {
 				'</td>',
 				'<td>',
 					'<div class="legend-candidate" style="text-align:right;">',
-						percent1( candidate.vsAll ),
+						formatPercent( candidate.vsAll ),
 					'</div>',
 				'</td>',
 				'<td class="right">',
@@ -1483,7 +1483,7 @@ function nationalEnabled() {
 	function formatListCandidate( candidate, i ) {
 		var selected = ( candidate.id == currentCandidate ) ? ' selected' : '';
 		var cls = i === 0 ? ' first' : '';
-		var pct = percent1( candidate.vsAll );
+		var pct = formatPercent( candidate.vsAll );
 		return S(
 			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
 				'<td class="left">',
@@ -1565,7 +1565,7 @@ function nationalEnabled() {
 		
 		var reporting =
 			boxes ? 'percentReporting'.T({
-				percent: percent1( counted / boxes ),
+				percent: formatPercent( counted / boxes ),
 				counted: counted,
 				total: boxes,
 				kind: ''
@@ -1662,16 +1662,22 @@ function nationalEnabled() {
 		$maptip.css({ left:x, top:y });
 	}
 	
+	// TODO: rewrite this
 	function formatNumber( nStr ) {
+		var dsep = 'decimalSep'.T(), tsep = 'thousandsSep'.T();
 		nStr += '';
 		x = nStr.split('.');
 		x1 = x[0];
-		x2 = x.length > 1 ? '.' + x[1] : '';
+		x2 = x.length > 1 ? dsep + x[1] : '';
 		var rgx = /(\d+)(\d{3})/;
-		while (rgx.test(x1)) {
-			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+		while( rgx.test(x1) ) {
+			x1 = x1.replace( rgx, '$1' + tsep + '$2' );
 		}
 		return x1 + x2;
+	}
+	
+	function formatPercent( n ) {
+		return percent1( n, 'decimalSep'.T() );
 	}
 	
 	function getLeaders( locals ) {
