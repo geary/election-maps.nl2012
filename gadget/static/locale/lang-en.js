@@ -28,7 +28,7 @@ loadStrings({
 "delegatesAbbr": "Del.", 
 "delegatesAttrib": "Associated Press projections", 
 "district": "District", 
-"frSource": "Source: <a href=\"http://www.interieur.gouv.fr\" target=\"_blank\" title=\"Ministry of the Interior\">Ministry of the Interior</a>", 
+"frSource": "Source: Ministry of the Interior", 
 "googlePoliticsTitle": "Google Politics & Elections", 
 "languageName": "English", 
 "linkToMap": "Link to this Map", 
