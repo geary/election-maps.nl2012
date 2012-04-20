@@ -24,8 +24,6 @@ if( $.browser.msie ) {
 		$body.addClass( 'ie7' );
 }
 
-params.randomize = params.debug = true;  // TEMP
-
 opt.randomized = params.randomize || params.zero;
 
 var year = params.year in elections ? +params.year : 2012;
@@ -1572,9 +1570,7 @@ function nationalEnabled() {
 			}) :
 			future ? longDateFromYMD(st.date) :
 			geo.draw === false ? 'clickForLocal'.T() :
-			( current.national  &&  view != 'county' )  ||  ! results ? 'waitingForVotes'.T() :
-			row ? 'noVotesHere'.T() :
-			'neverVotesHere'.T();
+			'waitingForVotes'.T();
 		
 		var clickForLocal =
 			top.length && current.national ? S(
@@ -1952,22 +1948,9 @@ function nationalEnabled() {
 	var cacheResults = new Cache;
 	
 	function getResults() {
-		if( true ) {
-			loadTestResults( current.geoid, params.randomize );
-			return;
-		}
-		var json = geoJSON[current.geoid];
-		if( current.national  &&  view == 'county' )
-			electionid = state.electionidCounties;
+		var electionid = election.electionids[current.geoid];
 		
-		//if( electionid == 'random' ) {
-		//	opt.randomized = params.randomize = true;
-		//	electionid += state.fips;
-		//}
-		
-		var results =
-			( ! current.national  ||  cacheResults.get( stateUS.electionidDelegates ) )  &&
-			cacheResults.get( electionid );
+		var results = cacheResults.get( electionid );
 		if( results ) {
 			loadResultTable( results, false );
 			return;
@@ -1979,14 +1962,7 @@ function nationalEnabled() {
 			return;
 		}
 		
-		var e = electionid.split( '|' );
-		var id = params.source == 'gop' ? e[1] : e[0];
-		
-		getElections(
-			current.national ?
-				[ id, stateUS.electionidDelegates ] :
-				[ id ]
-		);
+		getElections([ electionid ]);
 	}
 	
 	var electionLoading, electionsPending = [];
