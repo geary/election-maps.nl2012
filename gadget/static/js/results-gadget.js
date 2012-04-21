@@ -45,7 +45,7 @@ function loadStrings( s ) {
 }
 
 function setLanguage() {
-	var defaultLanguage = 'en';
+	var defaultLanguage = 'fr';
 	var supportedLanguages = {
 		en: true,
 		es: true,
