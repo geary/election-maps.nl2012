@@ -21,7 +21,8 @@ def simpleGeom( level ):
 def makeDepartments():
 	db = pg.Database( database = 'france2012' )
 	table = 'departement'
-	for level in ( None, '512', '1024', '2048', '4096', '8192', ):
+	#for level in ( None, 512, 1024, 2048, 4096, 8192, ):
+	for level in ( None, 4096, ):
 		if level is not None:
 			addLevel( db, table, 'id_geofla', level )
 		mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
@@ -44,6 +45,7 @@ def makeDepartments():
 def makeCommunes():
 	db = pg.Database( database = 'france2012' )
 	table = 'commune'
+	#for level in ( None, 1, ):
 	for level in ( None, ):
 		if level is not None:
 			addLevel( db, table, 'id_geofla', level )
