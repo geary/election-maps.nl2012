@@ -10,15 +10,15 @@ var elections = {
 			photos: true,
 			candidates: [
 				// Candidate order must match the candidate-photos image for this election
-				{ color: '#FF0000', id: 'arthaud', firstName: 'Nathalie', lastName: 'Arthaud', fullName: 'Nathalie Arthaud' },
+				{ color: '#FF6666', id: 'arthaud', firstName: 'Nathalie', lastName: 'Arthaud', fullName: 'Nathalie Arthaud' },
 				{ color: '#F58522', id: 'bayrou', firstName: 'Fran&ccedil;ois', lastName: 'Bayrou', fullName: 'Fran&ccedil;ois Bayrou' },
 				{ color: '#D8F70A', id: 'cheminade', firstName: 'Jacques', lastName: 'Cheminade', fullName: 'Jacques Cheminade' },
 				{ color: '#900AF7', id: 'dupont-aignan', firstName: 'Nicolas', lastName: 'Dupont-Aignan', fullName: 'Nicolas Dupont-Aignan' },
-				{ color: '#E30B3D', id: 'hollande', firstName: 'Fran&ccedil;ois', lastName: 'Hollande', fullName: 'Fran&ccedil;ois Hollande' },
+				{ color: '#EF4BB6', id: 'hollande', firstName: 'Fran&ccedil;ois', lastName: 'Hollande', fullName: 'Fran&ccedil;ois Hollande' },
 				{ color: '#4DC706', id: 'joly', firstName: 'Eva', lastName: 'Joly', fullName: 'Eva Joly' },
 				{ color: '#1006C7', id: 'le pen', firstName: 'Marine', lastName: 'Le Pen', fullName: 'Marine Le Pen' },
-				{ color: '#E30B0B', id: htmlUnescape('m&eacute;lenchon'), firstName: 'Jean-Luc', lastName: 'M&eacute;lenchon', fullName: 'Jean-Luc M&eacute;lenchon' },
-				{ color: '#B00000', id: 'poutou', firstName: 'Philippe', lastName: 'Poutou', fullName: 'Philippe Poutou' },
+				{ color: '#9F1D35', id: htmlUnescape('m&eacute;lenchon'), firstName: 'Jean-Luc', lastName: 'M&eacute;lenchon', fullName: 'Jean-Luc M&eacute;lenchon' },
+				{ color: '#F00000', id: 'poutou', firstName: 'Philippe', lastName: 'Poutou', fullName: 'Philippe Poutou' },
 				{ color: '#0B65E3', id: 'sarkozy', firstName: 'Nicolas', lastName: 'Sarkozy', fullName: 'Nicolas Sarkozy' }
 			],
 			electionids: {
