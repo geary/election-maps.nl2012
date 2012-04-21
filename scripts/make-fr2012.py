@@ -162,7 +162,9 @@ def fixGeoID( geoid ):
 		return geoid
 	if geoid[0] == 'Z':
 		return '97' + geoid[1]
-	return '0' + geoid
+	if len(geoid) == 2:
+		return '0' + geoid
+	return geoid
 
 
 def writeGeoJSON( db, geoid, geom, geo ):
