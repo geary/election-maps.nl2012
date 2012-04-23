@@ -2065,6 +2065,33 @@ function nationalEnabled() {
 		//US: { AS:1, GU:1, MP:1, PR:1, VI:1 }
 	};
 	
+	function fixup( geoid, id ) {
+		switch( geoid ) {
+			case '013':
+				if( id.match( /^055SR(\d\d)$/ ) )
+					return null;
+				var m = id.match( /^055AR(\d\d)$/ );
+				if( m )
+					return '2' + m[1];
+				break;
+			case '069':
+				if( id == '123' )
+					return null;
+				var m = id.match( /^123AR0(\d)$/ );
+				if( m )
+					return '38' + m[1];
+				break;
+			case '075':
+				if( id == '056' )
+					return null;
+				var m = id.match( /^056AR(\d\d)$/ );
+				if( m )
+					return '1' + m[1];
+				break;
+		}
+		return id;
+	}
+	
 	function loadResultTable( json, loading ) {
 		if( loading )
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
@@ -2097,8 +2124,11 @@ function nationalEnabled() {
 		var missing = [];
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
+		var geoid = geo.id;
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			var id = row[col.ID];
+			row[col.ID] = id = fixup( geoid, id );
+			if( id === null ) continue;
 			//var fixed = fix[id];
 			//if( fixed ) {
 			//	id = row[col.ID] = fixed;
