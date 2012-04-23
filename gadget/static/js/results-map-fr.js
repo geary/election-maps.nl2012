@@ -2068,6 +2068,8 @@ function nationalEnabled() {
 	function fixup( geoid, id ) {
 		switch( geoid ) {
 			case '013':
+				if( id == '055' )
+					return null;
 				if( id.match( /^055SR(\d\d)$/ ) )
 					return null;
 				var m = id.match( /^055AR(\d\d)$/ );
