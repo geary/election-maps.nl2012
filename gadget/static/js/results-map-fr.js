@@ -2066,6 +2066,8 @@ function nationalEnabled() {
 	};
 	
 	function fixup( geoid, id ) {
+		if( id === null )
+			return null;
 		switch( geoid ) {
 			case '013':
 				if( id == '055' )
