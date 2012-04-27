@@ -618,8 +618,6 @@ function nationalEnabled() {
 			moveToGeo();
 		}
 		//$('#view-usa').toggle( state.fips != '00' );
-		polys();
-		//mapIdled = false;
 		$('#spinner').hide();
 		if( ! opt.randomized  &&  opt.reloadTime  &&  params.refresh != 'false' ) {
 			clearInterval( reloadTimer );
@@ -703,15 +701,12 @@ function nationalEnabled() {
 	var  mouseFeature;
 	
 	var dragged = false;
-	var mapIdled;
 	function addMapListeners( map ) {
 		gme.addListener( map, 'dragstart', function() {
 			dragged = true;
 		});
 		gme.addListener( map, 'idle', function() {
-			//if( mapIdled )
-				polys();
-			mapIdled = true;
+			polys();
 		});
 /*
 		nationalEnabled() && gme.addListener( map, 'zoom_changed', function() {
@@ -821,10 +816,12 @@ function nationalEnabled() {
 		colorize();
 		//overlays.clear();
 		// Let map display before drawing polys
-		var pt = polyTimeNext;
-		polyTimeNext = 0;
-		if( pt ) setTimeout( draw, 250 );
-		else draw();
+		//var pt = polyTimeNext;
+		//polyTimeNext = 0;
+		//if( pt )
+		//	setTimeout( draw, 250 );
+		//else
+			draw();
 	}
 	
 	function colorize() {
