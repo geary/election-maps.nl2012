@@ -725,100 +725,102 @@ function nationalEnabled() {
 	var touch;
 	if( params.touch ) touch = { mouse: true };
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
+	
+	var mousedown = false;
+	var polyEvents = {
+		mousedown: function( event, where ) {
+			if( touch  &&  ! touch.mouse ) return;
+			showTip( false );
+			mousedown = true;
+			dragged = false;
+		},
+		mouseup: function( event, where ) {
+			if( touch  &&  ! touch.mouse ) return;
+			mousedown = false;
+		},
+		mousemove: function( event, where ) {
+			if( touch || mousedown ) return;
+			polysThrottle( function() {
+				var feature = where && where.feature;
+				if( feature == mouseFeature ) return;
+				mouseFeature = feature;
+				var cursor =
+					! feature ? null :
+					where.geo.id == 'FR' ? 'pointer' :
+					'default';
+				map.setOptions({ draggableCursor: cursor });
+				outlineFeature( where );
+				showTipThrottle( function() { showTip(where); });
+			});
+		},
+		touchstart: function( event, where ) {
+			touch = {};
+			if( event.touches.length == 1 )
+				touch.where = where;
+			else  // multitouch
+				this.touchcancel( event, where );
+		},
+		touchmove: function( event, where ) {
+			this.touchcancel( event, where );
+		},
+		touchend: function( event, where ) {
+			var feature = touch.where && touch.where.feature;
+			if( feature != mouseFeature ) {
+				mouseFeature = feature;
+				outlineFeature( touch.where );
+				showTip( touch.where );
+				touch.moveTip = true;
+			}
+			else {
+				if( where.geo.id == 'FR' )
+					gotoGeo( feature, 'tap' );
+			}
+		},
+		touchcancel: function( event, where ) {
+			delete touch.where;
+			outlineFeature( null );
+			showTip( false );
+		},
+		click: function( event, where ) {
+			if( touch  && ! touch.mouse ) return;
+			mousedown = false;
+			var didDrag = dragged;
+			dragged = false;
+			polyEvents.mousemove( event, where );
+			if( didDrag ) return;
+			var feature = where && where.feature;
+			if( ! feature ) return;
+			if( touch && touch.mouse ) {
+				touch.where = where;
+				this.touchend( event, where );
+			}
+			else {
+				if( where.geo.id == 'FR' )
+					gotoGeo( feature, 'click' );
+			}
+		}
+	};
+	
+	function draw() {
+		var overlay = new PolyGonzo.PgOverlay({
+			map: map,
+			geos: currentGeos(),
+			underlay: getInsetUnderlay,
+			events: playType() ? {} : polyEvents
+		});
+		overlay.setMap( map );
+		setTimeout( function() {
+			overlays.clear();
+			overlays.push( overlay );
+		}, 1 );
+		//overlay.redraw( null, true );
+	}
+	
 	function polys() {
 		outlineFeature( null );
-		var mousedown = false;
 		colorize();
-		var $container = $('#map');
-		var events = playType() ? {} : {
-			mousedown: function( event, where ) {
-				if( touch  &&  ! touch.mouse ) return;
-				showTip( false );
-				mousedown = true;
-				dragged = false;
-			},
-			mouseup: function( event, where ) {
-				if( touch  &&  ! touch.mouse ) return;
-				mousedown = false;
-			},
-			mousemove: function( event, where ) {
-				if( touch || mousedown ) return;
-				polysThrottle( function() {
-					var feature = where && where.feature;
-					if( feature == mouseFeature ) return;
-					mouseFeature = feature;
-					var cursor =
-						! feature ? null :
-						where.geo.id == 'FR' ? 'pointer' :
-						'default';
-					map.setOptions({ draggableCursor: cursor });
-					outlineFeature( where );
-					showTipThrottle( function() { showTip(where); });
-				});
-			},
-			touchstart: function( event, where ) {
-				touch = {};
-				if( event.touches.length == 1 )
-					touch.where = where;
-				else  // multitouch
-					this.touchcancel( event, where );
-			},
-			touchmove: function( event, where ) {
-				this.touchcancel( event, where );
-			},
-			touchend: function( event, where ) {
-				var feature = touch.where && touch.where.feature;
-				if( feature != mouseFeature ) {
-					mouseFeature = feature;
-					outlineFeature( touch.where );
-					showTip( touch.where );
-					touch.moveTip = true;
-				}
-				else {
-					if( where.geo.id == 'FR' )
-						gotoGeo( feature, 'tap' );
-				}
-			},
-			touchcancel: function( event, where ) {
-				delete touch.where;
-				outlineFeature( null );
-				showTip( false );
-			},
-			click: function( event, where ) {
-				if( touch  && ! touch.mouse ) return;
-				mousedown = false;
-				var didDrag = dragged;
-				dragged = false;
-				events.mousemove( event, where );
-				if( didDrag ) return;
-				var feature = where && where.feature;
-				if( ! feature ) return;
-				if( touch && touch.mouse ) {
-					touch.where = where;
-					this.touchend( event, where );
-				}
-				else {
-					if( where.geo.id == 'FR' )
-						gotoGeo( feature, 'click' );
-				}
-			}
-		};
 		//overlays.clear();
 		// Let map display before drawing polys
-		function draw() {
-			var overlay = new PolyGonzo.PgOverlay({
-				map: map,
-				geos: currentGeos(),
-				underlay: getInsetUnderlay,
-				events: events
-			});
-			overlay.setMap( map );
-			setTimeout( function() {
-				overlays.clear();
-				overlays.push( overlay );
-			}, 1 );
-			//overlay.redraw( null, true );
-		}
 		var pt = polyTimeNext;
 		polyTimeNext = 0;
 		if( pt ) setTimeout( draw, 250 );
