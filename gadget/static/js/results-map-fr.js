@@ -617,6 +617,9 @@ function nationalEnabled() {
 			geoMoveNext = false;
 			moveToGeo();
 		}
+		else {
+			polys();
+		}
 		//$('#view-usa').toggle( state.fips != '00' );
 		$('#spinner').hide();
 		if( ! opt.randomized  &&  opt.reloadTime  &&  params.refresh != 'false' ) {
