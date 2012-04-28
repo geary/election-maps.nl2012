@@ -780,7 +780,8 @@ function nationalEnabled() {
 			showTip( false );
 		},
 		click: function( event, where ) {
-			if( touch  && ! touch.mouse ) return;
+			event.stopPropagation();
+			if( touch  &&  ! touch.mouse ) return;
 			mousedown = false;
 			var didDrag = dragged;
 			dragged = false;
