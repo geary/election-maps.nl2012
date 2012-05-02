@@ -128,7 +128,7 @@ class Database:
 		})
 		self.connection.commit()
 	
-	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True, shpfilename=None ):
+	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True, shpfilename=None, tweaksql=None ):
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		if encoding is None: encoding = 'LATIN1'
@@ -154,6 +154,10 @@ class Database:
 		os.system( command )
 		t2 = time.clock()
 		print 'shp2pgsql %.1f seconds' %( t2 - t1 )
+		
+		if tweaksql:
+			sqlfile = tweaksql( sqlfile )
+		
 		command = '"%s/psql" -h %s -p %s -q -U %s -d %s -f %s' %(
 			private.POSTGRES_BIN,
 			private.POSTGRES_HOST,
@@ -165,6 +169,7 @@ class Database:
 		os.system( command )
 		t3 = time.clock()
 		print 'psql %.1f seconds' %( t3 - t2 )
+		
 		shutil.rmtree( unzipdir )
 		print 'loadShapefile done'
 	
@@ -444,7 +449,7 @@ class Database:
 	):
 		print 'makeFeatureCollection'
 		if fixid is None: geoidfix = geoid
-		else: geoidfix = fixid(geoid)
+		else: geoidfix = fixid( geoid )
 		srid = self.getSRID( table, polyGeom )
 		digits = [ 6, 0 ][ isGoogleSRID(srid) ]  # integer for google projection
 		
@@ -531,7 +536,7 @@ class Database:
 		for featuregeoid, featurename, featureextra, centroidjson, geomjson in self.cursor.fetchall():
 			#print featurename
 			if fixid is None: featuregeoidfix = featuregeoid
-			else: featuregeoidfix = fixid(featuregeoid)
+			else: featuregeoidfix = fixid( featuregeoid, geoid )
 			if not centroidjson or not geomjson:
 				print 'NO GEOMETRY for %s %s %s' %( featuregeoidfix, featurename, featureextra )
 				continue

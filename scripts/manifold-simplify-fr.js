@@ -39,14 +39,15 @@ function Clean() {
 }
 
 function ImportSimplifyExport() {
-	ForAllShapes( function( table, tolerance, tolerance2 ) {
+	ForAllShapes( function( table, key, tolerance, custom ) {
 		Log( 'Importing ', table.name );
 		ImportShape( table.shpNameFull );
 		Log( 'Simplifying ', table.name );
-		var drawingSimple = Simplify( table, tolerance, tolerance2 );
+		var drawingSimple = Simplify( table, key, tolerance, custom );
 		Log( 'Exporting ', table.name );
-		if( drawingSimple ) ExportShape( drawingSimple, table.shpNameSimple );
-
+		if( drawingSimple )
+			ExportShape( drawingSimple, table.shpNameSimple );
+		
 		RemoveDrawing( table.shpNameFull );
 		RemoveDrawing( table.shpNameSimple );
 	});
@@ -54,21 +55,37 @@ function ImportSimplifyExport() {
 
 function ForAllShapes( callback ) {
 
-	function go( tableName, tol, tol2 ) {
+	function go( tableName, key, tolerance, custom ) {
 		var table = tables[tableName];
 		var shpNameBase = S( 'fr2012-', table.name, '-' );
 		table.shpNameFull = S( shpNameBase, 'full' );
-		table.shpNameSimple = S( shpNameBase, tol );
-		callback( table, tol, tol2 );
+		table.shpNameSimple = S( shpNameBase, tolerance );
+		callback( table, key, tolerance, custom );
 	}
 	
-	go( 'departement', '512' );
-	go( 'departement', '1024' );
-	go( 'departement', '2048' );
-	go( 'departement', '4096' );
-	go( 'departement', '8192' );
+	go( 'departement', 'code_dept', '4096', {
+		'971': '1024',  // Guadeloupe
+		'972': '1024',  // Martinique
+		'973': '4096',  // Guyane
+		'974': '1024',  // La Reunion
+		'975': '512',  // Saint Pierre et Miquelon
+		'976': '1024',  // Mayotte
+		'986': '512',  // Wallis-et-Futuna
+		'987': '2048',  // Polynesie Francaise
+		'988': '4096'  // Nouvelle Caledonie
+	});
 	
-	//go( 'commune', '512' );
+	go( 'commune', 'code_dept', '128', {
+		'971': '1',  // Guadeloupe
+		'972': '1',  // Martinique
+		'973': '1024',  // Guyane
+		'974': '1',  // La Reunion
+		'975': '64',  // Saint Pierre et Miquelon
+		'976': '1',  // Mayotte
+		'986': '64',  // Wallis-et-Futuna
+		'987': '4096',  // Polynesie Francaise
+		'988': '1024'  // Nouvelle Caledonie
+	});
 }
 
 function RemoveDrawing( shpName ) {
@@ -136,27 +153,42 @@ function Drawing( drawing ) {
 	this.recordSet = this.table.RecordSet;
 }
 
-function SelectStateInto( dest, source, state ) {
-	ForEach( source.recordSet, function( record, i ) {
-		source.objectSet( i ).Selected = ( record.Data('STATE') == state );
-	});
+function SelectInto( table, dest, source, key, value ) {
 /*
-	var query = Document.NewQuery( 'SelectState', true );
+	var n = source.recordSet.Count;
+	ForEach( source.recordSet, function( record, i ) {
+		if( ( i % 10 ) == 0 ) {
+			Log(
+				'Selecting ', key, '=', value, ': ',
+				i, '/', n, ' (', Math.floor( i / n * 100 ), '%)'
+			);
+		}
+		source.objectSet( i ).Selected = ( record.Data(key) == value );
+	});
+*/
+	var query = Document.NewQuery( 'SelectInto', true );
 	query.Text = S(
 		'INSERT INTO [',
 			dest.drawing.Name,
-		'] SELECT [', table.columns.join('],['), '] FROM [',
+		'] SELECT * FROM [',
 			source.drawing.Name,
-		'] WHERE [STATE] = "',
-			state,
+		'] WHERE [', key, '] = "',
+			value,
 		'";'
 	);
 	query.Run();
-	var i = 1;
-*/
+	query.Text = S(
+		'DELETE FROM [',
+			source.drawing.Name,
+		'] WHERE [', key, '] = "',
+			value,
+		'";'
+	);
+	query.Run();
+	Document.ComponentSet.Remove( query );
 }
 
-function Simplify( table, tolerance /*, toleranceAK*/ ) {
+function Simplify( table, key, tolerance, custom ) {
 	var fullDrawing = GetDrawing( table.shpNameFull );
 	var full = new Drawing( fullDrawing );
 	
@@ -170,30 +202,30 @@ function Simplify( table, tolerance /*, toleranceAK*/ ) {
 		CopyColumn( simple.columnSet, full.columnSet, name );
 	});
 	
-	var shpNameTemp = table.shpNameFull + '-Temp';
-	var temp = new Drawing( Document.NewDrawing(
-		DrawingName(shpNameTemp),
-		full.drawing.CoordinateSystem,
-		false
-	) );
+	for( var geoid in custom ) {
+		var tol = custom[geoid];
+		var shpNameTemp = table.shpNameFull + '-Temp';
+		var temp = new Drawing( Document.NewDrawing(
+			DrawingName(shpNameTemp),
+			full.drawing.CoordinateSystem,
+			false
+		) );
+		
+		ForEach( table.columns, function( name ) {
+			CopyColumn( temp.columnSet, full.columnSet, name );
+		});
+		
+		SelectInto( table, temp, full, key, geoid );
+		//full.drawing.Cut( true );
+		full = new Drawing( fullDrawing );  // TODO: better way to update this?
+		//temp.drawing.Paste();
+		
+		SimplifyPart( temp, simple, table, tol );
+		RemoveDrawing( shpNameTemp );
+	}
 	
-/*
-	ForEach( table.columns, function( name ) {
-		CopyColumn( temp.columnSet, full.columnSet, name );
-	});
-*/
-	
-/*
-	SelectStateInto( temp, full, '02' );
-	full.drawing.Cut( true );
-	full = new Drawing( fullDrawing );  // TODO: better way to update this?
-	temp.drawing.Paste();
-	
-	SimplifyPart( temp, simple, table, toleranceAK );
-*/
-	SimplifyPart( full, simple, table, tolerance );
-	
-	RemoveDrawing( shpNameTemp );
+	if( full.geomSet.Count )
+		SimplifyPart( full, simple, table, tolerance );
 	
 	return simple.drawing;
 }

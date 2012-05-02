@@ -24,7 +24,7 @@ def makeDepartments():
 	#for level in ( None, 512, 1024, 2048, 4096, 8192, ):
 	for level in ( None, 4096, ):
 		if level is not None:
-			addLevel( db, table, 'id_geofla', level )
+			addLevel( db, table, 'code_dept', level )
 		mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
 			WHERE
 				france.departement.code_reg = france.reg2012.region
@@ -46,9 +46,9 @@ def makeCommunes():
 	db = pg.Database( database = 'france2012' )
 	table = 'commune'
 	#for level in ( None, 1, ):
-	for level in ( None, ):
+	for level in ( None, 128, ):
 		if level is not None:
-			addLevel( db, table, 'id_geofla', level )
+			addLevel( db, table, 'code_dept,code_comm', level )
 		mergeGeometries( db, 'france.commune', 'france.departement', level, '''
 			WHERE
 				france.commune.code_dept = france.departement.code_dept
@@ -60,7 +60,7 @@ def makeCommunes():
 	db.connection.close()
 
 
-def addLevel( db, table, idcol, level ):
+def addLevel( db, table, idcols, level ):
 	shpfile = '%(path)s/fr2012-%(table)s-%(level)s/fr2012-%(table)s-%(level)s.shp' %({
 		'path': private.OUTPUT_SHAPEFILE_PATH,
 		'table': table,
@@ -75,6 +75,17 @@ def addLevel( db, table, idcol, level ):
 		simplegeom, '3857', 'LATIN1', True
 	)
 	db.addGeometryColumn( fulltable, simplegeom, 3857, True )
+	# TODO: break out this cutesy code into a useful function?
+	where = ' AND '.join( map(
+		lambda idcol: (
+			'%(fulltable)s.%(idcol)s = %(temptable)s.%(idcol)s' % ({
+				'fulltable': fulltable,
+				'temptable': temptable,
+				'idcol': idcol
+			})
+		),
+		idcols.split(',')
+	) )
 	db.execute( '''
 		UPDATE
 			%(fulltable)s
@@ -84,13 +95,13 @@ def addLevel( db, table, idcol, level ):
 					%(temptable)s.%(simplegeom)s
 				)
 		FROM %(temptable)s
-		WHERE %(fulltable)s.%(idcol)s = %(temptable)s.%(idcol)s
+		WHERE %(where)s
 		;
 	''' %({
 		'fulltable': fulltable,
 		'temptable': temptable,
 		'simplegeom': simplegeom,
-		'idcol': idcol,
+		'where': where,
 	}) )
 	#db.dropTable( temptable )
 	pass
@@ -102,7 +113,21 @@ def mergeGeometries( db, sourceTable, targetTable, level, whereGroupBy ):
 
 
 def writeEachDepartment( db, table, level ):
-	db.execute( 'SELECT code_dept, nom_dept FROM %s.departement ORDER BY code_dept;' %( schema ) )
+	#db.execute( 'SELECT code_dept, nom_dept FROM %s.departement ORDER BY code_dept;' %( schema ) )
+	db.execute( '''
+		SELECT code_dept, nom_dept
+		FROM %s.departement
+		-- --
+--		WHERE
+--			( substring(code_dept from 1 for 2) = '97' AND code_dept != '97' )
+--		OR
+--			substring(code_dept from 1 for 2) = '98'
+		-- --
+--		WHERE
+--			code_dept = '971' OR code_dept = '972'
+		-- --
+		ORDER BY code_dept;
+	''' %( schema ) )
 	for code_dept, nom_dept in db.cursor.fetchall():
 		writeDepartment( db, table, level, code_dept, nom_dept )
 
@@ -157,13 +182,21 @@ def writeAllDepartments( db, table, level ):
 	writeGeoJSON( db, geoid, geom, geo )
 
 
-def fixGeoID( geoid ):
+def fixGeoID( geoid, parentid=None ):
+	g = fixGeoIDx( geoid, parentid )
+	if g != geoid:
+		print "fixGeoID( '%s', '%s' ) return '%s'" %( geoid, parentid, g )
+	return g
+
+def fixGeoIDx( geoid, parentid=None ):
 	if geoid == 'FR':
 		return geoid
-	if geoid[0] == 'Z':
-		return '97' + geoid[1]
-	if len(geoid) == 2:
-		return '0' + geoid
+	geoid = geoid.rjust( 3, '0' )
+	if parentid:
+		if parentid == '976':
+			geoid = '5' + geoid[1:]
+		elif parentid in [ '971', '972', '973', '974', '975', '977', '988' ]:
+			geoid = parentid[2] + geoid[1:]
 	return geoid
 
 
