@@ -50,6 +50,8 @@ loadStrings({
 "percentReporting": "{{percent}} reporting ({{counted}}/{{total}}{{kind}})", 
 "primaries": "Primaries", 
 "primary": "Primary", 
+"round1": "Round 1", 
+"round2": "Round 2", 
 "tapForLocal": "Tap again for detailed results", 
 "testData": "TEST DATA", 
 "thousandsSep": ",", 

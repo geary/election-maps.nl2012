@@ -26,10 +26,19 @@ if( $.browser.msie ) {
 
 opt.randomized = params.randomize || params.zero;
 
-var year = params.year in elections ? +params.year : 2012;
-var parties = elections[year];
-var party = params.party in parties ? params.party : 'fr';
-var election = parties[party];
+var defaultElectionKey = '2012-pres-1';
+params.year = params.year || '2012';
+params.contest = params.contest || 'pres';
+params.round = params.round || '1';
+
+var electionKey, election;
+setElection();
+
+function setElection() {
+	electionKey = [ params.year, params.contest, params.round ].join( '-' );
+	election = elections[electionKey] || elections[defaultElectionKey];
+}
+
 var currentCandidate;
 
 if( params.date ) {
@@ -154,12 +163,13 @@ document.body.scroll = 'no';
 document.write(
 	'<style type="text/css">',
 		'html, body { width:', ww, 'px; height:', wh, 'px; margin:0; padding:0; overflow:hidden; color:#222; background-color:white; }',
-		'#legend, #maptip { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; }',
+		'#topbar, #sidebar, #maptip { font-family: Arial,sans-serif; font-size: ', opt.fontsize, '; background-color:white; }',
+		'#topbar { position:absolute; left:', sidebarWidth, 'px; top:0; width:', ww - sidebarWidth, 'px; }',
 		'a { font-size:13px; text-decoration:none; color:#1155CC; }',
 		'a:hover { text-decoration:underline; }',
 		//'a:visited { color:#6611CC; }',
-		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; height:27px; line-height:27px; padding:0 7px; }',
-		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; }',
+		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; xheight:27px; xline-height:27px; padding:2px 6px; }',
+		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; text-decoration:none; }',
 		'a.button.selected { background-color: #EEE; background-image:linear-gradient(top,#EEE,#E0E0E0); border:1px solid #CCC; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#333; }',
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
@@ -169,8 +179,6 @@ document.write(
 		'div.body-text, div.body-text label { font-size:13px; }',
 		'div.faint-text { font-size:12px; color:#777; }',
 		'div.small-text, a.small-text { font-size:11px; }',
-		'div.topbar-delegates { font-size:21px; line-height:21px; font-weight:bold; }',
-		'body.narrow #topbar div.candidate-name { display:none; }',
 		'.content table { xwidth:100%; }',
 		'.content .contentboxtd { width:7%; }',
 		'.content .contentnametd { xfont-size:24px; xwidth:18%; }',
@@ -206,10 +214,9 @@ document.write(
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
 		'#selectors label { font-weight:bold; }',
-		'#selectors, #legend { width:100%; /*border-bottom:1px solid #C2C2C2;*/ }',
-		'#legend { background-color:white; }',
+		'#selectors { width:100%; /*border-bottom:1px solid #C2C2C2;*/ }',
 		'body.tv #legend { margin-top:8px; }',
-		'body.sidebar #legend { width:', sidebarWidth, 'px; }',
+		'#sidebar { width:', sidebarWidth, 'px; }',
 		'#sidebar table.candidates { width:100%; }',
 		'table.candidates td { border-top:1px solid #E7E7E7; }',
 		'#maptip table.candidates { width:100%; }',
@@ -324,8 +331,11 @@ function contentTable() {
 			//		//'<label for="chkCounties">', 'countiesCheckbox'.T(), '</label>',
 			//	'</div>',
 			//'</div>',
-			'<div id="legend">',
-				formatLegendTable( [] ),
+			'<div id="sidebar">',
+				formatSidebarTable( [] ),
+			'</div>',
+			'<div id="topbar">',
+				formatTopbar(),
 			'</div>',
 			'<div style="width:100%;">',
 				'<div id="map" style="width:100%; height:100%;">',
@@ -335,7 +345,7 @@ function contentTable() {
 	);
 }
 
-function formatLegendTable( cells ) {
+function formatSidebarTable( cells ) {
 	function filler() {
 		return S(
 			'<td class="legend-filler">',
@@ -360,6 +370,32 @@ function formatLegendTable( cells ) {
 	);
 }
 
+	function formatTopbar() {
+		return S(
+			'<div id="topbar-content" style="position:relative;">',
+				'<div style="margin:0; padding:3px; float:right;">',
+					'<a class="button', params.year == 2007 ? ' selected' : '', '" id="btn2007">',
+						2007,
+					'</a>',
+					'&nbsp;',
+					'<a class="button', params.year == 2012 ? ' selected' : '', '" id="btn2012">',
+						2012,
+					'</a>',
+					'&nbsp;&nbsp;&nbsp;',
+					'<a class="button', params.round == 1 ? ' selected' : '', '" id="btnRound1">',
+						'round1'.T(),
+					'</a>',
+					'&nbsp;',
+					'<a class="button', params.round == 2 ? ' selected' : '', '" id="btnRound2">',
+						'round2'.T(),
+					'</a>',
+				'</div>',
+				'<div style="clear:both;">',
+				'</div>',
+			'</div>'
+		);
+	}
+	
 function nationalEnabled() {
 	return ! current.national;
 }
@@ -578,17 +614,10 @@ function nationalEnabled() {
 		]);
 	}
 	
-	var useSidebar;
-	function setSidebar() {
-		useSidebar = true;
-		$body.toggleClass( 'sidebar', useSidebar );
-	}
-	
 	$body.addClass( autoplay() ? 'autoplay' : 'interactive' );
 	$body.addClass( tv() ? 'tv' : 'web' );
-	setSidebar();
 	// TODO: refactor with duplicate code in geoReady() and resizeViewNow()
-	var mapWidth = ww - ( useSidebar ? sidebarWidth : 0 );
+	var mapWidth = ww - sidebarWidth;
 	$body
 		.toggleClass( 'hidelogo', mapWidth < 140 )
 		.toggleClass( 'narrow', ww < 770 );
@@ -610,7 +639,6 @@ function nationalEnabled() {
 	var didGeoReady;
 	function geoReady() {
 		// TODO: refactor with duplicate code in resizeViewNow()
-		setSidebar();
 		setLegend();
 		resizeViewOnly();
 		if( geoMoveNext ) {
@@ -895,7 +923,7 @@ function nationalEnabled() {
 	
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
 		var time = now() + times.offset;
-		var results = currentGeo().results;
+		var results = currentGeo().results[electionKey];
 		var col = results && results.cols;
 		var candidates = results && results.candidates;
 		if( !( candidates && currentCandidate ) ) {
@@ -1247,106 +1275,8 @@ function nationalEnabled() {
 	}
 	
 	function setLegend() {
-		$('#legend').html( formatLegend() );
-	}
-	
-	function formatLegend() {
-		return useSidebar ? formatSidebar() : formatTopbar();
-	}
-	
-	function formatTopbar() {
-		var candidatesHTML = '';
-		var results = state.delegates;
-		if( results ) {
-			var topCandidates = getTopCandidates( results, -1, 'delegates', 4 );
-			//var top = formatTopbarTopCandidates( topCandidates );
-			var candidates =
-				topCandidates.length ? topCandidates.map( formatTopbarCandidate ) :
-				formatTopbarCandidate({});
-			candidatesHTML = [ /*top*/ ].concat( candidates ).join('');
-		}
-		var test = testFlag( results );
-		return S(
-			'<div id="topbar" style="position:relative;">',
-				'<div class="topbar-header" style="float:left;">',
-					'<div id="election-title" class="title-text">',
-						'topbarTitle'.T(),
-					'</div>',
-					'<div id="election-subtitle" class="subtitle-text" style="',
-						test ? 'color:red; font-weight:bold;' : '',
-					'">',
-						test ? 'testData'.T() : 'topbarSubtitle'.T(),
-					'</div>',
-					'<div class="subtitle-text">',
-						'delegatesAttrib'.T(),
-					'</div>',
-				'</div>',
-				'<div id="topbar-candidates" style="position:relative; float:right;">',
-					candidatesHTML,
-					'<div style="clear:both;">',
-					'</div>',
-				'</div>',
-				'<div style="clear:both;">',
-				'</div>',
-			'</div>'
-		);
-	}
-	
-	//function formatTopbarTopCandidates( topCandidates ) {
-	//	var colors = topCandidates.map( function( candidate ) {
-	//		return candidate.color;
-	//	});
-	//	var selected = currentCandidate ? '' : ' selected';
-	//	return S(
-	//		'<td class="legend-candidate', selected, '" id="legend-candidate-top">',
-	//			'<div class="legend-candidate">',
-	//				formatSpanColorPatch( colors, 2 ),
-	//				'&nbsp;', 'allCandidatesShort'.T(), '&nbsp;',
-	//			'</div>',
-	//		'</td>'
-	//	);
-	//}
-	
-	function formatTopbarCandidate( candidate ) {
-		var selected = ( candidate.id === currentCandidate ) ? ' selected' : '';
-		var delegates = candidate.delegates;
-		if( params.triple ) delegates = 999;
-		return S(
-			'<div style="float:left; padding:6px 5px 1px 12px;">',
-				'<table cellpadding="0" cellspacing="0">',
-					'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
-						'<td class="left">',
-							'<div class="topbar-delegates" style="text-align:center; margin:-1px 0 0 2px;">',
-								candidate.delegates == null ? ' ' :
-									formatNumber( delegates ),
-							'</div>',
-							'<div style="margin-left:2px;">',
-								formatDivColorPatch(
-									candidate.color || 'white',
-									delegates < 100 ? 23 : 34,
-									12, '1px solid transparent'
-								),
-							'</div>',
-						'</td>',
-						'<td>',
-							'<div style="padding:2px 1px;">',
-								formatCandidateIcon( candidate, 32 ),
-							'</div>',
-						'</td>',
-						'<td class="right">',
-							'<div class="candidate-name" style="margin-right:2px;">',
-								'<div class="first-name">',
-									candidate.firstName || '&nbsp;',
-								'</div>',
-								'<div class="last-name">',
-									candidate.lastName || '&nbsp;',
-								'</div>',
-							'</div>',
-						'</td>',
-					'</tr>',
-				'</table>',
-			'</div>'
-		);
+		$('#topbar').html( formatTopbar() );
+		$('#sidebar').html( formatSidebar() );
 	}
 	
 	function nameCase( name ) {
@@ -1364,11 +1294,10 @@ function nationalEnabled() {
 	}
 	
 	function formatSidebar() {
-		// TODO: refactor with formatTopbar()
 		var resultsHeaderHTML = '';
 		var resultsScrollingHTML = '';
 		var geo = currentGeo();
-		var results = geo.results;
+		var results = geo.results[electionKey];
 		if( results ) {
 			var topCandidates = getTopCandidates( results, -1, 'votes' );
 			var none = ! topCandidates.length;
@@ -1585,13 +1514,13 @@ function nationalEnabled() {
 		if( ! feature ) return null;
 		var geoid = where.feature.id;
 		var future = false;
-		var geo = where.geo, results = geo.results, col = results && results.colsById;
+		var geo = where.geo, results = geo.results[electionKey], col = results && results.colsById;
 		var row = geo.draw !== false  &&  featureResults( results, where.feature );
 		var top = [];
 		if( row  &&  col  &&  mayHaveResults(row,col) ) {
 			row.geoid = geoid;
 			row.geo = geo;
-			top = getTopCandidates( results, row, 'votes', /*useSidebar ? 0 :*/ 4 );
+			top = getTopCandidates( results, row, 'votes', 4 );
 			var content = S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, true ),
@@ -1843,8 +1772,9 @@ function nationalEnabled() {
 			setCounties( this.checked );
 		});
 		
-		var $legend = $('#legend');
-		$legend.delegate( 'tr.legend-candidate', {
+		var $topbar = $('#topbar');
+		var $sidebar = $('#sidebar');
+		$sidebar.delegate( 'tr.legend-candidate', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
@@ -1860,7 +1790,7 @@ function nationalEnabled() {
 			}
 		});
 		
-		$legend.delegate( 'a', {
+		$topbar.delegate( 'a', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
 			},
@@ -1869,24 +1799,50 @@ function nationalEnabled() {
 			}
 		});
 		
-		$legend.delegate( '#viewNational', {
+		$topbar.delegate( '#btn2007,#btn2012', {
+			click: function( event ) {
+				setYear( this.id.replace(/^btn/, '' ) );
+				event.preventDefault();
+			}
+		});
+		
+		$topbar.delegate( '#btnRound1,#btnRound2', {
+			click: function( event ) {
+				setRound( this.id.replace(/^btnRound/, '' ) );
+				event.preventDefault();
+			}
+		});
+		
+		$sidebar.delegate( '#viewNational', {
 			click: function( event ) {
 				gotoGeo( 'FR', 'return' );
 				event.preventDefault();
 			}
 		});
 		
-		$legend.delegate( '#btnCycle', {
-			click: function( event ) {
-				toggleCycle();
-			}
-		});
+		//$sidebar.delegate( '#btnCycle', {
+		//	click: function( event ) {
+		//		toggleCycle();
+		//	}
+		//});
 		
 		setCandidate = function( id, why ) {
 			currentCandidate = id;
 			loadView();
 			if( why ) analytics( why, 'candidate', id || 'all' );
 		}
+	}
+	
+	function setRound( round ) {
+		params.round = round;
+		setElection();
+		loadView();
+	}
+	
+	function setYear( year ) {
+		params.year = year;
+		setElection();
+		loadView();
 	}
 	
 	function toggleCycle() {
@@ -1953,20 +1909,18 @@ function nationalEnabled() {
 			top: Math.floor( wh/2 - 20 )
 		});
 		
-		var mapLeft = 0, mapTop = 0, mapWidth = ww, mapHeight = wh;
-		if( useSidebar ) {
-			mapLeft = sidebarWidth;
-			mapWidth -= mapLeft;
-			//var $sidebarScroll = $('#sidebar-scroll');
-			//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
-		}
-		else {
-			var topbarHeight = $('#topbar').height() + 1;
-			//if( topbarHeight > 50 )  // two rows
-			//	$('#topbar-candidates').css({ float:'left' });
-			mapTop = topbarHeight;
-			mapHeight -= mapTop;
-		}
+		$('#topbar').css({
+			position: 'absolute',
+			left: sidebarWidth,
+			top: 0,
+			width: ww - sidebarWidth
+		});
+		var topbarHeight = $('#topbar').height() + 1;
+		var mapLeft = sidebarWidth, mapTop = topbarHeight;
+		var mapWidth = ww - mapLeft, mapHeight = wh - mapTop;
+		//var $sidebarScroll = $('#sidebar-scroll');
+		//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
+		
 		mapPixBounds = $('#map')
 			.css({
 				position: 'absolute',
@@ -2140,7 +2094,8 @@ function nationalEnabled() {
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
 		var geo = currentGeo();  //  geoJSON[current.geoid];
-		var results = geo.results = json.table;
+		geo.results = geo.results || {};
+		var results = geo.results[electionKey] = json.table;
 		results.mode = json.mode;
 		var zero = ( json.mode == 'test'  &&  ! debug );
 		
