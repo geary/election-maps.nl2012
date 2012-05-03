@@ -963,19 +963,24 @@ function nationalEnabled() {
 	}
 	
 	function useInset() {
-		return current.national  &&  map.getZoom() == 5;
+		if( ! current.national ) return false;
+		var zoom = map.getZoom();
+		return zoom >= 3  &&  zoom <= 6;
 	}
 	
 	function getInsetUnderlay() {
-		var size = 50;
+		var zoom = map.getZoom();
+		var extra = zoom - 5;
+		var pow = Math.pow( 2, extra );
+		var size = 50 * pow;
 		function clear( feature ) {
 			delete feature.zoom;
 			delete feature.offset;
 		}
 		function set( feature, z, x, y ) {
 			var p = PolyGonzo.Mercator.coordToPixel( feature.centroid, z );
-			feature.zoom = z;
-			feature.offset = { x: x - p[0], y: y - p[1] };
+			feature.zoom = z + extra;
+			feature.offset = { x: ( x - p[0] ) * pow, y: ( y - p[1] ) * pow };
 		}
 		function insetAll( action ) {
 			function inset( id, z, x, y ) {
@@ -1018,7 +1023,7 @@ function nationalEnabled() {
 		var images = [{
 			//src: imgUrl('insets-fr.png'),
 			width: size * 2, height: size * 5,
-			left: -225, top: -1365
+			left: -225 * pow, top: -1365 * pow
 		}];
 		return {
 			images: images,
