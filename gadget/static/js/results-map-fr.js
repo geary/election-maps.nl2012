@@ -991,9 +991,21 @@ function nationalEnabled() {
 			inset( 974, 5.8, -200, -1190 );  // La Reunion
 			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
 			inset( 976, 7.2, -150, -1340 );  // Mayotte
-			inset( 986, 6, -150, -1290 );  // Wallis-et-Futun
+			inset( 986, 7.5, -150, -1290 );  // Wallis-et-Futuna
 			inset( 987, 4, -150, -1240 );  // Polynesie Francais
 			inset( 988, 3.4, -150, -1190 );  // Nouvelle Caledoni
+			
+			// Wallis-et-Futuna
+			var feature = geoJSON.FR.departement.features.by[986];
+			feature.geometry.coordinates.forEach( function( poly ) {
+				poly.centroid = feature.centroid;  // hack
+				var ring = poly[0];
+				var coord = ring[0];
+				if( coord[0] < -19700000 )
+					action( poly, 7.5, -30, -1350 );
+				else
+					action( poly, 7.5, -255, -1235 );
+			});
 		}
 		if( ! geoJSON.FR ) return null;
 		var featuresDept = geoJSON.FR.departement.features.by;
