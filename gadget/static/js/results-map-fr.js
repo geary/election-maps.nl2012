@@ -1209,7 +1209,7 @@ function nationalEnabled() {
 			border = '#C2C2C2';
 			photo = S(
 				'background:url(',
-					imgUrl( S( 'candidate-photos-fr-', year, '-', size, '.png' ) ),
+					imgUrl( S( 'candidate-photos-fr-', params.year, '-', size, '.png' ) ),
 				'); ',
 				'background-position:-',
 				election.candidates.by.id[candidate.id].index * size, 'px 0px; '
