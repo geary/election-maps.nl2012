@@ -662,8 +662,8 @@ function nationalEnabled() {
 		
 		if( current.geoid == 'FR' ) {
 			geo = {
-				bbox: [ -571432, 5032100, 1063003, 6596437 ],
-				centerLL: [ 2.2104, 46.2260 ]
+				bbox: [ -1060000, 5060000, 1070000, 6650000 ],
+				centerLL: [ 0.2104, 46.2260 ]
 			};
 		}
 		geo && fitBbox( geo.bbox, geo.centerLL );
@@ -963,96 +963,71 @@ function nationalEnabled() {
 	}
 	
 	function useInset() {
-		return false;
-		return current.national  &&  map.getZoom() == 4;
-	}
-	
-	function insetFeatures( abbr, callback ) {
-		var sf = stateUS.geo.state.features.by;
-		var cf = ( view == 'county' ) && stateUS.geo.county.features.by;
-		if( abbr == 'AK' ) {
-			callback( sf.AK || sf['02'] );
-			cf && callback( cf['02'] );
-		}
-		else {  // HI
-			callback( sf.HI || sf['15'] );
-			cf && '15001 15003 15005 15007 15009'.words( function( fips ) {
-				callback( cf[fips] );
-			});
-		}
+		return current.national  &&  map.getZoom() == 5;
 	}
 	
 	function getInsetUnderlay() {
-		return null;
+		var size = 50;
 		function clear( feature ) {
 			delete feature.zoom;
 			delete feature.offset;
 		}
-		if( ! stateUS.geo ) return null;
-		var kind = view == 'county' ? 'county' : 'state';
-		var features = stateUS.geo[kind].features;
+		function set( feature, z, x, y ) {
+			var p = PolyGonzo.Mercator.coordToPixel( feature.centroid, z );
+			feature.zoom = z;
+			feature.offset = { x: x - p[0], y: y - p[1] };
+		}
+		function insetAll( action ) {
+			function inset( id, z, x, y ) {
+				var feature = featuresDept[id];
+				action( feature, z, x, y );
+				var featureRgn = featuresRgn['0'+feature.code_reg];
+				if( featureRgn )
+					action( featureRgn, z, x, y );
+			}
+			inset( 971, 6.1, -200, -1340 );  // Guadeloupe
+			inset( 972, 6.2, -200, -1290 );  // Martinique
+			inset( 973, 3.3, -200, -1240 );  // Guyane
+			inset( 974, 5.8, -200, -1190 );  // La Reunion
+			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
+			inset( 976, 7.2, -150, -1340 );  // Mayotte
+			inset( 986, 6, -150, -1290 );  // Wallis-et-Futun
+			inset( 987, 4, -150, -1240 );  // Polynesie Francais
+			inset( 988, 3.4, -150, -1190 );  // Nouvelle Caledoni
+		}
+		if( ! geoJSON.FR ) return null;
+		var featuresDept = geoJSON.FR.departement.features.by;
+		var featuresRgn = geoJSON.FR.region.features.by;
 		if( ! useInset() ) {
-			insetFeatures( 'AK', clear );
-			insetFeatures( 'HI', clear );
+			insetAll( clear );
 			return null;
 		}
-		insetFeatures( 'AK', function( feature ) {
-			feature.zoom = 1;
-			feature.offset = { x: -1122, y: -211 };
-		});
-		insetFeatures( 'HI', function( feature ) {
-			feature.zoom = 4;
-			feature.offset = { x: 538, y: -89 };
-		});
+		insetAll( set );
 		var images = [{
-			src: imgUrl('ak-hi.png'),
-			width: 166, height: 84,
-			left: -1380, top: -370
+			//src: imgUrl('insets-fr.png'),
+			width: size * 2, height: size * 5,
+			left: -225, top: -1365
 		}];
-		if( view != 'county' )
-			images = images.concat([{
-				abbr: 'CT',
-				width: 68, height: 14,
-				left: -823, top: -482
-			}, {
-				abbr: 'DC',
-				width: 55, height: 24,
-				left: -876, top: -410
-			}, {
-				abbr: 'DE',
-				width: 51, height: 14,
-				left: -820, top: -442
-			}, {
-				abbr: 'MA',
-				width: 81, height: 14,
-				left: -784, top: -516
-			}, {
-				abbr: 'MD',
-				width: 52, height: 14,
-				left: -839, top: -426
-			}, {
-				abbr: 'NH',
-				width: 61, height: 22,
-				left: -760, top: -544
-			}, {
-				abbr: 'NJ',
-				width: 64, height: 14,
-				left: -814, top: -462
-			}, {
-				abbr: 'RI',
-				width: 71, height: 14,
-				left: -799, top: -500
-			}, {
-				abbr: 'VT',
-				width: 49, height: 14,
-				left: -764, top: -558
-			}]);
 		return {
 			images: images,
 			hittest: function( image, x, y ) {
+				var i = Math.floor( x / size );
+				var j = Math.floor( y / size );
+				var ids = [
+					[ 971, 972, 973, 974, 975 ],
+					[ 976, 986, 987, 988, 0 ]
+				];
+				var id = ids[i][j], feature = featuresDept[id];
+				if( feature ) {
+					return {
+						geo: geoJSON.FR.departement,
+						feature: feature
+					}
+				}
+/*
 				if( image.abbr )
 					return {
-						geo: stateUS.geo,
+						geo: geoJSON.FR.departement,
 						feature: features.by[image.abbr]
 					}
 				var feature =
@@ -1061,6 +1036,8 @@ function nationalEnabled() {
 					hittestBboxes( features, bboxesInsetHI, x, y );
 				if( feature )
 					return { geo: stateUS.geo, feature: feature }
+*/
+
 				return null;
 			}
 		};
