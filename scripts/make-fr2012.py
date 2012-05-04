@@ -45,7 +45,6 @@ def makeDepartments():
 def makeCommunes():
 	db = pg.Database( database = 'france2012' )
 	table = 'commune'
-	#for level in ( None, 1, ):
 	for level in ( None, 128, ):
 		if level is not None:
 			addLevel( db, table, 'code_dept,code_comm', level )
@@ -55,7 +54,7 @@ def makeCommunes():
 			GROUP BY
 				france.commune.code_dept
 		''' )
-		writeEachDepartment( db, table, level )
+	writeEachDepartment( db, table, None )
 	db.connection.commit()
 	db.connection.close()
 
@@ -129,7 +128,8 @@ def writeEachDepartment( db, table, level ):
 		ORDER BY code_dept;
 	''' %( schema ) )
 	for code_dept, nom_dept in db.cursor.fetchall():
-		writeDepartment( db, table, level, code_dept, nom_dept )
+		levels = { '973':128, '975':128, '986':128, '987':128, '988':128 }
+		writeDepartment( db, table, levels.get(code_dept), code_dept, nom_dept )
 
 
 def writeDepartment( db, table, level, code_dept, nom_dept ):
@@ -152,7 +152,7 @@ def writeDepartment( db, table, level, code_dept, nom_dept ):
 		'commune': geoCommune,
 	}
 	
-	writeGeoJSON( db, code_dept, geom, geo )
+	writeGeoJSON( db, code_dept, googGeom, geo )
 
 
 def writeAllDepartments( db, table, level ):
