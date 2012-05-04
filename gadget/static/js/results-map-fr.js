@@ -1275,8 +1275,19 @@ function nationalEnabled() {
 	}
 	
 	function setLegend() {
+		makeCurrentCandidateValid();
 		$('#topbar').html( formatTopbar() );
 		$('#sidebar').html( formatSidebar() );
+	}
+	
+	function makeCurrentCandidateValid() {
+		if( ! currentCandidate )
+			return;
+		var geo = currentGeo();
+		var results = geo.results[electionKey];
+		var col = results.colsById[ 'TabCount-' + currentCandidate ];
+		if( ! results.totals[col] )
+			currentCandidate = null;
 	}
 	
 	function nameCase( name ) {
