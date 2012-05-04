@@ -812,6 +812,8 @@ function nationalEnabled() {
 				var feature = where && where.feature;
 				if( feature == mouseFeature ) return;
 				mouseFeature = feature;
+				if( feature && feature.id == current.geoid )
+					where = feature = null;
 				var cursor =
 					! feature ? null :
 					where.geo.id == 'FR' ? 'pointer' :
@@ -840,7 +842,7 @@ function nationalEnabled() {
 				touch.moveTip = true;
 			}
 			else {
-				if( where.geo.id == 'FR' )
+				if( where.geo.id == 'FR'  &&  feature.id != current.geoid )
 					gotoGeo( feature, 'tap' );
 			}
 		},
@@ -864,7 +866,7 @@ function nationalEnabled() {
 				this.touchend( event, where );
 			}
 			else {
-				if( where.geo.id == 'FR' )
+				if( where.geo.id == 'FR'  &&  feature.id != current.geoid )
 					gotoGeo( feature, 'click' );
 			}
 		}
