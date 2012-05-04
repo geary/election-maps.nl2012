@@ -476,6 +476,8 @@ function nationalEnabled() {
 				var geo = json[kind];
 				indexFeatures( geo );
 			}
+			if( geoid == 'FR' )
+				addLivingAbroad();
 			oneTime();
 		}
 		//setCounties( true );
@@ -489,6 +491,39 @@ function nationalEnabled() {
 		for( var feature, i = -1;  feature = features[++i]; ) {
 			by[feature.id] = feature;
 		}
+	}
+	
+	function addLivingAbroad() {
+		var radius = 100000;
+		feature = {
+			bbox: [ -radius, -radius, radius, radius ],
+			centroid: [ 0, 0],
+			click: false,
+			draw: false,
+			geometry: {
+				coordinates: drawCircle( radius, 32 ),
+				type: 'Polygon'
+			},
+			id: '099',
+			name: "Fran&ccedil;ais de l'Etranger",
+			type: 'Feature'
+		};
+		var features = geoJSON.FR.departement.features;
+		features.push( feature );
+		features.by['099'] = feature;
+	}
+	
+	function drawCircle( radius, steps ) {
+		var ring = [];
+		var pi2 = Math.PI * 2;
+		for( var i = 0;  i < steps;  ++i ) {
+			ring.push([
+				radius * Math.sin( i / steps * pi2 ),
+				radius * Math.cos( i / steps * pi2 )
+			]);
+		}
+		ring.push( ring[0] );
+		return [ ring ];
 	}
 	
 	function setPlayback() {
@@ -790,6 +825,15 @@ function nationalEnabled() {
 */
 	}
 	
+	function maybeGo( where, feature, why ) {
+		if(
+			where.geo.id == 'FR'  &&
+			feature.id != current.geoid  &&
+			feature.click !== false
+		)
+			gotoGeo( feature, why );
+	}
+	
 	var touch;
 	if( params.touch ) touch = { mouse: true };
 	var polysThrottle = throttle(200), showTipThrottle = throttle(200);
@@ -816,7 +860,7 @@ function nationalEnabled() {
 					where = feature = null;
 				var cursor =
 					! feature ? null :
-					where.geo.id == 'FR' ? 'pointer' :
+					where.geo.id == 'FR'  &&  feature.click !== false ? 'pointer' :
 					'default';
 				map.setOptions({ draggableCursor: cursor });
 				outlineFeature( where );
@@ -842,8 +886,7 @@ function nationalEnabled() {
 				touch.moveTip = true;
 			}
 			else {
-				if( where.geo.id == 'FR'  &&  feature.id != current.geoid )
-					gotoGeo( feature, 'tap' );
+				maybeGo( where, feature, 'tap' );
 			}
 		},
 		touchcancel: function( event, where ) {
@@ -866,8 +909,7 @@ function nationalEnabled() {
 				this.touchend( event, where );
 			}
 			else {
-				if( where.geo.id == 'FR'  &&  feature.id != current.geoid )
-					gotoGeo( feature, 'click' );
+				maybeGo( where, feature, 'click' );
 			}
 		}
 	};
@@ -1029,6 +1071,7 @@ function nationalEnabled() {
 			inset( 986, 7.5, -150, -1290 );  // Wallis-et-Futuna
 			inset( 987, 4, -150, -1240 );  // Polynesie Francais
 			inset( 988, 3.4, -150, -1190 );  // Nouvelle Caledoni
+			inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
 			var feature = geoJSON.FR.departement.features.by[986];
@@ -1041,6 +1084,9 @@ function nationalEnabled() {
 				else
 					action( poly, 7.5, -255, -1235 );
 			});
+			
+			// Francais de l'Etranger (French living abroad)
+			geoJSON.FR.departement.features.by['099'].draw = ( action == set );
 		}
 		if( ! geoJSON.FR ) return null;
 		var featuresDept = geoJSON.FR.departement.features.by;
@@ -1062,7 +1108,7 @@ function nationalEnabled() {
 				var j = Math.floor( y / size );
 				var ids = [
 					[ 971, 972, 973, 974, 975 ],
-					[ 976, 986, 987, 988, 0 ]
+					[ 976, 986, 987, 988, '099' ]
 				];
 				var id = ids[i][j], feature = featuresDept[id];
 				if( feature ) {
