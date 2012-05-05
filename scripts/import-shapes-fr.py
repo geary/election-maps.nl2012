@@ -370,6 +370,7 @@ def loadGadmCommune( db, abbr, geoid, level, suffix ):
 	)
 	if abbr == 'NCL':
 		loadGadmTable( db, abbr )
+		mergePoya( db )
 		updateGadmCommune( db, abbr )
 	db.executeCommit('''
 		INSERT INTO %(table)s
@@ -394,6 +395,40 @@ def loadGadmCommune( db, abbr, geoid, level, suffix ):
 		'level': level,
 		'suffix': suffix,
 	}) )
+
+
+def mergePoya( db ):
+	db.executeCommit('''
+		UPDATE
+			france.commune_ncl
+		SET
+			full_geom = (
+				SELECT
+					ST_Multi(
+						ST_MakeValid(
+							ST_Union(
+								Array(
+									SELECT full_geom
+									FROM france.commune_ncl
+									WHERE id_2 = 18 OR id_2 = 32
+								)
+							)
+						)
+					)
+			)
+		WHERE id_2 = 18;
+		
+		UPDATE
+			france.commune_ncl
+		SET
+			name_2 = 'Poya'
+		WHERE
+			id_2 = 18;
+		
+		DELETE FROM
+			france.commune_ncl
+		WHERE id_2 = 32;
+	''')
 
 
 def loadGadmTable( db, abbr ):
