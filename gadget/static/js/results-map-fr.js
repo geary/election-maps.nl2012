@@ -1771,6 +1771,7 @@ function nationalEnabled() {
 		//var select = $('#stateSelector')[0];
 		//select && ( select.selectedIndex = state.selectorIndex );
 		//opt.state = state.abbr.toLowerCase();
+		outlineFeature( null );
 		geoMoveNext = true;
 		loadViewID( id );
 		if( why ) analytics( why, 'geo', id );
