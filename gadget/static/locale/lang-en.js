@@ -46,6 +46,7 @@ loadStrings({
 "monthName11": "November", 
 "monthName12": "December", 
 "neverVotesHere": "This location does not report voting results", 
+"noLocal": "Detailed results not available", 
 "noVotesHere": "This location has not reported voting results", 
 "percentReporting": "{{percent}} reporting ({{counted}}/{{total}}{{kind}})", 
 "primaries": "Primaries", 
