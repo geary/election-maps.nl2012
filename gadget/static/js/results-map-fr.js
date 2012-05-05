@@ -713,7 +713,6 @@ function nationalEnabled() {
 	function moveToGeo() {
 		var json = geoJSON[current.geoid];
 		if( ! json ) return;
-		var geo = json.departement;
 		$('#map').show();
 		initMap();
 		gme && map && gme.trigger( map, 'resize' );
@@ -723,12 +722,17 @@ function nationalEnabled() {
 		
 		outlineFeature( null );
 		
-		if( current.geoid == 'FR' ) {
-			geo = {
+		var geo = {
+			'FR': {
 				bbox: [ -1060000, 5060000, 1070000, 6650000 ],
 				centerLL: [ 0.2104, 46.2260 ]
-			};
-		}
+			},
+			'988': {
+				bbox: [ 18205000, -2600000, 18720000, -2215000 ],
+				centerLL: [ 165.85, -21.13 ]
+			},
+			_: 0
+		}[current.geoid] || json.departement;
 		geo && fitBbox( geo.bbox, geo.centerLL );
 	}
 	
