@@ -1082,7 +1082,7 @@ function nationalEnabled() {
 			inset( 976, 7.2, -150, -1340 );  // Mayotte
 			inset( 986, 7.5, -150, -1290 );  // Wallis-et-Futuna
 			inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
-			inset( 988, 3.4, -150, -1190 );  // Nouvelle Caledoni
+			inset( 988, 3.6, -150, -1190 );  // Nouvelle Caledoni
 			inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
