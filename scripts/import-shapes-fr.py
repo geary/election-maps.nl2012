@@ -368,6 +368,9 @@ def loadGadmCommune( db, abbr, geoid, level, suffix ):
 		fullGeom, '4326', 'LATIN1', True,
 		'%s%s.shp' % ( zipfile, level )
 	)
+	if abbr == 'NCL':
+		loadGadmTable( db, abbr )
+		updateGadmCommune( db, abbr )
 	db.executeCommit('''
 		INSERT INTO %(table)s
 			SELECT nextval('%(table)s_gid_seq'),
@@ -392,6 +395,45 @@ def loadGadmCommune( db, abbr, geoid, level, suffix ):
 		'suffix': suffix,
 	}) )
 
+
+def loadGadmTable( db, abbr ):
+	table = '%s_communes' % abbr
+	source = '../shapes/gadm/%s.tsv' %( table )
+	target = '%s/%s-utf8.tsv' %( private.TEMP_PATH, table )
+	utf8 = file(source).read().decode('latin1').encode('utf8')
+	file( target, 'w' ).write( utf8 )
+	db.executeCommit( '''
+		CREATE TABLE %(table)s (
+			gid serial,
+			gadm_id int4, gadm_name varchar(70),
+			gov_id int4, gov_name varchar(70)
+		);
+		
+		ALTER TABLE %(table)s ADD PRIMARY KEY (gid);
+		
+		COPY %(table)s ( gadm_id, gadm_name, gov_id, gov_name )
+			FROM '%(target)s'
+			WITH CSV HEADER DELIMITER E'\t';
+	''' %({
+		'table': schema + '.' + table,
+		'target': target,
+	}) )
+	os.remove( target )
+
+
+def updateGadmCommune( db, abbr ):
+	table = 'commune_%s' % abbr
+	fixer = '%s_communes' % abbr
+	db.executeCommit('''
+		UPDATE %(table)s
+		SET id_2 = (
+			SELECT gov_id FROM %(fixer)s
+			WHERE id_2 = %(fixer)s.gadm_id
+		)
+	''' %({
+		'table': schema + '.' + table,
+		'fixer': schema + '.' + fixer,
+	}) )
 
 def updateCommuneNames( db ):
 	fromWhere = '''
