@@ -783,12 +783,22 @@ function nationalEnabled() {
 		if( bboxOverlay )
 			bboxOverlay.setMap( null );
 		bboxOverlay = null;
-		var feature = {
+		var geo = makeBboxGeo( bbox, {
 			fillColor: '#000000',
 			fillOpacity: 0,
 			strokeWidth: 1,
 			strokeColor: '#FF0000',
-			strokeOpacity: .5,
+			strokeOpacity: .5
+		});
+		bboxOverlay = new PolyGonzo.PgOverlay({
+			map: map,
+			geos: [ geo ]
+		});
+		bboxOverlay.setMap( map );
+	}
+	
+	function makeBboxGeo( bbox, settings ) {
+		var feature = $.extend( {}, {
 			geometry: {
 				type: 'Polygon',
 				coordinates: [
@@ -801,21 +811,16 @@ function nationalEnabled() {
 					]
 				]
 			}
-		};
-		bboxOverlay = new PolyGonzo.PgOverlay({
-			map: map,
-			geos: [{
-				crs: {
-					type: 'name',
-					properties: {
-						name: 'urn:ogc:def:crs:EPSG::3857'
-					}
-				},
-				//kind: where.geo.kind,
-				features: [ feature ]
-			}]
-		});
-		bboxOverlay.setMap( map );
+		}, settings );
+		return {
+			crs: {
+				type: 'name',
+				properties: {
+					name: 'urn:ogc:def:crs:EPSG::3857'
+				}
+			},
+			features: [ feature ]
+		}
 	}
 	
 	var  mouseFeature;
@@ -927,9 +932,12 @@ function nationalEnabled() {
 	};
 	
 	function draw() {
+		var geos = currentGeos();
+		if( useInset() )
+			geos.unshift( insetGeo() );
 		var overlay = new PolyGonzo.PgOverlay({
 			map: map,
-			geos: currentGeos(),
+			geos: geos,
 			underlay: getInsetUnderlay,
 			events: playType() ? {} : polyEvents
 		});
@@ -1146,6 +1154,20 @@ function nationalEnabled() {
 				return null;
 			}
 		};
+	}
+	
+	function insetGeo() {
+		var bbox = [ -1072000, 5420000, -600000, 6700000 ];
+		var geo = makeBboxGeo( bbox, {
+			fillColor: '#F8F8F8',
+			fillOpacity: 1,
+			strokeWidth: 1.5,
+			strokeColor: '#222222',
+			strokeOpacity: 1
+		});
+		geo.hittest = false;
+		geo.click = false;
+		return geo;
 	}
 	
 	function hittestBboxes( features, places, x, y ) {
