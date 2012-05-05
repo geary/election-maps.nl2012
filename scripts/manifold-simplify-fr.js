@@ -71,7 +71,7 @@ function ForAllShapes( callback ) {
 		'975': '512',  // Saint Pierre et Miquelon
 		'976': '256',  // Mayotte
 		'986': '512',  // Wallis-et-Futuna
-		'987': '2048',  // Polynesie Francaise
+		'987': '1024',  // Polynesie Francaise
 		'988': '4096'  // Nouvelle Caledonie
 	});
 	
@@ -83,7 +83,7 @@ function ForAllShapes( callback ) {
 		'975': '64',  // Saint Pierre et Miquelon
 		'976': '1',  // Mayotte
 		'986': '64',  // Wallis-et-Futuna
-		'987': '4096',  // Polynesie Francaise
+		'987': '256',  // Polynesie Francaise
 		'988': '1024'  // Nouvelle Caledonie
 	});
 }
