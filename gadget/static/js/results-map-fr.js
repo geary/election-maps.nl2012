@@ -476,8 +476,8 @@ function nationalEnabled() {
 				var geo = json[kind];
 				indexFeatures( geo );
 			}
-			if( geoid == 'FR' )
-				addLivingAbroad();
+			var tweak = tweakGeoJSON[geoid];
+			tweak && tweak( json, geoid );
 			oneTime();
 		}
 		//setCounties( true );
@@ -493,7 +493,16 @@ function nationalEnabled() {
 		}
 	}
 	
-	function addLivingAbroad() {
+	var tweakGeoJSON = {
+		FR: function( json, geoid ) {
+			var features = geoJSON.FR.departement.features;
+			features.by['986'].click = false;  // Wallis et Futuna
+			features.by['987'].click = false;  // French Polynesia
+			addLivingAbroad( features );
+		}
+	}
+	
+	function addLivingAbroad( features ) {
 		var radius = 100000;
 		feature = {
 			bbox: [ -radius, -radius, radius, radius ],
@@ -508,7 +517,6 @@ function nationalEnabled() {
 			name: "Fran&ccedil;ais de l'Etranger",
 			type: 'Feature'
 		};
-		var features = geoJSON.FR.departement.features;
 		features.push( feature );
 		features.by['099'] = feature;
 	}
