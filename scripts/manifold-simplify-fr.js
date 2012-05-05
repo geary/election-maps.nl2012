@@ -69,7 +69,7 @@ function ForAllShapes( callback ) {
 		'973': '4096',  // Guyane
 		'974': '1024',  // La Reunion
 		'975': '512',  // Saint Pierre et Miquelon
-		'976': '1024',  // Mayotte
+		'976': '256',  // Mayotte
 		'986': '512',  // Wallis-et-Futuna
 		'987': '2048',  // Polynesie Francaise
 		'988': '4096'  // Nouvelle Caledonie
