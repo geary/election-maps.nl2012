@@ -1635,11 +1635,10 @@ function nationalEnabled() {
 			'waitingForVotes'.T();
 		
 		var clickForLocal =
-			feature.click !== false  &&
 			top.length &&
 			current.national ? S(
 				'<div class="click-for-local faint-text">',
-					( touch ? 'tapForLocal' : 'clickForLocal' ).T(),
+					( feature.click === false ? 'noLocal' : touch ? 'tapForLocal' : 'clickForLocal' ).T(),
 				'</div>'
 			) : '';
 		// TODO
