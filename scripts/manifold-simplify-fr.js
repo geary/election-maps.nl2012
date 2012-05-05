@@ -39,11 +39,11 @@ function Clean() {
 }
 
 function ImportSimplifyExport() {
-	ForAllShapes( function( table, key, tolerance, custom ) {
+	ForAllShapes( function( table, key, tolerance, all, custom ) {
 		Log( 'Importing ', table.name );
 		ImportShape( table.shpNameFull );
 		Log( 'Simplifying ', table.name );
-		var drawingSimple = Simplify( table, key, tolerance, custom );
+		var drawingSimple = Simplify( table, key, tolerance, all, custom );
 		Log( 'Exporting ', table.name );
 		if( drawingSimple )
 			ExportShape( drawingSimple, table.shpNameSimple );
@@ -55,15 +55,15 @@ function ImportSimplifyExport() {
 
 function ForAllShapes( callback ) {
 
-	function go( tableName, key, tolerance, custom ) {
+	function go( tableName, key, tolerance, all, custom ) {
 		var table = tables[tableName];
 		var shpNameBase = S( 'fr2012-', table.name, '-' );
 		table.shpNameFull = S( shpNameBase, 'full' );
 		table.shpNameSimple = S( shpNameBase, tolerance );
-		callback( table, key, tolerance, custom );
+		callback( table, key, tolerance, all, custom );
 	}
 	
-	go( 'departement', 'code_dept', '4096', {
+	go( 'departement', 'code_dept', '4096', true, {
 		'971': '1024',  // Guadeloupe
 		'972': '1024',  // Martinique
 		'973': '4096',  // Guyane
@@ -75,7 +75,7 @@ function ForAllShapes( callback ) {
 		'988': '4096'  // Nouvelle Caledonie
 	});
 	
-	go( 'commune', 'code_dept', '128', {
+	go( 'commune', 'code_dept', '128', false, {
 		'971': '1',  // Guadeloupe
 		'972': '1',  // Martinique
 		'973': '1024',  // Guyane
@@ -188,7 +188,7 @@ function SelectInto( table, dest, source, key, value ) {
 	Document.ComponentSet.Remove( query );
 }
 
-function Simplify( table, key, tolerance, custom ) {
+function Simplify( table, key, tolerance, all, custom ) {
 	var fullDrawing = GetDrawing( table.shpNameFull );
 	var full = new Drawing( fullDrawing );
 	
@@ -224,7 +224,7 @@ function Simplify( table, key, tolerance, custom ) {
 		RemoveDrawing( shpNameTemp );
 	}
 	
-	if( full.geomSet.Count )
+	if( all && full.geomSet.Count )
 		SimplifyPart( full, simple, table, tolerance );
 	
 	return simple.drawing;
