@@ -1088,9 +1088,9 @@ function nationalEnabled() {
 			inset( 974, 5.8, -200, -1190 );  // La Reunion
 			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
 			inset( 976, 7.2, -150, -1340 );  // Mayotte
-			inset( 986, 7.5, -150, -1290 );  // Wallis-et-Futuna
+			inset( 988, 3.6, -150, -1290 );  // Nouvelle Caledoni
 			inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
-			inset( 988, 3.6, -150, -1190 );  // Nouvelle Caledoni
+			inset( 986, 7.5, -150, -1190 );  // Wallis-et-Futuna
 			inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
@@ -1100,9 +1100,9 @@ function nationalEnabled() {
 				var ring = poly[0];
 				var coord = ring[0];
 				if( coord[0] < -19700000 )
-					action( poly, 7.5, -30, -1350 );
+					action( poly, 7.5, -30, -1250 );
 				else
-					action( poly, 7.5, -255, -1235 );
+					action( poly, 7.5, -257, -1132 );
 			});
 			
 			// Francais de l'Etranger (French living abroad)
@@ -1128,7 +1128,7 @@ function nationalEnabled() {
 				var j = Math.floor( y / size );
 				var ids = [
 					[ 971, 972, 973, 974, 975 ],
-					[ 976, 986, 987, 988, '099' ]
+					[ 976, 988, 987, 986, '099' ]
 				];
 				var id = ids[i][j], feature = featuresDept[id];
 				if( feature ) {
