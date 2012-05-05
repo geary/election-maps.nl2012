@@ -987,7 +987,7 @@ function nationalEnabled() {
 	
 	function colorVotes( features, strokeColor, strokeOpacity, strokeWidth ) {
 		var time = now() + times.offset;
-		var results = currentGeo().results[electionKey];
+		var results = geoResults();
 		var col = results && results.cols;
 		var candidates = results && results.candidates;
 		if( !( candidates && currentCandidate ) ) {
@@ -1365,8 +1365,7 @@ function nationalEnabled() {
 	function makeCurrentCandidateValid() {
 		if( ! currentCandidate )
 			return;
-		var geo = currentGeo();
-		var results = geo.results[electionKey];
+		var results = geoResults();
 		var col = results.colsById[ 'TabCount-' + currentCandidate ];
 		if( ! results.totals[col] )
 			currentCandidate = null;
@@ -1390,7 +1389,7 @@ function nationalEnabled() {
 		var resultsHeaderHTML = '';
 		var resultsScrollingHTML = '';
 		var geo = currentGeo();
-		var results = geo.results[electionKey];
+		var results = geoResults();
 		if( results ) {
 			var topCandidates = getTopCandidates( results, -1, 'votes' );
 			var none = ! topCandidates.length;
@@ -1607,7 +1606,7 @@ function nationalEnabled() {
 		if( ! feature ) return null;
 		var geoid = where.feature.id;
 		var future = false;
-		var geo = where.geo, results = geo.results[electionKey], col = results && results.colsById;
+		var geo = where.geo, results = geoResults(geo), col = results && results.colsById;
 		var row = geo.draw !== false  &&  featureResults( results, where.feature );
 		var top = [];
 		if( row  &&  col  &&  mayHaveResults(row,col) ) {
@@ -2041,6 +2040,11 @@ function nationalEnabled() {
 	//		callback();
 	//	});
 	//}
+	
+	function geoResults( geo ) {
+		var results = ( geo || currentGeo() || {} ).results;
+		return results[electionKey];
+	}
 	
 	var cacheResults = new Cache;
 	
