@@ -28,6 +28,8 @@ def makeDepartments():
 		mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
 			WHERE
 				france.departement.code_reg = france.reg2012.region
+			AND
+				substring(france.departement.code_reg from 1 for 1) != '0'
 			GROUP BY
 				france.departement.code_reg
 		''' )
