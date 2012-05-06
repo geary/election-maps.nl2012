@@ -29,7 +29,7 @@ opt.randomized = params.randomize || params.zero;
 var defaultElectionKey = '2012-pres-1';
 params.year = params.year || '2012';
 params.contest = params.contest || 'pres';
-params.round = params.round || '1';
+params.round = params.round || '2';
 
 var electionKey, election;
 setElection();
