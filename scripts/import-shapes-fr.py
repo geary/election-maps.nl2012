@@ -29,8 +29,8 @@ def process():
 	# GEOFLA and GADM shapefiles
 	loadDepartmentShapes( db )
 	loadCommuneShapes( db )
-	updateDepartmentNames( db )
-	updateCommuneNames( db )
+	updateDepartments( db )
+	updateCommunes( db )
 	saveShapefile( db, 'departement'  )
 	saveShapefile( db, 'commune'  )
 	closeDatabase( db )
@@ -211,9 +211,23 @@ def loadInseeTable( db, table, cols, columns ):
 
 def loadGadmShapes( db, loader ):
 	loader( db, 'SPM', '975', '1', '1' )
+	loader( db, 'MAF', '977', '0', 'local' )
+	loader( db, 'BLM', '+977', '0', 'local' )
 	loader( db, 'WLF', '986', '2', '2' )
 	loader( db, 'PYF', '987', '0', 'local' )
 	loader( db, 'NCL', '988', '2', '2' )
+
+
+def tweakDepartmentSQL( sqlfile ):
+	sql = file( sqlfile ).read()
+	sql = re.sub(
+		'"nom_dept" varchar\(30\)',
+		'"nom_dept" varchar(40)',
+		sql, 1
+	)
+	newfile = re.sub( '\.sql$', '-tweak.sql', sqlfile )
+	file( newfile, 'w' ).write( sql )
+	return newfile
 
 
 def loadDepartmentShapes( db ):
@@ -224,7 +238,8 @@ def loadDepartmentShapes( db ):
 	db.loadShapefile(
 		filename, private.TEMP_PATH, table,
 		fullGeom, '4326', 'LATIN1', True,
-		'%s/DEPARTEMENT.shp' % zipfile
+		'%s/DEPARTEMENT.shp' % zipfile,
+		tweaksql=tweakDepartmentSQL
 	)
 	loadGadmShapes( db, loadGadmDepartment )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
@@ -242,25 +257,39 @@ def loadGadmDepartment( db, abbr, geoid, level, suffix ):
 		fullGeom, '4326', 'LATIN1', True,
 		'%s0.shp' % zipfile
 	)
-	db.executeCommit('''
-		INSERT INTO %(table)s
-			SELECT nextval('%(table)s_gid_seq'),
-				'%(dept)s' AS id_geofla,
-				'%(dept)s' AS code_dept, name_local AS nom_dept,
-				'' AS code_chf, '' AS nom_chf,
-				'' AS x_chf_lieu, '' AS y_chf_lieu,
-				'' AS x_centroid, '' AS y_centroid,
-				'' AS code_reg, '' AS nom_region,
-				ST_SetSRID( full_geom, 4326 )
-			FROM %(srctable)s;
-	''' %({
+	vars = {
 		'table': table,
 		'srctable': srctable,
 		'dept': geoid,
-	}) )
+	}
+	if geoid[0] == '+':
+		vars['dept'] = geoid = geoid[1:]
+		db.executeCommit('''
+			UPDATE %(table)s
+			SET full_geom = ST_Union(
+				ARRAY[
+					full_geom,
+					( SELECT ST_SetSRID(full_geom,4326) FROM %(srctable)s )
+				]
+			)
+			WHERE %(table)s.code_dept = '%(dept)s';			
+		''' % vars )
+	else:
+		db.executeCommit('''
+			INSERT INTO %(table)s
+				SELECT nextval('%(table)s_gid_seq'),
+					'%(dept)s' AS id_geofla,
+					'%(dept)s' AS code_dept, name_local AS nom_dept,
+					'' AS code_chf, '' AS nom_chf,
+					'' AS x_chf_lieu, '' AS y_chf_lieu,
+					'' AS x_centroid, '' AS y_centroid,
+					'' AS code_reg, '' AS nom_region,
+					ST_SetSRID( full_geom, 4326 )
+				FROM %(srctable)s;
+		''' % vars )
 
 
-def updateDepartmentNames( db ):
+def updateDepartments( db ):
 	fromWhere = '''
 		FROM france.depts2012
 		WHERE (
@@ -276,6 +305,10 @@ def updateDepartmentNames( db ):
 			ON france.depts2012(dep);
 		CREATE INDEX france_depts2012_cheflieu_idx
 			ON france.depts2012(cheflieu);
+		
+		UPDATE france.departement
+		SET nom_dept = 'Saint-Martin et Saint-Barthélemy'
+		WHERE code_dept = '977';
 		
 		UPDATE france.departement
 		SET code_dept = '976', code_reg = '06'
@@ -372,6 +405,8 @@ def loadGadmCommune( db, abbr, geoid, level, suffix ):
 		loadGadmTable( db, abbr )
 		mergePoya( db )
 		updateGadmCommune( db, abbr )
+	if geoid[0] == '+':
+		geoid = geoid[1:]
 	db.executeCommit('''
 		INSERT INTO %(table)s
 			SELECT nextval('%(table)s_gid_seq'),
@@ -470,7 +505,7 @@ def updateGadmCommune( db, abbr ):
 		'fixer': schema + '.' + fixer,
 	}) )
 
-def updateCommuneNames( db ):
+def updateCommunes( db ):
 	fromWhere = '''
 			FROM france.comsimp2012
 			WHERE
