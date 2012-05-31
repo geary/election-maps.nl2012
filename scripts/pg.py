@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import json, os, os.path, re, shutil, tempfile, time
+import json, os, os.path, re, shutil, tempfile, time, unicodedata
 import psycopg2
 from zipfile import ZipFile
 
@@ -582,6 +582,10 @@ def makeNewDir( path ):
 		shutil.rmtree( path )
 		time.sleep( 1 )  # hack to prevent access not allowed error on os.mkdir
 	os.mkdir( path )
+
+
+def TTYstr( ustr ):
+	return unicodedata.normalize( 'NFKD', ustr ).encode( 'ascii', 'ignore' ).upper()
 
 
 if __name__ == "__main__":
