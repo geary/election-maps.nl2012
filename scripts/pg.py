@@ -433,7 +433,7 @@ class Database:
 		print 'makeGeoJSON %.1f seconds' %( t2 - t1 )
 
 
-	def writeGeoJSON( self, filename, data, jsonp ):
+	def writeGeoJSON( self, filename, data, jsonp=None ):
 		print 'writeGeoJSON', filename
 		geojson = json \
 			.dumps( data, separators=( ',', ':' ) ) \
