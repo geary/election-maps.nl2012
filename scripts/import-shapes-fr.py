@@ -19,6 +19,8 @@ def process():
 	db = openDatabase( database )
 	#addSimplificationFunction( db )
 	createSchema( db )
+	# data.gouv.fr tables
+	loadLegislativeTable( db )
 	# Insee tables
 	loadNationTable( db )
 	loadRegionTable( db )
@@ -81,6 +83,30 @@ def createSchema( db ):
 # region varchar(2)
 # tncc varchar(1)
 # typct varchar(1)
+
+
+def loadLegislativeTable( db ):
+	loadGouvTable( db,
+		'legislative',
+		'''
+			code_dept_cant,
+			code_dept, nom_dept,
+			code_cant, nom_cant,
+			code_comm, nom_comm,
+			circ_leg_1986, circ_leg_2012
+		''',
+		'''
+			code_dept_cant varchar(4),
+			code_dept varchar(3),
+			nom_dept varchar(50),
+			code_cant varchar(3),
+			nom_cant varchar(50),
+			code_comm varchar(7),
+			nom_comm varchar(50),
+			circ_leg_1986 varchar(9),
+			circ_leg_2012 varchar(2)
+		'''
+	)
 
 
 def loadNationTable( db ):
@@ -183,12 +209,15 @@ def loadCommuneTable( db ):
 	)
 
 
-def loadInseeTable( db, table, cols, columns ):
-	source = '../shapes/insee/%s.txt' %( table )
+def loadGouvTable( db, table, cols, columns ):
+	source = '../shapes/data.gouv.fr/%s.csv' %( table )
+	return loadCsvTable( db, source, table, cols, columns )
+
+
+def loadCsvTable( db, source, table, cols, columns, copyopt='HEADER' ):
 	target = '%s/%s-utf8.txt' %( private.TEMP_PATH, table )
 	utf8 = file(source).read().decode('latin1').encode('utf8')
 	file( target, 'w' ).write( utf8 )
-	#cols = re.sub( r'\s*(\S+)\s+([^\n])+(\n)\s*', r'\1,', columns )
 	db.executeCommit( '''
 		CREATE TABLE %(table)s (
 			gid serial,
@@ -199,14 +228,24 @@ def loadInseeTable( db, table, cols, columns ):
 		
 		COPY %(table)s ( %(cols)s )
 			FROM '%(target)s'
-			WITH CSV HEADER DELIMITER E'\t';
+			WITH CSV %(copyopt)s;
 	''' %({
 		'table': schema + '.' + table,
 		'cols': cols,
 		'columns': columns,
 		'target': target,
+		'copyopt': copyopt,
 	}) )
 	os.remove( target )
+
+
+def loadTsvTable( db, source, table, cols, columns ):
+	return loadCsvTable( db, source, table, cols, columns, "HEADER DELIMITER E'\t' " )
+
+
+def loadInseeTable( db, table, cols, columns ):
+	source = '../shapes/insee/%s.txt' %( table )
+	return loadTsvTable( db, source, table, cols, columns )
 
 
 def loadGadmShapes( db, loader ):
@@ -469,26 +508,14 @@ def mergePoya( db ):
 def loadGadmTable( db, abbr ):
 	table = '%s_communes' % abbr
 	source = '../shapes/gadm/%s.tsv' %( table )
-	target = '%s/%s-utf8.tsv' %( private.TEMP_PATH, table )
-	utf8 = file(source).read().decode('latin1').encode('utf8')
-	file( target, 'w' ).write( utf8 )
-	db.executeCommit( '''
-		CREATE TABLE %(table)s (
-			gid serial,
+	loadTsvTable( db,
+		source, table,
+		'gadm_id, gadm_name, gov_id, gov_name',
+		'''
 			gadm_id int4, gadm_name varchar(70),
 			gov_id int4, gov_name varchar(70)
-		);
-		
-		ALTER TABLE %(table)s ADD PRIMARY KEY (gid);
-		
-		COPY %(table)s ( gadm_id, gadm_name, gov_id, gov_name )
-			FROM '%(target)s'
-			WITH CSV HEADER DELIMITER E'\t';
-	''' %({
-		'table': schema + '.' + table,
-		'target': target,
-	}) )
-	os.remove( target )
+		'''
+	)
 
 
 def updateGadmCommune( db, abbr ):
