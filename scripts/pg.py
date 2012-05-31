@@ -177,9 +177,7 @@ class Database:
 		if column is None: column = 'full_geom'
 		if srid is None: srid = '4269'
 		outdir = os.path.join( shpdir, shpfile )
-		if os.path.exists( outdir ):
-			shutil.rmtree( outdir )
-		os.mkdir( outdir )
+		makeNewDir( outdir )
 		print 'saveShapefile %s' % shpfile
 		t1 = time.clock()
 		command = '"%s/pgsql2shp" -f %s/%s -h %s -p %s -u %s -P %s -g %s %s %s' %(
@@ -577,6 +575,13 @@ class Database:
 		t4 = time.clock()
 		print 'makeFeatureCollection %.1f seconds' %( t4 - t3 )
 		return featurecollection
+
+
+def makeNewDir( path ):
+	if os.path.exists( path ):
+		shutil.rmtree( path )
+		time.sleep( 1 )  # hack to prevent access not allowed error on os.mkdir
+	os.mkdir( path )
 
 
 if __name__ == "__main__":
