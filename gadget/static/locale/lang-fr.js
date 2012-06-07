@@ -1,6 +1,7 @@
 loadStrings({
 "allCandidates": "Tous les candidats", 
 "allCandidatesShort": "Tous", 
+"allParties": "Tous les parties", 
 "automaticUpdate": "Cette page se met \u00e0 jour automatiquement", 
 "candidate": "Candidat", 
 "caucus": "Comit\u00e9 \u00e9lectoral", 
