@@ -28,12 +28,17 @@ def process():
 	loadArrondTable( db )
 	loadCantonTable( db )
 	loadCommuneTable( db )
+	# Legislative shapefiles
+	loadLegislativeShapes( db )
 	# GEOFLA and GADM shapefiles
 	loadDepartmentShapes( db )
+	#loadCantonShapes( db )
 	loadCommuneShapes( db )
 	updateDepartments( db )
 	updateCommunes( db )
+	saveShapefile( db, 'legislative'  )
 	saveShapefile( db, 'departement'  )
+	#saveShapefile( db, 'canton'  )
 	saveShapefile( db, 'commune'  )
 	closeDatabase( db )
 
@@ -87,7 +92,7 @@ def createSchema( db ):
 
 def loadLegislativeTable( db ):
 	loadGouvTable( db,
-		'legislative',
+		'legislative', 'crosswalk',
 		'''
 			code_dept_cant,
 			code_dept, nom_dept,
@@ -209,8 +214,8 @@ def loadCommuneTable( db ):
 	)
 
 
-def loadGouvTable( db, table, cols, columns ):
-	source = '../shapes/data.gouv.fr/%s.csv' %( table )
+def loadGouvTable( db, filename, table, cols, columns ):
+	source = '../shapes/data.gouv.fr/%s.csv' %( filename )
 	return loadCsvTable( db, source, table, cols, columns )
 
 
@@ -246,6 +251,71 @@ def loadTsvTable( db, source, table, cols, columns ):
 def loadInseeTable( db, table, cols, columns ):
 	source = '../shapes/insee/%s.txt' %( table )
 	return loadTsvTable( db, source, table, cols, columns )
+
+
+def loadLegislativeShapes( db ):
+	table = schema + '.legislative'
+	filename = '../shapes/private/articque/Circos_2012_WGS84.zip'
+	print 'Loading %s' % filename
+	db.loadShapefile(
+		filename, private.TEMP_PATH, table,
+		fullGeom, '4326', 'LATIN1', True,
+		'France_entiere/fr_metropole_circoelec_WGS84.shp',
+		#tweaksql=tweakDepartmentSQL
+	)
+	db.addGoogleGeometry( table, fullGeom, googGeom )
+	db.indexGeometryColumn( table, googGeom )
+
+def loadLegislativeShapes( db ):
+	table = schema + '.legislative'
+	def loadOne( zipfile, shpname, suffix, cols=None, create=False ):
+		if cols is None:
+			cols = 'id_circo, id_reg, nom_circo, id_dep'
+		srid = '4326'
+		filename = '../shapes/private/articque/%s.zip' % zipfile
+		srctable = table + '_' + suffix
+		print 'Loading %s' % filename
+		db.loadShapefile(
+			filename, private.TEMP_PATH, srctable,
+			fullGeom, srid, 'LATIN1', True,
+			'%s.shp' % shpname
+			#tweaksql=tweakCommuneSQL
+		)
+		if create:
+			db.createLikeTable( table, srctable )
+			db.addGeometryColumn( table, fullGeom, 4326, True )
+		if 1:
+			db.executeCommit('''
+				INSERT INTO %(table)s
+					SELECT nextval('%(table)s_gid_seq'),
+						%(cols)s,
+						ST_Transform( ST_SetSRID( full_geom, %(srid)s ), 4326 )
+					FROM %(srctable)s;
+			''' %({
+				'table': table,
+				'srctable': srctable,
+				'srid': '4326',
+				'cols': cols
+			}) )
+	def loadMore( id, cols=None ):
+		if cols:
+			cols = {
+				'e': 'id_circoel as id_circo, id_reg, lib_circoe as nom_circo, id_dep'
+			}[cols]
+		loadOne( id, '%s/fr_circoelec_D%s' %(id,id), id, cols )
+	loadOne( 'Legislative', 'fr_metropole_circoelec_WGS84', 'fr', None, True )
+	loadMore( '971' )
+	loadMore( '972' )
+	loadMore( '973' )
+	loadMore( '974' )
+	loadMore( '975', 'e' )
+	loadMore( '976' )
+	loadMore( '977', 'e' )
+	loadMore( '986', 'e' )
+	loadMore( '987', 'e' )
+	loadMore( '988', 'e' )
+	db.addGoogleGeometry( table, fullGeom, googGeom )
+	db.indexGeometryColumn( table, googGeom )
 
 
 def loadGadmShapes( db, loader ):
@@ -372,6 +442,21 @@ def updateDepartments( db ):
 		'fromWhere': fromWhere,
 	})
 	db.connection.commit()
+
+
+#def loadCantonShapes( db ):
+#	table = schema + '.canton'
+#	zipfile = 'GEOFLA_1-1_SHP_LAMB93_FR-ED111'
+#	filename = '../shapes/geofla/%s.zip' % zipfile
+#	print 'Loading %s' % filename
+#	db.loadShapefile(
+#		filename, private.TEMP_PATH, table,
+#		fullGeom, '2154', 'LATIN1', True,
+#		'%s/CANTONS/CANTON.shp' % zipfile,
+#		#tweaksql=tweakDepartmentSQL
+#	)
+#	db.addGoogleGeometry( table, fullGeom, googGeom )
+#	db.indexGeometryColumn( table, googGeom )
 
 
 def tweakCommuneSQL( sqlfile ):
