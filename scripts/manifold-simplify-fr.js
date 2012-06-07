@@ -7,6 +7,10 @@ var tables = {
 		columns: 'ID_GEOFLA,CODE_DEPT,NOM_DEPT,CODE_CHF,NOM_CHF,X_CHF_LIEU,Y_CHF_LIEU,X_CENTROID,Y_CENTROID,CODE_REG,NOM_REGION,FULL_GEOM',
 		errcols: 'ID_GEOFLA,CODE_DEPT,NOM_DEPT'
 	},
+	legislative: {
+		columns: 'ID_CIRCO,ID_REG,NOM_CIRCO,ID_DEP,FULL_GEOM',
+		errcols: 'ID_DEP,ID_CIRCO,NOM_CIRCO'
+	},
 	commune: {
 		columns: 'ID_GEOFLA,CODE_COMM,INSEE_COM,NOM_COMM,STATUT,X_CHF_LIEU,Y_CHF_LIEU,X_CENTROID,Y_CENTROID,Z_MOYEN,SUPERFICIE,POPULATION,CODE_CANT,CODE_ARR,CODE_DEPT,NOM_DEPT,CODE_REG,NOM_REGION,FULL_GEOM',
 		errcols: 'ID_GEOFLA,CODE_DEPT,NOM_DEPT,CODE_COMM,NOM_COMM'
@@ -63,6 +67,19 @@ function ForAllShapes( callback ) {
 		callback( table, key, tolerance, all, custom );
 	}
 	
+	go( 'legislative', 'id_dep', '1024', true, {
+		'971': '256',  // Guadeloupe
+		'972': '256',  // Martinique
+		'973': '256',  // Guyane
+		'974': '256',  // La Reunion
+		'975': '512',  // Saint Pierre et Miquelon
+		'976': '64',  // Mayotte
+		'977': '64',  // Saint-Barthelemy, Saint-Martin 
+		'986': '512',  // Wallis-et-Futuna
+		'987': '1024',  // Polynesie Francaise
+		'988': '4096'  // Nouvelle Caledonie
+	});
+	
 	go( 'departement', 'code_dept', '4096', true, {
 		'971': '1024',  // Guadeloupe
 		'972': '1024',  // Martinique
@@ -70,6 +87,7 @@ function ForAllShapes( callback ) {
 		'974': '1024',  // La Reunion
 		'975': '512',  // Saint Pierre et Miquelon
 		'976': '256',  // Mayotte
+		'977': '64',  // Saint-Barthelemy, Saint-Martin 
 		'986': '512',  // Wallis-et-Futuna
 		'987': '1024',  // Polynesie Francaise
 		'988': '4096'  // Nouvelle Caledonie
@@ -82,6 +100,7 @@ function ForAllShapes( callback ) {
 		'974': '1',  // La Reunion
 		'975': '64',  // Saint Pierre et Miquelon
 		'976': '1',  // Mayotte
+		'977': '32',  // Saint-Barthelemy, Saint-Martin 
 		'986': '64',  // Wallis-et-Futuna
 		'987': '256',  // Polynesie Francaise
 		'988': '1024'  // Nouvelle Caledonie
