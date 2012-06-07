@@ -18,6 +18,38 @@ def simpleGeom( level ):
 		return '%s%s' %( googGeom, level )
 
 
+def makeLegislative():
+	db = pg.Database( database = 'france2012' )
+	table = 'legislative'
+	#for level in ( None, 512, 1024, ):
+	for level in ( 1024, ):
+		if level is not None:
+			addLevel( db, table, 'id_circo', level )
+		mergeGeometries( db, 'france.legislative', 'france.departement', level, '''
+			WHERE
+				france.legislative.id_dep = france.departement.code_dept
+			GROUP BY
+				france.legislative.id_dep
+		''' )
+		mergeGeometries( db, 'france.departement', 'france.reg2012', level, '''
+			WHERE
+				france.departement.code_reg = france.reg2012.region
+			AND
+				substring(france.departement.code_reg from 1 for 1) != '0'
+			GROUP BY
+				france.departement.code_reg
+		''' )
+		mergeGeometries( db, 'france.reg2012', 'france.france2012', level, '''
+			WHERE
+				true
+		''' )
+		#mergeGeometries( db, table, level )
+		#writeEachLegislative( db, table, level )
+		writeAllLegislative( db, table, level )
+	db.connection.commit()
+	db.connection.close()
+
+
 def makeDepartments():
 	db = pg.Database( database = 'france2012' )
 	table = 'departement'
@@ -184,6 +216,39 @@ def writeAllDepartments( db, table, level ):
 	writeGeoJSON( db, geoid, geom, geo )
 
 
+def writeAllLegislative( db, table, level ):
+	geom = simpleGeom( level )
+	where = 'true'
+	geoid = 'FRL'  # TODO
+	geoLegislative = db.makeFeatureCollection(
+		schema + '.legislative',
+		boxGeom, boxGeomLL, geom, geoid, 'France',
+		'id_circo', 'nom_circo', 'id_dep', where, fixGeoID
+	)
+	geoDepartment = db.makeFeatureCollection(
+		schema + '.departement',
+		boxGeom, boxGeomLL, geom, geoid, 'France',
+		'code_dept', 'nom_dept', 'code_reg', where, fixGeoID
+	)
+	geoRegion = db.makeFeatureCollection(
+		schema + '.reg2012',
+		None, None, geom, geoid, 'France',
+		'region', 'nccenr', 'tncc', where, fixGeoID
+	)
+	geoNation = db.makeFeatureCollection(
+		schema + '.france2012',
+		None, None, geom, geoid, 'France',
+		'nation', 'nccenr', 'nation', where, fixGeoID
+	)
+	geo = {
+		'nation': geoNation,
+		'region': geoRegion,
+		'departement': geoDepartment,
+		'legislative': geoLegislative,
+	}
+	writeGeoJSON( db, geoid, geom, geo )
+
+
 def fixGeoID( geoid, parentid=None ):
 	g = fixGeoIDx( geoid, parentid )
 	if g != geoid:
@@ -216,6 +281,7 @@ def writeGeoJSON( db, geoid, geom, geo ):
 
 
 def main():
+	makeLegislative()
 	makeDepartments()
 	makeCommunes()
 
