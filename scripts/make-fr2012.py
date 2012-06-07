@@ -197,7 +197,12 @@ def fixGeoIDx( geoid, parentid=None ):
 	if parentid:
 		if parentid == '976':
 			geoid = '5' + geoid[1:]
-		elif parentid in [ '971', '972', '973', '974', '975', '977', '988' ]:
+		elif parentid == '977':
+			if geoid == '193':
+				geoid = '701'
+			elif geoid == '194':
+				geoid = '801'
+		elif parentid in [ '971', '972', '973', '974', '975', '988' ]:
 			geoid = parentid[2] + geoid[1:]
 	return geoid
 
