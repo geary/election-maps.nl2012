@@ -16,6 +16,27 @@ var candidatesFR2012 = [
 	{ color: '#0B65E3', id: 'sarkozy', firstName: 'Nicolas', lastName: 'Sarkozy', fullName: 'Nicolas Sarkozy' }
 ];
 
+var partiesFR2012 = [
+	// Candidate order must match the party-logos image for this election
+	{ color: '#4DC706', id: 'VEC', name: 'Europe-Ecologie-Les Verts' },
+	{ color: '#169E28', id: 'ECO', name: 'Ecologiste' },
+	{ color: '#F00000', id: 'EXG', name: 'Extr&ecirc;me gauche' },
+	{ color: '#E615A7', id: 'PRV', name: 'Parti radical' },
+	{ color: '#000000', id: 'EXD', name: 'Extr&ecirc;me droite' },
+	{ color: '#EF4BB6', id: 'SOC', name: 'Socialiste' },
+	{ color: '#DE7676', id: 'DVG', name: 'Divers gauche' },
+	{ color: '#A3A3A3', id: 'NCE', name: 'Nouveau Centre' },
+	{ color: '#1BA5E0', id: 'DVD', name: 'Divers droite' },
+	{ color: '#696969', id: 'ALLI', name: 'Alliance centriste' },
+	{ color: '#1006C7', id: 'FN', name: 'Front National' },
+	{ color: '#0B65E3', id: 'UMP', name: 'Union pour un Mouvement Populaire' },
+	{ color: '#F58522', id: 'CEN', name: 'Le Centre pour la France' },
+	{ color: '#752A0C', id: 'AUT', name: 'Autres' },
+	{ color: '#D8F70A', id: 'REG', name: 'R&eacute;gionaliste' },
+	{ color: '#940000', id: 'RDG', name: 'Radical de Gauche' },
+	{ color: '#9F1D35', id: 'FG', name: 'Front de gauche' }
+];
+
 var elections = {
 	'2012-pres-1': {
 		date: '2012-04-22',
@@ -247,6 +268,24 @@ var elections = {
 			'986': 2767,
 			'987': 2768,
 			'988': 2769
+		}
+	},
+	'2012-leg-1': {
+		date: '2012-06-10',
+		tzHour: +2,
+		photos: false,
+		parties: partiesFR2012,
+		electionids: {
+			'FRL': 9901
+		}
+	},
+	'2012-leg-2': {
+		date: '2012-06-17',
+		tzHour: +2,
+		photos: false,
+		parties: partiesFR2012,
+		electionids: {
+			'FRL': 9902
 		}
 	}
 };
