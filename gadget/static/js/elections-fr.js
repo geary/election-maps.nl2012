@@ -276,7 +276,7 @@ var elections = {
 		photos: false,
 		parties: partiesFR2012,
 		electionids: {
-			'FRL': 9901
+			'FRL': 2786
 		}
 	},
 	'2012-leg-2': {
