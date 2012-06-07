@@ -1,6 +1,7 @@
 loadStrings({
 "allCandidates": "All Candidates", 
 "allCandidatesShort": "All", 
+"allParties": "All Parties", 
 "automaticUpdate": "This page updates automatically", 
 "candidate": "Candidate", 
 "caucus": "Caucus", 

@@ -1334,16 +1334,18 @@ function nationalEnabled() {
 		};
 	}
 	
-	function getTopCandidates( results, result, sortBy, max ) {
+	function getTopCandidates( results, row, sortBy, max ) {
+		var legislative = ( current.geoid == 'FRL' );
+		var colIncr = legislative ? 4 : 1;
 		max = max || Infinity;
-		if( ! result ) return [];
-		if( result == -1 ) result = results.totals;
+		if( ! row ) return [];
+		if( row == -1 ) row = results.totals;
 		var col = results.colsById;
-		var top = ( results.candidates || [] ).slice();
-		for( var i = -1;  ++i < top.length; ) {
-			var candidate = top[i], votes = result[i];
+		var top = ( row.candidates || results.parties || [] ).slice();
+		for( var i = 0, iCol = 0;  i < top.length; ++i, iCol += colIncr ) {
+			var candidate = top[i], votes = row[iCol];
 			candidate.votes = votes;
-			candidate.vsAll = votes / result[col.TabTotal];
+			candidate.vsAll = votes / row[col.TabTotal];
 			//candidate.total = total;
 		}
 		top = sortArrayBy( top, sortBy, { numeric:true } )
@@ -1483,6 +1485,7 @@ function nationalEnabled() {
 	}
 	
 	function formatSidebarTopCandidates( topCandidates ) {
+		var legislative = ( current.geoid == 'FRL' );
 		var colors = topCandidates.map( function( candidate ) {
 			return candidate.color;
 		});
@@ -1496,7 +1499,7 @@ function nationalEnabled() {
 				'</td>',
 				'<td colspan="3" class="right">',
 					'<div class="legend-candidate">',
-						'allCandidates'.T(),
+						legislative ? 'allParties'.T() : 'allCandidates'.T(),
 					'</div>',
 				'</td>',
 			'</tr>'
@@ -1514,7 +1517,7 @@ function nationalEnabled() {
 				'</td>',
 				'<td>',
 					'<div class="legend-candidate">',
-						candidate.lastName,
+						candidate.name || candidate.lastName,
 					'</div>',
 				'</td>',
 				'<td>',
