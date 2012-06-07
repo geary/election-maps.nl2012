@@ -4,3 +4,5 @@ gadget/private\.py$
 scripts/parser\.out
 scripts/parsetab\.py
 scripts/private\.py$
+shapes/private/
+shapes/shp/private-
