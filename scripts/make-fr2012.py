@@ -208,10 +208,11 @@ def fixGeoIDx( geoid, parentid=None ):
 
 
 def writeGeoJSON( db, geoid, geom, geo ):
-	filename = '%s/%s-%s-%s.js' %(
+	filename = '%s/%s-%s-%s' %(
 		private.GEOJSON_PATH, schema, fixGeoID(geoid), geom
 	)
-	db.writeGeoJSON( filename, geo, 'loadGeoJSON' )
+	db.writeGeoJSON( filename + '.js', geo, 'loadGeoJSON' )
+	db.writeGeoJSON( filename + '.geojson', geo )
 
 
 def main():
