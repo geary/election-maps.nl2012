@@ -1016,11 +1016,13 @@ function nationalEnabled() {
 	
 	function colorVotes( geo, strokeColor, strokeOpacity, strokeWidth ) {
 		if( ! geo ) return;
+		var legislative = ( current.geoid == 'FRL' );
+		var colIncr = legislative ? 4 : 1;
 		var features = geo.features;
 		var time = now() + times.offset;
 		var results = geoResults();
 		var col = results && results.cols;
-		var parties = results && results.parties;
+		var parties = election.parties;
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
@@ -1043,18 +1045,29 @@ function nationalEnabled() {
 		}
 		else {
 			var rows = results.rows;
-			var max = 0;
-			var party = parties.by.id[current.party], color = party.color, index = party.index;
+			var maxFract = 0;
+			var partyID = current.party, party = parties.by.id[partyID],
+				color = party.color, index = party.index;
 			var nCols = parties.length;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				var total = 0, value = 0;
 				if( row ) {
 					var total = 0;
-					for( var iCol = -1;  ++iCol < nCols; )
-						total += row[iCol];
-					value = row[index];
-					max = Math.max( max,
+					if( legislative ) {
+						value = 0;
+						for( var iCol = 0;  iCol < nCols;  iCol += colIncr ) {
+							total += row[iCol];
+							if( row[iCol+3] == partyID )
+								value += row[iCol];
+						}
+					}
+					else {
+						for( var iCol = 0;  iCol < nCols;  iCol += colIncr )
+							total += row[iCol];
+						value = row[index];
+					}
+					maxFract = Math.max( maxFract,
 						row.fract = total ? value / total : 0
 					);
 				}
@@ -1062,7 +1075,9 @@ function nationalEnabled() {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				feature.fillColor = party.color;
-				feature.fillOpacity = row && max ? row.fract / max * .75 : 0;
+				feature.fillOpacity =
+					row && maxFract ? row.fract / maxFract * .75 :
+					0;
 				var complete = row &&
 					row[col.NumCountedBallotBoxes] ==
 					row[col.NumBallotBoxes];
@@ -1386,7 +1401,7 @@ function nationalEnabled() {
 			return;
 		var results = geoResults();
 		var col = results.totals.colsById[ 'TabCount-' + current.party ];
-		if( ! results.totals.rows[col] )
+		if( ! results.totals.row[col] )
 			current.party = null;
 	}
 	
