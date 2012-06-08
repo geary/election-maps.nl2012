@@ -17,7 +17,7 @@ var candidatesFR2012 = [
 ];
 
 var partiesFR2012 = [
-	// Candidate order must match the party-logos image for this election
+	// Party order must match the party-logos image for this election
 	{ color: '#4DC706', id: 'VEC', name: 'Europe-Ecologie-Les Verts' },
 	{ color: '#169E28', id: 'ECO', name: 'Ecologiste' },
 	{ color: '#F00000', id: 'EXG', name: 'Extr&ecirc;me gauche' },
