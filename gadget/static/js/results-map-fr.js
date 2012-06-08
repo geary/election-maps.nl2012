@@ -1339,8 +1339,12 @@ function nationalEnabled() {
 		var colIncr = legislative ? 4 : 1;
 		max = max || Infinity;
 		if( ! row ) return [];
-		if( row == -1 ) row = results.totals;
 		var col = results.colsById;
+		if( row == -1 ) {
+			row = results.totals.row;
+			col = results.totals.colsById;
+			colIncr = 1;
+		}
 		var top = ( row.candidates || results.parties || [] ).slice();
 		for( var i = 0, iCol = 0;  i < top.length; ++i, iCol += colIncr ) {
 			var candidate = top[i], votes = row[iCol];
@@ -1363,16 +1367,6 @@ function nationalEnabled() {
 		return top;
 	}
 	
-	function getCandidateDelegates( state, candidate ) {
-		var delegates = stateUS.delegates;
-		if( ! delegates ) return 0;
-		var iCol = delegates.colsById[ 'TabCount-' + candidate.id ];
-		var row =
-			current.national ? delegates.totals :
-			delegates.rowsByID[state.abbr];
-		return row ? row[iCol] : 0;
-	}
-	
 	function setLegend() {
 		makeCurrentCandidateValid();
 		$('#topbar').html( formatTopbar() );
@@ -1383,8 +1377,8 @@ function nationalEnabled() {
 		if( ! current.party )
 			return;
 		var results = geoResults();
-		var col = results.colsById[ 'TabCount-' + current.party ];
-		if( ! results.totals[col] )
+		var col = results.totals.colsById[ 'TabCount-' + current.party ];
+		if( ! results.totals.rows[col] )
 			current.party = null;
 	}
 	
@@ -2258,31 +2252,40 @@ function nationalEnabled() {
 		var col = results.colsById = {};
 		col.candidates = 0;
 		var cols = results.cols;
-		var totals = results.totals = [];
 		for( var id, iCol = -1;  id = cols[++iCol]; ) {
 			col[id] = iCol;
-			totals.push( 0 );
 		}
 		var colID = col.ID;
 		
-		if( legislative ) {
-			var colIncr = 4;
-			var nCandidates = colID / colIncr;
-			var parties = results.parties = election.parties.map( function( party ) {
-				return $.extend( {}, party );
-			});
-			parties.index('id');
-		}
-		else {
-			var colIncr = 1;
-			var candidates = results.candidates = results.parties = [];
-			for( var i = 0, colID = col.ID;  i < colID;  ++i ) {
-				var id = cols[i].replace(/^TabCount-/,'').toLowerCase(),
-					candidate = election.candidates.by.id[id];
-				candidates.push( $.extend( {}, candidate ) );
+		var colIncr = legislative ? 4 : 1;
+		
+		var rowT = [], colsT = [], colT = {};
+		rowT.candidates = [];
+		var totals = results.totals = {
+			row: rowT,
+			cols: colsT,
+			colsById: colT
+		};
+		function totalPush( prefix, id, value, party ) {
+			var colID = prefix ? prefix + id : id;
+			colT[colID] = colsT.length;
+			colsT.push( colID );
+			rowT.push( value );
+			if( party ) {
+				rowT.candidates.push({
+					color: party.color,
+					id: id,
+					party: party,
+					name: party.name
+				});
 			}
-			candidates.index('id');
 		}
+		election.parties.forEach( function( party, iCol ) {
+			totalPush( 'TabCount-', party.id, 0, party );
+		});
+		totalPush( null, 'TabTotal', 0 );
+		totalPush( null, 'NumBallotBoxes', 0 );
+		totalPush( null, 'NumCountedBallotBoxes', 0 );
 		
 		//var fix = state.fix || {};
 		var features = geo.features;
@@ -2316,7 +2319,7 @@ function nationalEnabled() {
 					row[iCol] = 0;
 				}
 				row[col.TabTotal] = 0;
-				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
+				rowT[colT.NumBallotBoxes] += row[col.NumBallotBoxes];
 				row[col.NumCountedBallotBoxes] = 0;
 			}
 			else {
@@ -2327,14 +2330,14 @@ function nationalEnabled() {
 						if( party ) {
 							var first = row[iCol+1], last = row[iCol+2];
 							candidates.push({
-								color: parties.by.id[party].color,
+								color: election.parties.by.id[party].color,
 								id: [ party, first, last ].join('|'),
 								party: party,
 								firstName: first,
 								lastName: last
 							});
 						}
-						totals[iCol] += count;
+						rowT[ colT[ 'TabCount-' + party ] ] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol / colIncr;
@@ -2342,19 +2345,19 @@ function nationalEnabled() {
 					}
 				}
 				else {
-					row.candidates = results.candidates;
+					var candidates = row.candidates = results.candidates;
 					for( iCol = 0;  iCol < colID;  ++iCol ) {
 						var count = row[iCol];
-						totals[iCol] += count;
+						rowT[ 'TabCount-' + candidates[iCol].id ] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol;
 						}
 					}
 				}
-				totals[col.TabTotal] += row[col.TabTotal];
-				totals[col.NumBallotBoxes] += row[col.NumBallotBoxes];
-				totals[col.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
+				rowT[colT.TabTotal] += row[col.TabTotal];
+				rowT[colT.NumBallotBoxes] += row[col.NumBallotBoxes];
+				rowT[colT.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
 			}
 			row.candidateMax = candidateMax;
 		}
