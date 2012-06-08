@@ -2,6 +2,8 @@ loadStrings({
 "allCandidates": "All Candidates", 
 "allCandidatesShort": "All", 
 "allParties": "All Parties", 
+"articqueCopyright": "Copyright ARTICQUE, legislative district boundaries", 
+"articqueTitle": "ARTICQUE", 
 "automaticUpdate": "This page updates automatically", 
 "candidate": "Candidate", 
 "caucus": "Caucus", 
