@@ -1973,7 +1973,21 @@ function nationalEnabled() {
 	}
 	
 	function setContest( contest ) {
+		$body.removeClass( 'source-' + params.source );
 		params.contest = contest;
+		if( contest == 'leg' ) {
+			params.source = 'articque';
+			current.geoid = 'FRL';
+			current.national = true;
+			delete current.party;
+		}
+		else {
+			delete params.source;
+			current.geoid = 'FR';
+			current.national = true;
+			delete current.party;
+		}
+		$body.addClass( 'source-' + params.source );
 		setElection();
 		loadView();
 	}
