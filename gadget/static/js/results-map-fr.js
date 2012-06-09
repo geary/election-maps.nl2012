@@ -1026,7 +1026,16 @@ function nationalEnabled() {
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
-				var candidate = row && row.candidates[row.candidateMax];
+				if( row.candidateMax < 0 ) {
+					var candidate = null;
+				}
+				else if( legislative ) {
+					var candidate = row && row.candidates[row.candidateMax];
+				}
+				else {
+					var id = ( col[row.candidateMax] || '' ).replace( 'TabCount-', '' );
+					var candidate = row && id && row.candidates.by.id[id];
+				}
 				if( candidate ) {
 					feature.fillColor = candidate.color;
 					feature.fillOpacity = .6;
@@ -2392,7 +2401,7 @@ function nationalEnabled() {
 					var candidates = row.candidates = election.candidates;
 					for( var iCol = 0;  iCol < colID;  ++iCol ) {
 						var count = row[iCol];
-						rowT[iCol] += count;
+						rowT[ colT[ cols[iCol] ] ] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol;
