@@ -3,7 +3,6 @@ loadStrings({
 "allCandidatesShort": "Todos", 
 "allParties": "Todos los partidos", 
 "articqueCopyright": "Derechos de autor ARTICQUE, los l\u00edmites de distritos legislativos", 
-"articqueTitle": "ARTICQUE", 
 "automaticUpdate": "Esta p\u00e1gina se actualiza autom\u00e1ticamente", 
 "candidate": "Candidato", 
 "caucus": "Comit\u00e9 electoral", 

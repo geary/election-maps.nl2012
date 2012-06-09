@@ -302,7 +302,7 @@ document.write(
 	//'</a>',
 	//'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="', 'dataAttribTitleGOP'.T(), '">',
 	//'</a>',
-	'<a id="articque-logo" class="logo" target="_blank" href="http://www.articque.com/" title="', 'articqueTitle'.T(), '">',
+	'<a id="articque-logo" class="logo" target="_blank" href="http://www.articque.com/" title="', 'articqueCopyright'.T(), '">',
 	'</a>',
 	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.fr/elections/ed/fr" title="', 'googlePoliticsTitle'.T(), '">',
 	'</a>',

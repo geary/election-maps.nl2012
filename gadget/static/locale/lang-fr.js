@@ -3,7 +3,6 @@ loadStrings({
 "allCandidatesShort": "Tous", 
 "allParties": "Tous les parties", 
 "articqueCopyright": "Copyright ARTICQUE, contour des circonscriptions administratives", 
-"articqueTitle": "ARTICQUE", 
 "automaticUpdate": "Cette page se met \u00e0 jour automatiquement", 
 "candidate": "Candidat", 
 "caucus": "Comit\u00e9 \u00e9lectoral", 
