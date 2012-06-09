@@ -1034,7 +1034,7 @@ function nationalEnabled() {
 				}
 				else {
 					var id = ( col[row.candidateMax] || '' ).replace( 'TabCount-', '' );
-					var candidate = row && id && row.candidates.by.id[id];
+					var candidate = row && id && election.candidates.by.id[id];
 				}
 				if( candidate ) {
 					feature.fillColor = candidate.color;
@@ -2398,10 +2398,12 @@ function nationalEnabled() {
 					}
 				}
 				else {
-					var candidates = row.candidates = election.candidates;
+					var candidates = row.candidates = [];
 					for( var iCol = 0;  iCol < colID;  ++iCol ) {
+						var idCol = cols[iCol], id = idCol.replace( 'TabCount-', '' );
+						candidates.push( election.candidates.by.id[id] );
 						var count = row[iCol];
-						rowT[ colT[ cols[iCol] ] ] += count;
+						rowT[ colT[idCol] ] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol;
