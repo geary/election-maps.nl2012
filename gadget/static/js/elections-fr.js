@@ -43,6 +43,7 @@ var elections = {
 		tzHour: +2,
 		photos: true,
 		candidates: candidatesFR2012,
+		parties: candidatesFR2012,
 		electionids: {
 			'FR': 2548,
 			'001': 2549,
@@ -159,6 +160,7 @@ var elections = {
 		tzHour: +2,
 		photos: true,
 		candidates: candidatesFR2012,
+		parties: candidatesFR2012,
 		electionids: {
 			'FR': 2662,
 			'001': 2664,
