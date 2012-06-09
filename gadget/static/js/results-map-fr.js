@@ -2302,7 +2302,11 @@ function nationalEnabled() {
 					color: party.color,
 					id: id,
 					party: party,
-					name: party.name
+					name: party.name,
+					// for candidates:
+					firstName: party.firstName,
+					lastName: party.lastName,
+					fullName: party.fullName
 				});
 			}
 		}
@@ -2371,10 +2375,10 @@ function nationalEnabled() {
 					}
 				}
 				else {
-					var candidates = row.candidates = results.candidates;
+					var candidates = row.candidates = election.candidates;
 					for( iCol = 0;  iCol < colID;  ++iCol ) {
 						var count = row[iCol];
-						rowT[ 'TabCount-' + candidates[iCol].id ] += count;
+						rowT[iCol] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol;
