@@ -2324,7 +2324,7 @@ function nationalEnabled() {
 				});
 			}
 		}
-		election.parties.forEach( function( party, iCol ) {
+		election.parties.forEach( function( party ) {
 			totalPush( 'TabCount-', party.id, 0, party );
 		});
 		totalPush( null, 'TabTotal', 0 );
@@ -2359,7 +2359,7 @@ function nationalEnabled() {
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var max = 0,  candidateMax = -1;
 			if( zero ) {
-				for( iCol = 0;  iCol < colID;  iCol += colIncr ) {
+				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 					row[iCol] = 0;
 				}
 				row[col.TabTotal] = 0;
@@ -2369,7 +2369,7 @@ function nationalEnabled() {
 			else {
 				if( legislative ) {
 					var candidates = row.candidates = [];
-					for( iCol = 0;  iCol < colID;  iCol += colIncr ) {
+					for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 						var count = row[iCol], party = row[iCol+3];
 						if( party ) {
 							var first = row[iCol+1], last = row[iCol+2];
@@ -2390,7 +2390,7 @@ function nationalEnabled() {
 				}
 				else {
 					var candidates = row.candidates = election.candidates;
-					for( iCol = 0;  iCol < colID;  ++iCol ) {
+					for( var iCol = 0;  iCol < colID;  ++iCol ) {
 						var count = row[iCol];
 						rowT[iCol] += count;
 						if( count > max ) {
