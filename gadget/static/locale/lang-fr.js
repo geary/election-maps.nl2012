@@ -29,7 +29,7 @@ loadStrings({
 "decimalSep": ",", 
 "delegatesAbbr": "D\u00e9l.", 
 "delegatesAttrib": "Estimations de l'Associated Press", 
-"district": "District", 
+"district": "Circonscription", 
 "frSource": "Source: Minist\u00e8re de l'Int\u00e9rieur", 
 "googlePoliticsTitle": "Google\u00a0Politics\u00a0&\u00a0Elections", 
 "languageName": "Fran\u00e7ais", 
