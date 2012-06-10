@@ -1102,9 +1102,6 @@ function nationalEnabled() {
 	}
 	
 	function useInset() {
-		var legislative = ( current.geoid == 'FRL' );
-		if( legislative )
-			return false;
 		if( ! current.national ) return false;
 		var zoom = map.getZoom();
 		return zoom >= 3  &&  zoom <= 6;
@@ -1112,8 +1109,6 @@ function nationalEnabled() {
 	
 	function getInsetUnderlay() {
 		var legislative = ( current.geoid == 'FRL' );
-		if( legislative )
-			return false;
 		var zoom = map.getZoom();
 		var extra = zoom - 5;
 		var pow = Math.pow( 2, extra );
