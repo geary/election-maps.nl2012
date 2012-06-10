@@ -1659,9 +1659,32 @@ function nationalEnabled() {
 		);
 	}
 	
+	function ordinal( n ) {
+		switch( params.hl ) {
+			case 'fr':
+				var suffix = ( n == 1 ? 're' : 'e' );
+				break;
+			default:
+				var m = n > 20 ? n % 10 : n;
+				var suffix = ( m == 1 ? 'st' : m == 2 ? 'nd' : m == 3 ? 'rd' : 'th' );
+				break;
+		}
+		return n + suffix;
+	}
+	
 	function formatFeatureName( feature ) {
 		if( ! feature ) return '';
-		return S( feature.name );
+		var legislative = ( current.geoid == 'FRL' );
+		if( ! legislative )
+			return feature.name;
+		var id = feature.id;
+		if( id.length != 5 )
+			return feature.name;
+		var deptID = id.slice( 0, 3 ), distID = id.slice( 3 ), distNum = +distID;
+		var dept = geoJSON.FRL.departement.features.by[deptID];
+		if( ! dept )
+			return feature.name;
+		return S( dept.name, ' ', ordinal(distNum), ' ', 'district'.T() );
 	}
 	
 	function mayHaveResults( row, col ) {
