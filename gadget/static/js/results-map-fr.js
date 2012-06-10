@@ -519,14 +519,18 @@ function nationalEnabled() {
 			features.by['986'].click = false;  // Wallis et Futuna
 			features.by['987'].click = false;  // French Polynesia
 			addLivingAbroad( features );
+		},
+		FRL: function( json, geoid ) {
+			var features = geoJSON.FRL.legislative.features;
+			addLivingAbroadLegislative( features );
 		}
 	}
 	
 	function addLivingAbroad( features ) {
 		var radius = 100000;
-		feature = {
+		var feature = {
 			bbox: [ -radius, -radius, radius, radius ],
-			centroid: [ 0, 0],
+			centroid: [ 0, 0 ],
 			click: false,
 			draw: false,
 			geometry: {
@@ -545,6 +549,43 @@ function nationalEnabled() {
 		var ring = [];
 		var pi2 = Math.PI * 2;
 		for( var i = 0;  i < steps;  ++i ) {
+			ring.push([
+				radius * Math.sin( i / steps * pi2 ),
+				radius * Math.cos( i / steps * pi2 )
+			]);
+		}
+		ring.push( ring[0] );
+		return [ ring ];
+	}
+	
+	// TODO: refactor with addLivingAbroad()
+	function addLivingAbroadLegislative( features ) {
+		var radius = 100000;
+		for( var district = 1;  district <= 11;  ++district ) {
+			var id = S( '099', district < 10 ? '0' : '', district );
+			var feature = {
+				bbox: [ -radius, -radius, radius, radius ],
+				centroid: [ 0, 0 ],
+				click: false,
+				draw: false,
+				geometry: {
+					coordinates: drawWedge( radius, 33, ( district - 1 ) * 3, 3 ),
+					type: 'Polygon'
+				},
+				id: id,
+				name: S( "Fran&ccedil;ais de l'Etranger", ' ', ordinal(district), ' ', 'district'.T() ),
+				type: 'Feature'
+			};
+			features.push( feature );
+			features.by[id] = feature;
+		}
+	}
+	
+	function drawWedge( radius, steps, start, count ) {
+		var ring = [];
+		var pi2 = Math.PI * 2;
+		ring.push([ 0, 0 ]);
+		for( var i = start;  i <= start + count;  ++i ) {
 			ring.push([
 				radius * Math.sin( i / steps * pi2 ),
 				radius * Math.cos( i / steps * pi2 )
@@ -1126,12 +1167,18 @@ function nationalEnabled() {
 		function insetAll( action ) {
 			function inset( id, z, x, y ) {
 				var feature = featuresDept[id];
-				action( feature, z, x, y );
-				var featureRgn = featuresRgn[ '0' + feature.code_reg ];
-				if( featureRgn )
-					action( featureRgn, z, x, y, feature );
+				if( feature ) {
+					action( feature, z, x, y );
+					var featureRgn = featuresRgn[ '0' + feature.code_reg ];
+					if( featureRgn )
+						action( featureRgn, z, x, y, feature );
+				}
 				if( featuresLeg ) {
-					for( var featureLeg, i = 1;  featureLeg = featuresLeg[ id + '0' + i ];  ++i ) {
+					for(
+						var featureLeg, i = 1;
+						featureLeg = featuresLeg[S( id, i < 10 ? '0' : '', i )];
+						++i
+					) {
 						action( featureLeg, z, x, y, feature );
 					}
 				}
@@ -1143,13 +1190,9 @@ function nationalEnabled() {
 			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
 			inset( 976, 7.2, -150, -1340 );  // Mayotte
 			inset( 988, 3.6, -150, -1290 );  // Nouvelle Caledoni
-			if( legislative )
-				inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
-			else
-				inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
+			inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
 			inset( 986, 7.5, -150, -1190 );  // Wallis-et-Futuna
-			if( ! legislative )
-				inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
+			inset( '099', 4.8, -150, -1140 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
 			function fixWeF( feature, centroidFeature ) {
@@ -1172,8 +1215,15 @@ function nationalEnabled() {
 			}
 			
 			// Francais de l'Etranger (French living abroad)
-			if( ! legislative )
+			if( legislative ) {
+				for( var district = 1;  district <= 11;  ++district ) {
+					var id = S( '099', district < 10 ? '0' : '', district );
+					geo.legislative.features.by[id].draw = ( action == set );
+				}
+			}
+			else {
 				geo.departement.features.by['099'].draw = ( action == set );
+			}
 		}
 		var geo = geoJSON[current.geoid];
 		if( ! geo ) return null;
