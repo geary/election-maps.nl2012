@@ -261,7 +261,8 @@ def fixGeoIDx( geoid, parentid=None ):
 	geoid = geoid.rjust( 3, '0' )
 	if parentid:
 		if parentid == 'FRL':
-			geoid = geoid.rjust( 5, '0' )
+			if len(geoid) == 4:
+				geoid = geoid.rjust( 5, '0' )
 		elif parentid == '976':
 			geoid = '5' + geoid[1:]
 		elif parentid == '977':
