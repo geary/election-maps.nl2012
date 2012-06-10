@@ -2461,8 +2461,8 @@ function nationalEnabled() {
 			}
 			row.candidateMax = candidateMax;
 		}
+		var missing = [];
 		if( debug  &&  ! features.didMissingCheck ) {
-			var missing = [];
 			for( var row, iRow = -1;  row = rows[++iRow]; ) {
 				var id = row[colID];
 				if( ! features.by[id] )
