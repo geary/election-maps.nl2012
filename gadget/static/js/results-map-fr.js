@@ -1183,16 +1183,16 @@ function nationalEnabled() {
 					}
 				}
 			}
-			inset( 971, 6.1, -200, -1340 );  // Guadeloupe
-			inset( 972, 6.2, -200, -1290 );  // Martinique
-			inset( 973, 3.3, -200, -1240 );  // Guyane
-			inset( 974, 5.8, -200, -1190 );  // La Reunion
-			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
-			inset( 976, 7.2, -150, -1340 );  // Mayotte
-			inset( 988, 3.6, -150, -1290 );  // Nouvelle Caledoni
-			inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
-			inset( 986, 7.5, -150, -1190 );  // Wallis-et-Futuna
-			inset( '099', 4.8, -150, -1140 );  // Francais de l'Etranger
+			inset( 971, 6.1, -200, -1325 );  // Guadeloupe
+			inset( 972, 6.2, -200, -1275 );  // Martinique
+			inset( 973, 3.3, -200, -1225 );  // Guyane
+			inset( 974, 5.8, -200, -1175 );  // La Reunion
+			inset( 975, 6.8, -200, -1125 );  // Saint Pierre et Miquelon
+			inset( 976, 7.2, -150, -1325 );  // Mayotte
+			inset( 988, 3.6, -150, -1275 );  // Nouvelle Caledoni
+			inset( 987, 6.2, -150, -1225 );  // Polynesie Francais
+			inset( 986, 7.5, -150, -1175 );  // Wallis-et-Futuna
+			inset( '099', 4.8, -150, -1125 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
 			function fixWeF( feature, centroidFeature ) {
@@ -1201,9 +1201,9 @@ function nationalEnabled() {
 					var ring = poly[0];
 					var coord = ring[0];
 					if( coord[0] < -19700000 )
-						action( poly, 7.5, -30, -1250, feature );
+						action( poly, 7.5, -30, -1235, feature );
 					else
-						action( poly, 7.5, -257, -1132, feature );
+						action( poly, 7.5, -257, -1117, feature );
 				});
 			}
 			featureDept = featuresDept[986];
@@ -1276,7 +1276,7 @@ function nationalEnabled() {
 	}
 	
 	function insetGeo() {
-		var bbox = [ -1072000, 5420000, -600000, 6700000 ];
+		var bbox = [ -1072000, 5350000, -600000, 6630000 ];
 		var geo = makeBboxGeo( bbox, {
 			fillColor: '#F8F8F8',
 			fillOpacity: 1,
