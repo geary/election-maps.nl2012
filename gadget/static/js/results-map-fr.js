@@ -1098,7 +1098,8 @@ function nationalEnabled() {
 	}
 	
 	function useInset() {
-		if( current.geoid == 'FRL' )
+		var legislative = ( current.geoid == 'FRL' );
+		if( legislative )
 			return false;
 		if( ! current.national ) return false;
 		var zoom = map.getZoom();
@@ -1106,8 +1107,9 @@ function nationalEnabled() {
 	}
 	
 	function getInsetUnderlay() {
-		if( current.geoid == 'FRL' )
-			return null;
+		var legislative = ( current.geoid == 'FRL' );
+		if( legislative )
+			return false;
 		var zoom = map.getZoom();
 		var extra = zoom - 5;
 		var pow = Math.pow( 2, extra );
@@ -1116,8 +1118,9 @@ function nationalEnabled() {
 			delete feature.zoom;
 			delete feature.offset;
 		}
-		function set( feature, z, x, y ) {
-			var p = PolyGonzo.Mercator.coordToPixel( feature.centroid, z );
+		function set( feature, z, x, y, centroidFeature ) {
+			var centroid = ( centroidFeature || feature ).centroid;
+			var p = PolyGonzo.Mercator.coordToPixel( centroid, z );
 			feature.zoom = z + extra;
 			feature.offset = { x: ( x - p[0] ) * pow, y: ( y - p[1] ) * pow };
 		}
@@ -1125,9 +1128,14 @@ function nationalEnabled() {
 			function inset( id, z, x, y ) {
 				var feature = featuresDept[id];
 				action( feature, z, x, y );
-				var featureRgn = featuresRgn['0'+feature.code_reg];
+				var featureRgn = featuresRgn[ '0' + feature.code_reg ];
 				if( featureRgn )
-					action( featureRgn, z, x, y );
+					action( featureRgn, z, x, y, feature );
+				if( featuresLeg ) {
+					for( var featureLeg, i = 1;  featureLeg = featuresLeg[ id + '0' + i ];  ++i ) {
+						action( featureLeg, z, x, y, feature );
+					}
+				}
 			}
 			inset( 971, 6.1, -200, -1340 );  // Guadeloupe
 			inset( 972, 6.2, -200, -1290 );  // Martinique
@@ -1136,28 +1144,43 @@ function nationalEnabled() {
 			inset( 975, 6.8, -200, -1140 );  // Saint Pierre et Miquelon
 			inset( 976, 7.2, -150, -1340 );  // Mayotte
 			inset( 988, 3.6, -150, -1290 );  // Nouvelle Caledoni
-			inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
+			if( legislative )
+				inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
+			else
+				inset( 987, 6.2, -150, -1240 );  // Polynesie Francais
 			inset( 986, 7.5, -150, -1190 );  // Wallis-et-Futuna
-			inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
+			if( ! legislative )
+				inset( '099', 4.4, -150, -1140 );  // Francais de l'Etranger
 			
 			// Wallis-et-Futuna
-			var feature = geoJSON.FR.departement.features.by[986];
-			feature.geometry.coordinates.forEach( function( poly ) {
-				poly.centroid = feature.centroid;  // hack
-				var ring = poly[0];
-				var coord = ring[0];
-				if( coord[0] < -19700000 )
-					action( poly, 7.5, -30, -1250 );
-				else
-					action( poly, 7.5, -257, -1132 );
-			});
+			function fixWeF( feature, centroidFeature ) {
+				feature.geometry.coordinates.forEach( function( poly ) {
+					poly.centroid = ( centroidFeature || feature ).centroid;  // hack
+					var ring = poly[0];
+					var coord = ring[0];
+					if( coord[0] < -19700000 )
+						action( poly, 7.5, -30, -1250, feature );
+					else
+						action( poly, 7.5, -257, -1132, feature );
+				});
+			}
+			featureDept = featuresDept[986];
+			fixWeF( featureDept );
+			if( featuresLeg ) {
+				for( var featureLeg, i = 1;  featureLeg = featuresLeg[ '9860' + i ];  ++i ) {
+					fixWeF( featureLeg, featureDept );
+				}
+			}
 			
 			// Francais de l'Etranger (French living abroad)
-			geoJSON.FR.departement.features.by['099'].draw = ( action == set );
+			if( ! legislative )
+				geo.departement.features.by['099'].draw = ( action == set );
 		}
-		if( ! geoJSON.FR ) return null;
-		var featuresDept = geoJSON.FR.departement.features.by;
-		var featuresRgn = geoJSON.FR.region.features.by;
+		var geo = geoJSON[current.geoid];
+		if( ! geo ) return null;
+		var featuresLeg = geo.legislative && geo.legislative.features.by;
+		var featuresDept = geo.departement.features.by;
+		var featuresRgn = geo.region.features.by;
 		if( ! useInset() ) {
 			insetAll( clear );
 			return null;
@@ -1170,7 +1193,7 @@ function nationalEnabled() {
 		}];
 		return {
 			images: images,
-			hittest: function( image, x, y ) {
+			hittest: ! legislative && function( image, x, y ) {
 				var i = Math.floor( x / size );
 				var j = Math.floor( y / size );
 				var ids = [
@@ -1180,14 +1203,14 @@ function nationalEnabled() {
 				var id = ids[i][j], feature = featuresDept[id];
 				if( feature ) {
 					return {
-						geo: geoJSON.FR.departement,
+						geo: geo.departement,
 						feature: feature
 					}
 				}
 /*
 				if( image.abbr )
 					return {
-						geo: geoJSON.FR.departement,
+						geo: geo.departement,
 						feature: features.by[image.abbr]
 					}
 				var feature =
