@@ -1238,7 +1238,7 @@ function nationalEnabled() {
 		var images = [{
 			//src: imgUrl('insets-fr.png'),
 			width: size * 2, height: size * 5,
-			left: -225 * pow, top: -1365 * pow
+			left: -225 * pow, top: -1350 * pow
 		}];
 		return {
 			images: images,
