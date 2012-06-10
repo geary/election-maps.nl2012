@@ -255,22 +255,9 @@ def loadInseeTable( db, table, cols, columns ):
 
 def loadLegislativeShapes( db ):
 	table = schema + '.legislative'
-	filename = '../shapes/private/articque/Circos_2012_WGS84.zip'
-	print 'Loading %s' % filename
-	db.loadShapefile(
-		filename, private.TEMP_PATH, table,
-		fullGeom, '4326', 'LATIN1', True,
-		'France_entiere/fr_metropole_circoelec_WGS84.shp',
-		#tweaksql=tweakDepartmentSQL
-	)
-	db.addGoogleGeometry( table, fullGeom, googGeom )
-	db.indexGeometryColumn( table, googGeom )
-
-def loadLegislativeShapes( db ):
-	table = schema + '.legislative'
 	def loadOne( zipfile, shpname, suffix, cols=None, create=False ):
 		if cols is None:
-			cols = 'id_circo, id_reg, nom_circo, id_dep'
+			cols = "id_circo, id_reg, '' as nom_circo, id_dep"
 		srid = '4326'
 		filename = '../shapes/private/articque/%s.zip' % zipfile
 		srctable = table + '_' + suffix
@@ -300,7 +287,7 @@ def loadLegislativeShapes( db ):
 	def loadMore( id, cols=None ):
 		if cols:
 			cols = {
-				'e': 'id_circoel as id_circo, id_reg, lib_circoe as nom_circo, id_dep'
+				'e': "id_circoel as id_circo, id_reg, '' as nom_circo, id_dep"
 			}[cols]
 		loadOne( id, '%s/fr_circoelec_D%s' %(id,id), id, cols )
 	loadOne( 'Legislative', 'fr_metropole_circoelec_WGS84', 'fr', None, True )
