@@ -1,7 +1,7 @@
 loadStrings({
 "allCandidates": "Tous les candidats", 
 "allCandidatesShort": "Tous", 
-"allParties": "Tous les parties", 
+"allParties": "Tous les partis", 
 "articqueCopyright": "Copyright ARTICQUE, contour des circonscriptions administratives", 
 "automaticUpdate": "Cette page se met \u00e0 jour automatiquement", 
 "candidate": "Candidat", 
