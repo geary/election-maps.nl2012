@@ -23,7 +23,7 @@ var partiesFR2012 = [
 	{ color: '#F00000', id: 'EXG', name: 'Extr&ecirc;me gauche' },
 	{ color: '#E615A7', id: 'PRV', name: 'Parti radical' },
 	{ color: '#000000', id: 'EXD', name: 'Extr&ecirc;me droite' },
-	{ color: '#EF4BB6', id: 'SOC', name: 'Socialiste' },
+	{ color: '#EF4BB6', id: 'SOC', name: 'Parti Socialiste' },
 	{ color: '#DE7676', id: 'DVG', name: 'Divers gauche' },
 	{ color: '#A3A3A3', id: 'NCE', name: 'Nouveau Centre' },
 	{ color: '#1BA5E0', id: 'DVD', name: 'Divers droite' },
