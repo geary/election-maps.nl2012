@@ -1572,7 +1572,7 @@ function nationalEnabled() {
 						resultsHeaderHTML,
 					'</div>',
 				'</div>',
-				'<div xclass="scroller" id="sidebar-scroll">',
+				'<div class="scroller" id="sidebar-scroll">',
 					resultsScrollingHTML,
 				'</div>',
 				'<div class="faint-text" style="padding:4px 8px 0; border-top:1px solid #C2C2C2;">',
@@ -2186,8 +2186,8 @@ function nationalEnabled() {
 		var topbarHeight = $('#topbar').height() + 1;
 		var mapLeft = sidebarWidth, mapTop = topbarHeight;
 		var mapWidth = ww - mapLeft, mapHeight = wh - mapTop;
-		//var $sidebarScroll = $('#sidebar-scroll');
-		//$sidebarScroll.height( wh - $sidebarScroll.offset().top );
+		var $sidebarScroll = $('#sidebar-scroll');
+		$sidebarScroll.height( wh - $sidebarScroll.offset().top );
 		
 		mapPixBounds = $('#map')
 			.css({
