@@ -2398,7 +2398,6 @@ function nationalEnabled() {
 		//var fix = state.fix || {};
 		var features = geo.features;
 		
-		var missing = [];
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		var geoid = geo.id;
@@ -2409,15 +2408,6 @@ function nationalEnabled() {
 			//var fixed = fix[id];
 			//if( fixed ) {
 			//	id = row[colID] = fixed;
-			//}
-			//if( state.geo ) {
-			//	var feature = features.by[id];
-			//	if( ! feature ) {
-			//		var ok = missingOK[current.geoid];
-			//		if( !( ok  &&  id in ok ) )
-			//			if( ! features.didMissingCheck )
-			//				missing.push( id );
-			//	}
 			//}
 			rowsByID[id] = row;
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
@@ -2471,12 +2461,26 @@ function nationalEnabled() {
 			}
 			row.candidateMax = candidateMax;
 		}
-		features.didMissingCheck = true;
+		if( debug  &&  ! features.didMissingCheck ) {
+			var missing = [];
+			for( var row, iRow = -1;  row = rows[++iRow]; ) {
+				var id = row[colID];
+				if( ! features.by[id] )
+					missing.push( S( id, ' in results but not in GeoJSON' ) );
+			}
+			for( var feature, iFeature = -1;  feature = features[++iFeature]; ) {
+				var id = feature.id;
+				if( ! rowsByID[id] )
+					missing.push( S( id, ' in GeoJSON but not in results' ) );
+			}
+			features.didMissingCheck = true;
+		}
 		
 		if( electionsPending.length == 0 )
 			geoReady();
 		
-		if( missing.length  &&  debug  &&  debug != 'quiet' ) {
+		if( debug == 'verbose'  ||  ( missing.length  &&  debug  &&  debug != 'quiet' ) ) {
+			if( ! missing.length ) missing.push( 'none' );
 			alert( S( 'Missing locations:\n', missing.sort().join( '\n' ) ) );
 		}
 	}
