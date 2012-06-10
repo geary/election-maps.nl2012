@@ -1094,7 +1094,7 @@ function nationalEnabled() {
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
-				if( row.candidateMax < 0 ) {
+				if( ! row  ||  row.candidateMax < 0 ) {
 					var candidate = null;
 				}
 				else if( legislative ) {
@@ -1172,6 +1172,7 @@ function nationalEnabled() {
 	}
 	
 	function getInsetUnderlay() {
+		if( ! current.national ) return null;
 		var legislative = ( current.geoid == 'FRL' );
 		var zoom = map.getZoom();
 		var extra = zoom - 5;
