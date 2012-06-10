@@ -194,7 +194,7 @@ document.write(
 		'.content .contentreporting * { xfont-size:20px; }',
 		'.content {}',
 		'div.scroller { overflow:scroll; overflow-x:hidden; }',
-		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; width:300px; }',
+		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; min-width:300px; }',
 		'div.candidate-name { line-height:1em; }',
 		'div.first-name { font-size:85%; }',
 		'body.tv #election-title { font-size:24px; font-weight:bold; }',
