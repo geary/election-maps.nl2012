@@ -170,9 +170,10 @@ document.write(
 		'a { font-size:13px; text-decoration:none; color:#1155CC; }',
 		'a:hover { text-decoration:underline; }',
 		//'a:visited { color:#6611CC; }',
-		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; xheight:27px; xline-height:27px; padding:2px 6px; }',
-		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; text-decoration:none; }',
+		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; xheight:27px; xline-height:27px; padding:2px 6px; text-decoration:none !important; }',
+		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; }',
 		'a.button.selected { background-color: #EEE; background-image:linear-gradient(top,#EEE,#E0E0E0); border:1px solid #CCC; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#333; }',
+		'a.button.disabled { color:#AAA; }',
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
 		'div.topbar-header, div.sidebar-header { padding:3px; }',
@@ -401,7 +402,10 @@ function formatSidebarTable( cells ) {
 						'round1'.T(),
 					'</a>',
 					'&nbsp;',
-					'<a class="button', params.round == 2 ? ' selected' : '', '" id="btnRound2">',
+					'<a class="button',
+								params.round == 2 ? ' selected' : '',
+								params.contest == 'leg' ? ' disabled' : '',
+							'" id="btnRound2">',
 						'round2'.T(),
 					'</a>',
 				'</div>',
@@ -1979,10 +1983,12 @@ function nationalEnabled() {
 		
 		$topbar.delegate( 'a', {
 			mouseover: function( event ) {
-				$(this).addClass( 'hover' );
+				if( ! $(this).hasClass('disabled') )
+					$(this).addClass( 'hover' );
 			},
 			mouseout: function( event ) {
-				$(this).removeClass( 'hover' );
+				if( ! $(this).hasClass('disabled') )
+					$(this).removeClass( 'hover' );
 			}
 		});
 		
@@ -1995,6 +2001,8 @@ function nationalEnabled() {
 		
 		$topbar.delegate( '#btnContest-pres,#btnContest-leg', {
 			click: function( event ) {
+				if( this.id == 'btnContest-leg' )
+					params.round = 1;
 				setContest( this.id.replace(/^btnContest-/, '' ) );
 				event.preventDefault();
 			}
@@ -2002,7 +2010,8 @@ function nationalEnabled() {
 		
 		$topbar.delegate( '#btnRound1,#btnRound2', {
 			click: function( event ) {
-				setRound( this.id.replace(/^btnRound/, '' ) );
+				if( ! $(this).hasClass('disabled') )
+					setRound( this.id.replace(/^btnRound/, '' ) );
 				event.preventDefault();
 			}
 		});
