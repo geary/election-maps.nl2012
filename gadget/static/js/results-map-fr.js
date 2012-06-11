@@ -1089,7 +1089,7 @@ function nationalEnabled() {
 		var features = geo.features;
 		var time = now() + times.offset;
 		var results = geoResults();
-		var col = results && results.cols;
+		var cols = results && results.cols, col = results && results.colsById;
 		var parties = election.parties;
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
@@ -1101,7 +1101,7 @@ function nationalEnabled() {
 					var candidate = row && row.candidates[row.candidateMax];
 				}
 				else {
-					var id = ( col[row.candidateMax] || '' ).replace( 'TabCount-', '' );
+					var id = ( cols[row.candidateMax] || '' ).replace( 'TabCount-', '' );
 					var candidate = row && id && election.candidates.by.id[id];
 				}
 				if( candidate ) {
@@ -1112,9 +1112,9 @@ function nationalEnabled() {
 					feature.fillColor = '#FFFFFF';
 					feature.fillOpacity = 0;
 				}
-				var complete = row &&
-					row[col.NumCountedBallotBoxes] ==
-					row[col.NumBallotBoxes];
+				//var complete = row &&
+				//	row[col.NumCountedBallotBoxes] ==
+				//	row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = strokeOpacity;
 				feature.strokeWidth = strokeWidth;
@@ -1122,42 +1122,47 @@ function nationalEnabled() {
 		}
 		else {
 			var rows = results.rows;
-			var maxFract = 0;
+			var minFract = Infinity, maxFract = 0;
 			var partyID = current.party, party = parties.by.id[partyID],
-				color = party.color, index = party.index;
-			var nCols = parties.length;
+				color = party.color;
+			if( ! legislative ) {
+				var iColParty = results.colsById[ 'TabCount-' + partyID ];
+			}
+			var colID = col.ID;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				var total = 0, value = 0;
 				if( row ) {
-					var total = 0;
 					if( legislative ) {
-						value = 0;
-						for( var iCol = 0;  iCol < nCols;  iCol += colIncr ) {
+						for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 							total += row[iCol];
 							if( row[iCol+3] == partyID )
 								value += row[iCol];
 						}
 					}
 					else {
-						for( var iCol = 0;  iCol < nCols;  iCol += colIncr )
+						for( var iCol = 0;  iCol < colID;  iCol += colIncr )
 							total += row[iCol];
-						value = row[index];
+						value = row[iColParty];
 					}
-					maxFract = Math.max( maxFract,
-						row.fract = total ? value / total : 0
-					);
+					var fract = row.fract = total ? value / total : 0
+					if( fract ) {
+						minFract = Math.min( minFract, fract );
+						maxFract = Math.max( maxFract, fract );
+					}
 				}
 			}
+			var fractRange = maxFract - minFract;
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				feature.fillColor = party.color;
 				feature.fillOpacity =
-					row && maxFract ? row.fract / maxFract * .75 :
-					0;
-				var complete = row &&
-					row[col.NumCountedBallotBoxes] ==
-					row[col.NumBallotBoxes];
+					row  &&  row.fract > 0  &&  fractRange > 0 ?
+						( row.fract - minFract ) / fractRange * .75 :
+						0;
+				//var complete = row &&
+				//	row[col.NumCountedBallotBoxes] ==
+				//	row[col.NumBallotBoxes];
 				feature.strokeColor = strokeColor;
 				feature.strokeOpacity = strokeOpacity;
 				feature.strokeWidth = strokeWidth;
