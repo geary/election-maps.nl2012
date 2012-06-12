@@ -21,7 +21,7 @@ var partiesFR2012 = [
 	{ color: '#4DC706', id: 'VEC', name: 'Europe-Ecologie-Les Verts' },
 	{ color: '#169E28', id: 'ECO', name: 'Ecologiste' },
 	{ color: '#F00000', id: 'EXG', name: 'Extr&ecirc;me gauche' },
-	{ color: '#E615A7', id: 'PRV', name: 'Parti radical' },
+	{ color: '#001EFF', id: 'PRV', name: 'Parti radical' },
 	{ color: '#000000', id: 'EXD', name: 'Extr&ecirc;me droite' },
 	{ color: '#EF4BB6', id: 'SOC', name: 'Parti Socialiste' },
 	{ color: '#DE7676', id: 'DVG', name: 'Divers gauche' },
@@ -33,7 +33,7 @@ var partiesFR2012 = [
 	{ color: '#F58522', id: 'CEN', name: 'Le Centre pour la France' },
 	{ color: '#752A0C', id: 'AUT', name: 'Autres' },
 	{ color: '#D8F70A', id: 'REG', name: 'R&eacute;gionaliste' },
-	{ color: '#940000', id: 'RDG', name: 'Radical de Gauche' },
+	{ color: '#FF0059', id: 'RDG', name: 'Radical de Gauche' },
 	{ color: '#9F1D35', id: 'FG', name: 'Front de gauche' }
 ];
 
