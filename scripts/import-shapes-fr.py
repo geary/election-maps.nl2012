@@ -392,7 +392,7 @@ def updateDepartments( db ):
 			france.departement.code_dept = france.depts2012.dep
 		)
 	'''
-	db.execute( '''
+	db.executeCommit( '''
 		CREATE INDEX france_departement_code_dept_idx
 			ON france.departement(code_dept);
 		CREATE INDEX france_departement_code_chf_idx
@@ -428,7 +428,6 @@ def updateDepartments( db ):
 	''' % {
 		'fromWhere': fromWhere,
 	})
-	db.connection.commit()
 
 
 #def loadCantonShapes( db ):
@@ -612,7 +611,7 @@ def updateCommunes( db ):
 			AND
 				france.commune.code_comm = france.comsimp2012.com
 	'''
-	db.execute( '''
+	db.executeCommit( '''
 		CREATE INDEX france_commune_code_dept_idx
 			ON france.commune(code_dept);
 		CREATE INDEX france_commune_code_comm_idx
@@ -640,7 +639,6 @@ def updateCommunes( db ):
 	''' % {
 		'fromWhere': fromWhere,
 	})
-	db.connection.commit()
 
 
 def saveShapefile( db, table ):
