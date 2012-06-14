@@ -120,13 +120,12 @@ class Database:
 		})
 	
 	def createSchema( self, schema ):
-		self.execute('''
+		self.executeCommit('''
 			DROP SCHEMA IF EXISTS %(schema)s CASCADE;
 			CREATE SCHEMA %(schema)s AUTHORIZATION postgres;
 		''' % {
 			'schema': schema,
 		})
-		self.connection.commit()
 	
 	def loadShapefile( self, zipfile, tempdir, tablename, column=None, srid=None, encoding=None, create=True, shpfilename=None, tweaksql=None ):
 		if column is None: column = 'full_geom'
@@ -286,11 +285,10 @@ class Database:
 		print 'indexGeometryColumn %s %s %s' %( table, geom, index )
 		vars = { 'table':table, 'geom':geom, 'index':index, }
 		t1 = time.clock()
-		self.execute('''
+		self.executeCommit('''
 			CREATE INDEX %(index)s ON %(table)s
 			USING GIST ( %(geom)s );
 		''' % vars )
-		self.connection.commit()
 		t2 = time.clock()
 		print 'CREATE INDEX %.1f seconds' %( t2 - t1 )
 		self.analyzeTable( table )
@@ -308,7 +306,7 @@ class Database:
 		print 'addGoogleGeometry %s %s %s' %( table, llgeom, googeom )
 		self.addGeometryColumn( table, googeom, 3857, True )
 		t1 = time.clock()
-		self.execute('''
+		self.executeCommit('''
 			UPDATE
 				%(table)s
 			SET
@@ -328,7 +326,6 @@ class Database:
 			'llgeom': llgeom,
 			'googeom': googeom,
 		})
-		self.connection.commit()
 		t2 = time.clock()
 		print 'UPDATE ST_Transform %.1f seconds' %( t2 - t1 )
 	
@@ -345,7 +342,7 @@ class Database:
 		t1 = time.clock()
 		srid = self.getSRID( sourceTable, sourceGeom )
 		self.addGeometryColumn( targetTable, targetGeom, srid, True )
-		self.execute('''
+		self.executeCommit('''
 			UPDATE
 				%(targetTable)s
 			SET
@@ -375,7 +372,6 @@ class Database:
 			'targetGeom': targetGeom,
 			'whereGroupBy': whereGroupBy,
 		})
-		self.connection.commit()
 		t2 = time.clock()
 		print 'UPDATE ST_Union %.1f seconds' %( t2 - t1 )
 	
@@ -390,7 +386,7 @@ class Database:
 			self.getSRID(table,sourceGeom), True
 		)
 		t1 = time.clock()
-		self.execute('''
+		self.executeCommit('''
 			UPDATE
 				%(table)s
 			SET
@@ -412,7 +408,6 @@ class Database:
 			'targetGeom': targetGeom,
 			'tolerance': tolerance,
 		})
-		self.connection.commit()
 		t2 = time.clock()
 		print 'UPDATE ST_SimplifyPreserveTopology %.1f seconds' %( t2 - t1 )
 	
