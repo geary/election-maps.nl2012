@@ -413,10 +413,10 @@ function formatSidebarTable( cells ) {
 					//	2012,
 					//'</a>',
 					//'&nbsp;&nbsp;&nbsp;&nbsp;',
-					//'<a class="button', params.contest == 'pres' ? ' selected' : '', '" id="btnContest-pres">',
-					//	'presidential'.T(),
-					//'</a>',
-					//'&nbsp;',
+					'<a class="button', params.contest == 'pres' ? ' selected' : '', '" id="btnContest-pres">',
+						'presidential'.T(),
+					'</a>',
+					'&nbsp;',
 					'<a class="button', params.contest == 'leg' ? ' selected' : '', '" id="btnContest-leg">',
 						'legislative'.T(),
 					'</a>',
@@ -849,8 +849,21 @@ function nationalEnabled() {
 		}
 		z = Math.floor( z );
 		
+		// Force a poly draw if the map is not going to move (much)
+		// TODO: better calculation using pixel position
+		var centerNew = new gm.LatLng( centerLL[1], centerLL[0] );
+		function near( a, b ) { return Math.abs( a - b ) < .001; }
+		var centerMap = map.getCenter();
+		if( centerMap  &&  z == map.getZoom() ) {
+			if(
+				near( centerMap.lat(), centerLL[1] )  &&
+				near( centerMap.lng(), centerLL[0] )
+			) {
+				polys();
+			}
+		}
 		map.setZoom( z );
-		map[setCenter]( new gm.LatLng( centerLL[1], centerLL[0] ) );
+		map[setCenter]( centerNew );
 		setCenter = 'panTo';
 		zoom = map.getZoom();
 	}
@@ -936,8 +949,9 @@ function nationalEnabled() {
 			where.geo.id == 'FR'  &&
 			feature.id != current.geoid  &&
 			feature.click !== false
-		)
+		) {
 			gotoGeo( feature, why );
+		}
 	}
 	
 	var touch;
