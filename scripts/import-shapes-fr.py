@@ -17,10 +17,11 @@ googGeom = 'goog_geom'
 def process():
 	createDatabase( database)
 	db = openDatabase( database )
+	db.addUtilityFunctions()
 	#addSimplificationFunction( db )
 	createSchema( db )
 	# data.gouv.fr tables
-	loadLegislativeTable( db )
+	loadCrosswalkTable( db )
 	# Insee tables
 	loadNationTable( db )
 	loadRegionTable( db )
@@ -36,6 +37,7 @@ def process():
 	loadCommuneShapes( db )
 	updateDepartments( db )
 	updateCommunes( db )
+	makeLegimunes( db )
 	saveShapefile( db, 'legislative'  )
 	saveShapefile( db, 'departement'  )
 	#saveShapefile( db, 'canton'  )
@@ -90,7 +92,7 @@ def createSchema( db ):
 # typct varchar(1)
 
 
-def loadLegislativeTable( db ):
+def loadCrosswalkTable( db ):
 	loadGouvTable( db,
 		'legislative', 'crosswalk',
 		'''
@@ -112,6 +114,37 @@ def loadLegislativeTable( db ):
 			circ_leg_2012 varchar(2)
 		'''
 	)
+	db.executeCommit( '''
+		CREATE INDEX ON france.crosswalk(code_dept);
+		CREATE INDEX ON france.crosswalk(code_cant);
+		CREATE INDEX ON france.crosswalk(code_comm);
+		
+		UPDATE france.crosswalk
+		SET
+			code_dept = lpad_notrunc( code_dept, 2, '0' ),
+			code_cant = lpad_notrunc( code_cant, 2, '0' ),
+			code_comm = lpad_notrunc( code_comm, 2, '0' );
+		
+		UPDATE france.crosswalk
+		SET code_dept = '971'
+		WHERE code_dept = 'ZA';
+		
+		UPDATE france.crosswalk
+		SET code_dept = '972'
+		WHERE code_dept = 'ZB';
+		
+		UPDATE france.crosswalk
+		SET code_dept = '973'
+		WHERE code_dept = 'ZC';
+		
+		UPDATE france.crosswalk
+		SET code_dept = '974'
+		WHERE code_dept = 'ZD';
+		
+--		UPDATE france.crosswalk
+--		SET code_comm = trim( leading '0' from substring( code_comm from 2 ) )
+--		WHERE code_dept >= '971' AND code_dept <= '979';
+	''')
 
 
 def loadNationTable( db ):
@@ -153,6 +186,10 @@ def loadDepartmentTable( db ):
 			nccenr varchar(70)
 		'''
 	)
+	db.executeCommit( '''
+		CREATE INDEX ON france.depts2012(dep);
+		CREATE INDEX ON france.depts2012(cheflieu);
+	''' )
 
 
 def loadArrondTable( db ):
@@ -212,6 +249,10 @@ def loadCommuneTable( db ):
 			nccenr varchar(70)
 		'''
 	)
+	db.executeCommit( '''
+		CREATE INDEX ON france.comsimp2012(dep);
+		CREATE INDEX ON france.comsimp2012(com);
+	''' )
 
 
 def loadGouvTable( db, filename, table, cols, columns ):
@@ -257,7 +298,7 @@ def loadLegislativeShapes( db ):
 	table = schema + '.legislative'
 	def loadOne( zipfile, shpname, suffix, cols=None, create=False ):
 		if cols is None:
-			cols = "id_circo, id_reg, '' as nom_circo, id_dep"
+			cols = "right(id_circo,2) AS id_circo, id_reg, '' as nom_circo, id_dep"
 		srid = '4326'
 		filename = '../shapes/private/articque/%s.zip' % zipfile
 		srctable = table + '_' + suffix
@@ -287,7 +328,7 @@ def loadLegislativeShapes( db ):
 	def loadMore( id, cols=None ):
 		if cols:
 			cols = {
-				'e': "id_circoel as id_circo, id_reg, '' as nom_circo, id_dep"
+				'e': "right(id_circoel,2) AS id_circo, id_reg, '' as nom_circo, id_dep"
 			}[cols]
 		loadOne( id, '%s/fr_circoelec_D%s' %(id,id), id, cols )
 	loadOne( 'Legislative', 'fr_metropole_circoelec_WGS84', 'fr', None, True )
@@ -303,6 +344,11 @@ def loadLegislativeShapes( db ):
 	loadMore( '988', 'e' )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
+	db.executeCommit( '''
+		CREATE INDEX ON france.legislative(id_circo);
+		CREATE INDEX ON france.legislative(id_dep);
+		CREATE INDEX ON france.legislative(id_reg);
+	''' )
 
 
 def loadGadmShapes( db, loader ):
@@ -340,6 +386,11 @@ def loadDepartmentShapes( db ):
 	loadGadmShapes( db, loadGadmDepartment )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
+	db.executeCommit( '''
+		CREATE INDEX ON france.departement(code_dept);
+		CREATE INDEX ON france.departement(code_chf);
+		CREATE INDEX ON france.departement(code_reg);
+	''' )
 
 
 def loadGadmDepartment( db, abbr, geoid, level, suffix ):
@@ -393,15 +444,6 @@ def updateDepartments( db ):
 		)
 	'''
 	db.executeCommit( '''
-		CREATE INDEX france_departement_code_dept_idx
-			ON france.departement(code_dept);
-		CREATE INDEX france_departement_code_chf_idx
-			ON france.departement(code_chf);
-		CREATE INDEX france_depts2012_dep_idx
-			ON france.depts2012(dep);
-		CREATE INDEX france_depts2012_cheflieu_idx
-			ON france.depts2012(cheflieu);
-		
 		UPDATE france.departement
 		SET nom_dept = 'Saint-Martin et Saint-Barthélemy'
 		WHERE code_dept = '977';
@@ -496,6 +538,10 @@ def loadCommuneShapes( db ):
 	loadGadmShapes( db, loadGadmCommune )
 	db.addGoogleGeometry( table, fullGeom, googGeom )
 	db.indexGeometryColumn( table, googGeom )
+	db.executeCommit( '''
+		CREATE INDEX ON france.commune(code_dept);
+		CREATE INDEX ON france.commune(code_comm);
+	''')
 
 
 def loadGadmCommune( db, abbr, geoid, level, suffix ):
@@ -603,8 +649,9 @@ def updateGadmCommune( db, abbr ):
 		'fixer': schema + '.' + fixer,
 	}) )
 
+
 def updateCommunes( db ):
-	fromWhere = '''
+	fromComSimp = '''
 			FROM france.comsimp2012
 			WHERE
 				france.commune.code_dept = france.comsimp2012.dep
@@ -612,15 +659,6 @@ def updateCommunes( db ):
 				france.commune.code_comm = france.comsimp2012.com
 	'''
 	db.executeCommit( '''
-		CREATE INDEX france_commune_code_dept_idx
-			ON france.commune(code_dept);
-		CREATE INDEX france_commune_code_comm_idx
-			ON france.commune(code_comm);
-		CREATE INDEX france_comsimp2012_dep_idx
-			ON france.comsimp2012(dep);
-		CREATE INDEX france_comsimp2012_com_idx
-			ON france.comsimp2012(com);
-		
 		UPDATE france.commune
 		SET code_dept = code_dept || substring( code_reg from 2 for 1 )
 		WHERE code_dept = '97';
@@ -631,14 +669,43 @@ def updateCommunes( db ):
 		
 		UPDATE france.commune
 		SET nom_comm = (
-			SELECT nccenr %(fromWhere)s
+			SELECT nccenr %(fromComSimp)s
 		)	
 		WHERE EXISTS (
-			SELECT NULL %(fromWhere)s
+			SELECT NULL %(fromComSimp)s
 		);
 	''' % {
-		'fromWhere': fromWhere,
+		'fromComSimp': fromComSimp,
 	})
+
+
+def makeLegimunes( db ):
+	db.createLikeTable( 'france.legimune', 'france.commune')
+	db.executeCommit( '''
+		ALTER TABLE france.legimune
+			ADD COLUMN code_leg varchar(2);
+		
+		INSERT INTO france.legimune
+		SELECT
+			nextval('france.legimune_gid_seq'),
+			id_geofla, code_comm, insee_com, nom_comm, statut,
+			x_chf_lieu, y_chf_lieu, x_centroid, y_centroid, z_moyen,
+			superficie, population, code_cant, code_arr, code_dept, nom_dept,
+			code_reg, nom_region, full_geom, goog_geom,
+			lpad( circ_leg_2012, 2, '0' )
+		FROM
+			france.commune
+		FULL OUTER JOIN (
+			SELECT
+				code_dept d, code_comm t, circ_leg_2012
+			FROM france.crosswalk
+			GROUP BY code_dept, code_comm, circ_leg_2012
+		) AS t
+		ON trim( leading '0' from code_dept ) = trim( leading '0' from d )
+		AND trim( leading '0' from code_comm ) = trim( leading '0' from t );
+		
+		CREATE INDEX ON france.legimune(code_leg);
+	''' )
 
 
 def saveShapefile( db, table ):

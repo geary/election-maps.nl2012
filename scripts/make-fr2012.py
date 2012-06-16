@@ -93,6 +93,25 @@ def makeCommunes():
 	db.connection.close()
 
 
+def makeLegimunes():
+	db = pg.Database( database = 'france2012' )
+	table = 'legimune'
+	for level in ( None, ):
+		if level is not None:
+			addLevel( db, table, 'code_leg,code_comm', level )
+		mergeGeometries( db, 'france.legimune', 'france.legislative', level, '''
+			WHERE
+				france.legimune.code_dept = france.legislative.id_dep
+			AND
+				france.legimune.code_leg = france.legislative.id_circo
+			GROUP BY
+				france.legimune.code_dept, france.legimune.code_leg
+		''' )
+	writeEachLegislative( db, table, None )
+	db.connection.commit()
+	db.connection.close()
+
+
 def addLevel( db, table, idcols, level ):
 	shpfile = '%(path)s/fr2012-%(table)s-%(level)s/fr2012-%(table)s-%(level)s.shp' %({
 		'path': private.OUTPUT_SHAPEFILE_PATH,
@@ -107,7 +126,7 @@ def addLevel( db, table, idcols, level ):
 		shpfile, private.TEMP_PATH, temptable,
 		simplegeom, '3857', 'LATIN1', True
 	)
-	db.addGeometryColumn( fulltable, simplegeom, 3857, True )
+	db.addGeometryColumn( fulltable, simplegeom, 3857 )
 	# TODO: break out this cutesy code into a useful function?
 	where = ' AND '.join( map(
 		lambda idcol: (
@@ -216,6 +235,50 @@ def writeAllDepartments( db, table, level ):
 	writeGeoJSON( db, geoid, geom, geo )
 
 
+def writeEachLegislative( db, table, level ):
+	#db.execute( 'SELECT code_leg, nom_leg FROM %s.departement ORDER BY code_leg;' %( schema ) )
+	db.execute( '''
+		SELECT id_dep, id_circo
+		FROM %s.legislative
+		ORDER BY id_dep, id_circo;
+	''' %( schema ) )
+	for code_dep, code_leg in db.cursor.fetchall():
+		#levels = { '973':128, '975':128, '986':128, '987':128, '988':128 }
+		levels = {}
+		writeLegislative( db, table, levels.get(code_leg), code_dep, code_leg )
+
+
+def writeLegislative( db, table, level, code_dep, code_leg ):
+	geom = simpleGeom( level )
+	
+	where = "( id_dep = '%s' AND id_circo = '%s' )" %( code_dep, code_leg )
+	geoLegislative = db.makeFeatureCollection(
+		schema+'.legislative',
+		boxGeom, boxGeomLL, geom, 'FRL', 'France',
+		"lpad( id_dep, 3, '0' ) || lpad( id_circo, 2, '0' )",
+		'nom_circo', 'id_dep', where, fixGeoID
+	)
+	if geoLegislative is None:
+		return
+	
+	where = "( code_dept = '%s' AND code_leg = '%s' )" %( code_dep, code_leg )
+	geoCommune = db.makeFeatureCollection(
+		schema+'.'+table,
+		boxGeom, boxGeomLL, geom, code_dep.zfill(3) + code_leg, '',
+		"lpad( code_dept, 3, '0' ) || lpad( code_leg, 2, '0' ) || lpad( code_comm, 3, '0' )",
+		'nom_comm', 'code_leg', where, fixGeoID
+	)
+	if geoCommune is None:
+		return
+	
+	geo = {
+		'legislative': geoLegislative,
+		'commune': geoCommune,
+	}
+	
+	writeGeoJSON( db, 'L-%s%s' %( code_dep.zfill(3), code_leg.zfill(2) ), googGeom, geo )
+
+
 def writeAllLegislative( db, table, level ):
 	geom = simpleGeom( level )
 	where = 'true'
@@ -287,6 +350,7 @@ def main():
 	makeLegislative()
 	makeDepartments()
 	makeCommunes()
+	makeLegimunes()
 
 
 if __name__ == "__main__":
