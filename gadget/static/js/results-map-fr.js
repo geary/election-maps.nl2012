@@ -17,6 +17,11 @@ params.source =
 	params.contest == 'leg' ? 'articque' :
 	params.source == 'gop' ? 'gop' :
 	'ap';
+
+function isLegislative() {
+	return params.contest == 'leg';
+}
+
 var hostPrefix = location.host.split('.')[0];
 var match = hostPrefix.match( /^([a-z][a-z])2012(-\w+)$/ );
 if( match ) {
@@ -51,7 +56,7 @@ if( params.date ) {
 }
 
 var current = {
-	geoid: params.contest == 'leg' ? 'FRL' : 'FR',
+	geoid: isLegislative() ? 'FRL' : 'FR',
 	national: true
 };
 
@@ -479,7 +484,8 @@ function nationalEnabled() {
 			loadGeoJSON( json, true );
 		}
 		else {
-			var file = S( 'france', '-', geoid, '-goog_geom', level, '.js' );
+			var prefix = isLegislative() && geoid != 'FRL' ? 'L-' : '';  // kludge
+			var file = S( 'france-', prefix, geoid, '-goog_geom', level, '.js' );
 			getGeoJSON( 'shapes/json/' + file );
 		}
 	}
@@ -508,7 +514,14 @@ function nationalEnabled() {
 				initSelectors();
 			}
 		}
-		var geoid = ( json.commune || json.departement || json.legislative ).id;
+		if( json.commune && json.legislative ) {
+			// TODO: temp hack, use a better ID in the GeoJSON
+			var feature = json.legislative.features[0];
+			var geoid = ( feature.id_dep.length == 2 ? '0' : '' ) + feature.id_dep +  feature.id.slice(-2);
+		}
+		else {
+			var geoid = ( json.commune || json.departement || json.legislative ).id;
+		}
 		current.national = ( geoid == 'FR'  ||  geoid == 'FRL' );
 		current.geoid = geoid;
 		if( ! geoJSON[geoid] ) {
@@ -793,8 +806,14 @@ function nationalEnabled() {
 	
 	function currentGeos() {
 		var json = geoJSON[current.geoid];
-		if( params.contest == 'leg' )
-			return [ json.legislative, json.departement, json.region, json.nation ];
+		if( params.contest == 'leg' ) {
+			// TODO: refactor
+			var jsonFRL = geoJSON.FRL;
+			jsonFRL.legislative.draw = ! json.commune;
+			return json.commune ?
+					[ json.commune, json.legislative, jsonFRL.legislative ] :
+					[ json.legislative, json.departement, json.region, json.nation ];
+		}
 		var jsonFR = geoJSON.FR;
 		jsonFR.departement.draw = ! json.commune;
 		return json.commune ?
@@ -827,7 +846,7 @@ function nationalEnabled() {
 				centerLL: [ 165.85, -21.13 ]
 			},
 			_: 0
-		}[current.geoid] || json.departement;
+		}[current.geoid] || json.departement || json.legislative;
 		geo && fitBbox( geo.bbox, geo.centerLL );
 	}
 	
@@ -944,7 +963,7 @@ function nationalEnabled() {
 	
 	function maybeGo( where, feature, why ) {
 		if(
-			where.geo.id == 'FR'  &&
+			where.geo.id.slice(0,2) == 'FR'  &&
 			feature.id != current.geoid  &&
 			feature.click !== false
 		) {
@@ -978,7 +997,7 @@ function nationalEnabled() {
 					where = feature = null;
 				var cursor =
 					! feature ? null :
-					where.geo.id == 'FR'  &&  feature.click !== false ? 'pointer' :
+					where.geo.id.slice(0,2) == 'FR'  &&  feature.click !== false ? 'pointer' :
 					'default';
 				map.setOptions({ draggableCursor: cursor });
 				outlineFeature( where );
@@ -1065,15 +1084,15 @@ function nationalEnabled() {
 	
 	function colorize() {
 		var json = geoJSON[current.geoid];
-		if( json.legislative ) {
+		if( json.commune ) {
+			colorVotes( json.commune, '#666666', 1, 1 );
+			colorSimple( json.departement || json.legislative, '#FFFFFF', '#444444', 1, 2 );
+		}
+		else if( json.legislative ) {
 			colorVotes( json.legislative, '#666666', 1, .5 );
 			colorSimple( json.departement, '#FFFFFF', '#444444', 1, 1 );
 			colorSimple( json.region, '#FFFFFF', '#444444', 1, 1.5 );
 			colorSimple( json.nation, '#FFFFFF', '#222222', 1, 2 );
-		}
-		else if( json.commune ) {
-			colorVotes( json.commune, '#666666', 1, 1 );
-			colorSimple( json.departement, '#FFFFFF', '#444444', 1, 2 );
 		}
 		else {
 			colorVotes( json.departement, '#666666', 1, 1 );
@@ -1096,7 +1115,7 @@ function nationalEnabled() {
 	
 	function colorVotes( geo, strokeColor, strokeOpacity, strokeWidth ) {
 		if( ! geo ) return;
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		var colIncr = legislative ? 4 : 1;
 		var features = geo.features;
 		var time = now() + times.offset;
@@ -1106,6 +1125,7 @@ function nationalEnabled() {
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
+				//if( row.wonRound1 ) feature.click = false;
 				if( ! row  ||  row.candidateMax < 0 ) {
 					var candidate = null;
 				}
@@ -1190,7 +1210,7 @@ function nationalEnabled() {
 	
 	function getInsetUnderlay() {
 		if( ! current.national ) return null;
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		var zoom = map.getZoom();
 		var extra = zoom - 5;
 		var pow = Math.pow( 2, extra );
@@ -1283,7 +1303,7 @@ function nationalEnabled() {
 		}];
 		return {
 			images: images,
-			hittest: ! legislative && function( image, x, y ) {
+			hittest: /*! legislative &&*/ function( image, x, y ) {
 				var i = Math.floor( x / size );
 				var j = Math.floor( y / size );
 				var ids = [
@@ -1480,7 +1500,7 @@ function nationalEnabled() {
 	}
 	
 	function getTopCandidates( results, row, sortBy, max ) {
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		var colIncr = legislative ? 4 : 1;
 		max = max || Infinity;
 		if( ! row ) return [];
@@ -1624,7 +1644,7 @@ function nationalEnabled() {
 	}
 	
 	function formatSidebarTopCandidates( topCandidates ) {
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		var colors = topCandidates.map( function( candidate ) {
 			return candidate.color;
 		});
@@ -1768,7 +1788,7 @@ function nationalEnabled() {
 	
 	function formatFeatureName( feature ) {
 		if( ! feature ) return '';
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		if( ! legislative )
 			return feature.name;
 		var id = feature.id;
@@ -2108,7 +2128,7 @@ function nationalEnabled() {
 		
 		$sidebar.delegate( '#viewNational', {
 			click: function( event ) {
-				gotoGeo( 'FR', 'return' );
+				gotoGeo( isLegislative() ? 'FRL' : 'FR', 'return' );
 				event.preventDefault();
 			}
 		});
@@ -2261,13 +2281,16 @@ function nationalEnabled() {
 	
 	function geoResults( geo ) {
 		var results = ( geo || currentGeo() || {} ).results;
-		return results[electionKey];
+		return results && results[electionKey];
 	}
 	
 	var cacheResults = new Cache;
 	
 	function getResults() {
 		var electionid = election.electionids[current.geoid];
+		if( isLegislative()  &&  ! electionid ) {
+			electionid = election.electionids.L + '&district=' + current.geoid;
+		}
 		
 		var results = cacheResults.get( electionid );
 		if( results ) {
@@ -2289,10 +2312,6 @@ function nationalEnabled() {
 		electionLoading = electionids[0];
 		electionsPending = [].concat( electionids );
 		electionids.forEach( function( electionid ) {
-// TEMP:
-			if( electionid == 2788 ) electionid = 2786;
-			if( electionid == 2789 ) electionid = 2787;
-// :PMET
 			var url = S(
 				'https://pollinglocation.googleapis.com/results?',
 				'electionid=', electionid,
@@ -2303,7 +2322,7 @@ function nationalEnabled() {
 	}
 	
 	function loadTestResults( electionid, randomize ) {
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		var random = randomize ? randomInt : function() { return 0; };
 		opt.resultCacheTime = Infinity;
 		opt.reloadTime = false;
@@ -2344,6 +2363,7 @@ function nationalEnabled() {
 			var nVoters = 0;
 			var nPrecincts = row[col.NumBallotBoxes] = random( 50 ) + 5;
 			var nCounted = row[col.NumCountedBallotBoxes] =
+				params.randomize == '100' ? nPrecincts :
 				Math.max( 0,
 					Math.min( nPrecincts,
 						random( nPrecincts * 2 ) -
@@ -2379,13 +2399,31 @@ function nationalEnabled() {
 		loadResultTable( json, true );
 	}
 	
+	handleJSONPError = function( json ) {
+		//json = {
+		//	"status": "REQUEST_FAILED",
+		//	"error": {
+		//		"code": 500,
+		//		"debug_message": "Internal Server Error"
+		//	}
+		//};
+		window.console && console.log( S(
+			'JSON error: ', json.status, ' ',
+			json.error && json.error.code, ' ', 
+			json.error && json.error.debug_message
+		) );
+		// TODO: report to user? retry?
+	};
+	
+	loadFilteredResults = function( json, electionid, geoid, mode ) {
+		electionid += '&district=' + geoid;
+		deleteFromArray( electionsPending, electionid );
+		json.electionid = '' + electionid;
+		json.mode = mode;
+		loadResultTable( json, true );
+	};
+	
 	loadResults = function( json, electionid, mode ) {
-// TEMP:
-			if( params.contest == 'leg'  &&  params.round == 2 ) {
-				if( electionid == 2786 ) electionid = 2788;
-				if( electionid == 2787 ) electionid = 2789;
-			}
-// :PMET
 		deleteFromArray( electionsPending, electionid );
 		json.electionid = '' + electionid;
 		json.mode = mode;
@@ -2443,7 +2481,7 @@ function nationalEnabled() {
 	}
 	
 	function loadResultTable( json, loading ) {
-		var legislative = ( current.geoid == 'FRL' );
+		var legislative = isLegislative();
 		if( loading )
 			cacheResults.add( json.electionid, json, opt.resultCacheTime );
 		
@@ -2501,7 +2539,30 @@ function nationalEnabled() {
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		var geoid = geo.id;
-		var winners = election.winners || {};
+		var winners = current.geoid == 'FRL' && election.winners;
+		if( winners ) {
+			for( var id in winners ) {
+				var winner = winners[id];
+				var row = [];
+				row[0] = 1;
+				row[1] = winner.firstName;
+				row[2] = winner.lastName;
+				row[3] = winner.party;
+				for( var iCol = 4;  iCol < colID;  iCol += colIncr ) {
+					row[iCol] = 0;
+					row[iCol+1] = '';
+					row[iCol+2] = '';
+					row[iCol+3] = '';
+				}
+				row[colID] = id;
+				row[col.TabTotal] = 1;
+				row[col.NumBallotBoxes] = 1;
+				row[col.NumCountedBallotBoxes] = 1;
+				row.wonRound1 = true;
+				rows.push( row );
+				rowsByID[id] = row;
+			}
+		}
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			var id = row[colID];
 			row[colID] = id = fixup( geoid, id );
@@ -2513,36 +2574,6 @@ function nationalEnabled() {
 			rowsByID[id] = row;
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var max = 0,  candidateMax = -1;
-			if( winners[id] ) {
-				var winner = winners[id];
-				row[0] = 1;
-				row[1] = winner.firstName;
-				row[2] = winner.lastName;
-				row[3] = winner.party;
-				for( var iCol = 4;  iCol < colID;  iCol += colIncr ) {
-					row[iCol] = 0;
-					row[iCol+1] = '';
-					row[iCol+2] = '';
-					row[iCol+3] = '';
-				}
-				row[col.TabTotal] = 1;
-				row[col.NumBallotBoxes] = 1;
-				row[col.NumCountedBallotBoxes] = 1;
-				row.wonRound1 = true;
-			}
-			// TEMP:
-			else if( election.winners ) {
-				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
-					row[iCol] = 0;
-					row[iCol+1] = '';
-					row[iCol+2] = '';
-					row[iCol+3] = '';
-				}
-				row[col.TabTotal] = 0;
-				row[col.NumBallotBoxes] = 0;
-				row[col.NumCountedBallotBoxes] = 0;
-			}
-			// :PMET
 			if( zero ) {
 				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 					row[iCol] = 0;
