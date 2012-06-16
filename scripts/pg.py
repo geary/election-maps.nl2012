@@ -86,6 +86,15 @@ class Database:
 			'database': database,
 		})
 	
+	def addUtilityFunctions( self ):
+		self.executeCommit('''
+			CREATE OR REPLACE FUNCTION lpad_notrunc( text, int4, varchar(1) )
+			RETURNS text
+			AS $$
+				SELECT repeat( $3, $2 - length($1) ) || $1;
+			$$ LANGUAGE SQL;
+		''' )
+	
 	def createLikeTable( self, target, source ):
 		self.executeCommit('''
 			DROP TABLE IF EXISTS %(target)s;
@@ -280,13 +289,12 @@ class Database:
 		''' % vars )
 		self.connection.commit()
 	
-	def indexGeometryColumn( self, table, geom, index=None ):
-		index = index or '%s_%s_gist' %( table.split( '.' ).pop(), geom  )
-		print 'indexGeometryColumn %s %s %s' %( table, geom, index )
-		vars = { 'table':table, 'geom':geom, 'index':index, }
+	def indexGeometryColumn( self, table, geom ):
+		print 'indexGeometryColumn %s %s' %( table, geom )
+		vars = { 'table':table, 'geom':geom, }
 		t1 = time.clock()
 		self.executeCommit('''
-			CREATE INDEX %(index)s ON %(table)s
+			CREATE INDEX ON %(table)s
 			USING GIST ( %(geom)s );
 		''' % vars )
 		t2 = time.clock()
@@ -304,7 +312,7 @@ class Database:
 	
 	def addGoogleGeometry( self, table, llgeom, googeom ):
 		print 'addGoogleGeometry %s %s %s' %( table, llgeom, googeom )
-		self.addGeometryColumn( table, googeom, 3857, True )
+		self.addGeometryColumn( table, googeom, 3857 )
 		t1 = time.clock()
 		self.executeCommit('''
 			UPDATE
@@ -341,7 +349,7 @@ class Database:
 		)
 		t1 = time.clock()
 		srid = self.getSRID( sourceTable, sourceGeom )
-		self.addGeometryColumn( targetTable, targetGeom, srid, True )
+		self.addGeometryColumn( targetTable, targetGeom, srid )
 		self.executeCommit('''
 			UPDATE
 				%(targetTable)s
@@ -490,6 +498,8 @@ class Database:
 				'digits': digits,
 			})
 			( centerjson, centerjsonll, extentjson, extentjsonll ) = self.cursor.fetchone()
+			if centerjson is None:
+				return None
 			center = json.loads( centerjson )
 			centerLL = json.loads( centerjsonll )
 			extent = json.loads( extentjson )
