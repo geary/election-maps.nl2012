@@ -37,6 +37,45 @@ var partiesFR2012 = [
 	{ color: '#9F1D35', id: 'FG', name: 'Front de gauche' }
 ];
 
+var winnersLegFR2012 = {
+	'04403': { party: 'SOC', firstName: 'Jean-Marc', lastName: 'AYRAULT' },
+	'06304': { party: 'SOC', firstName: 'Jean-Paul', lastName: 'BACQUET' },
+	'07902': { party: 'SOC', firstName: 'Delphine', lastName: 'BATHO' },
+	'97402': { party: 'DVG', firstName: 'Huguette', lastName: 'BELLO' },
+	'08504': { party: 'DVD', firstName: 'V&eacute;ronique', lastName: 'BESSE' },
+	'04408': { party: 'SOC', firstName: 'Marie-Odile', lastName: 'BOUILLE' },
+	'05004': { party: 'SOC', firstName: 'Bernard', lastName: 'CAZENEUVE' },
+	'06205': { party: 'SOC', firstName: 'Fr&eacute;d&eacute;ric', lastName: 'CUVILLIER' },
+	'03108': { party: 'SOC', firstName: 'Carole', lastName: 'DELGA' },
+	'01901': { party: 'SOC', firstName: 'Sophie', lastName: 'DESSUS' },
+	'04003': { party: 'SOC', firstName: 'Henri', lastName: 'EMMANUELLI' },
+	'07604': { party: 'SOC', firstName: 'Laurent', lastName: 'FABIUS' },
+	'05303': { party: 'UMP', firstName: 'Yannick', lastName: 'FAVENNEC' },
+	'06706': { party: 'UMP', firstName: 'Laurent', lastName: 'FURST' },
+	'97501': { party: 'RDG', firstName: 'Annick', lastName: 'GIRARDIN' },
+	'07514': { party: 'UMP', firstName: 'Claude', lastName: 'GOASGUEN' },
+	'06403': { party: 'SOC', firstName: 'David', lastName: 'HABIB' },
+	'01603': { party: 'SOC', firstName: 'J&eacute;r&ocirc;me', lastName: 'LAMBERT' },
+	'02403': { party: 'SOC', firstName: 'Colette', lastName: 'LANGLADE' },
+	'04602': { party: 'SOC', firstName: 'Jean', lastName: 'LAUNAY' },
+	'97404': { party: 'SOC', firstName: 'Patrick', lastName: 'LEBRETON' },
+	'00607': { party: 'UMP', firstName: 'Jean', lastName: 'LEONETTI' },
+	'00606': { party: 'UMP', firstName: 'Lionnel', lastName: 'LUCA' },
+	'97104': { party: 'SOC', firstName: 'Victorin', lastName: 'LUREL' },
+	'03303': { party: 'VEC', firstName: 'No&euml;l', lastName: 'MAMERE' },
+	'01502': { party: 'UMP', firstName: 'Alain', lastName: 'MARLEIX' },
+	'03201': { party: 'SOC', firstName: 'Philippe', lastName: 'MARTIN' },
+	'00901': { party: 'SOC', firstName: 'Fr&eacute;d&eacute;rique', lastName: 'MASSAT' },
+	'02404': { party: 'SOC', firstName: 'Germinal', lastName: 'PEIRO' },
+	'01601': { party: 'SOC', firstName: 'Martine', lastName: 'PINVILLE' },
+	'04404': { party: 'SOC', firstName: 'Dominique', lastName: 'RAIMBOURG' },
+	'06708': { party: 'UMP', firstName: 'Fr&eacute;d&eacute;ric', lastName: 'REISS' },
+	'06803': { party: 'UMP', firstName: 'Jean-Luc', lastName: 'REITZER' },
+	'03307': { party: 'SOC', firstName: 'Alain', lastName: 'ROUSSET' },
+	'02804': { party: 'NCE', firstName: 'Philippe', lastName: 'VIGIER' },
+	'00803': { party: 'UMP', firstName: 'Jean-Luc', lastName: 'WARSMANN' }
+};
+
 var elections = {
 	'2012-pres-1': {
 		date: '2012-04-22',
@@ -286,8 +325,9 @@ var elections = {
 		tzHour: +2,
 		photos: false,
 		parties: partiesFR2012,
+		winners: winnersLegFR2012,
 		electionids: {
-			'FRL': 9902
+			'FRL': 2788
 		}
 	}
 };
