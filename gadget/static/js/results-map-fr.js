@@ -2574,7 +2574,7 @@ function nationalEnabled() {
 			rowsByID[id] = row;
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var max = 0,  candidateMax = -1;
-			if( zero ) {
+			if( zero  &&  ! row.wonRound1 ) {
 				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 					row[iCol] = 0;
 				}
