@@ -281,7 +281,7 @@ document.write(
 		'body.source-ap #gop-logo { display:none; }',
 		'#ap-logo { right:64px; width:41px; background: url(', imgUrl('ap-logo-48x41.png'), ') no-repeat; }',
 		'#articque-logo { right:64px; width:37px; background: url(', imgUrl('articque-logo-37x48.png'), ') no-repeat; display:none; }',
-		'#articque-attrib { display:none; position:absolute; font-family: Arial,sans-serif; font-size:13px; color:#444; text-align:right; right:2px; bottom:22px; z-index:999999; }',
+		'#articque-attrib { display:none; position:absolute; font-family: Arial,sans-serif; font-size:13px; color:#444; text-align:right; right:2px; bottom:22px; }',
 		'body.source-gop #ap-logo, body.source-articque #ap-logo { display:none; }',
 		'body.source-articque #articque-logo, body.source-articque #articque-attrib { display:block; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
