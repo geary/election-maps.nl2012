@@ -69,5 +69,6 @@ loadStrings({
 "viewNational-us": "&laquo; Revenir \u00e0 la carte g\u00e9n\u00e9rale des \u00c9tats-Unis", 
 "viewUSA": "&laquo; Revenir \u00e0 la carte g\u00e9n\u00e9rale des \u00c9tats-Unis", 
 "votes": "Votes", 
-"waitingForVotes": "En attente des r\u00e9sultats"
+"waitingForVotes": "En attente des r\u00e9sultats", 
+"wonRound1": "\u00c9lu au premier tour"
 })

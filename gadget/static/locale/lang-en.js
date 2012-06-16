@@ -69,5 +69,6 @@ loadStrings({
 "viewNational-us": "&laquo; Back to U.S. Overview Map", 
 "viewUSA": "&laquo; Back to U.S. Overview Map", 
 "votes": "Votes", 
-"waitingForVotes": "Waiting for results"
+"waitingForVotes": "Waiting for results", 
+"wonRound1": "Elected in round 1"
 })

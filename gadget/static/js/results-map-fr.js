@@ -11,7 +11,7 @@ var times = {
 var defaultElectionKey = '2012-pres-1';
 params.year = params.year || '2012';
 params.contest = params.contest || 'leg';
-params.round = params.round || '1';
+params.round = params.round || '2';
 
 params.source =
 	params.contest == 'leg' ? 'articque' :
@@ -426,9 +426,7 @@ function formatSidebarTable( cells ) {
 					'</a>',
 					'&nbsp;',
 					'<a class="button',
-								params.round == 2 ? ' selected' : '',
-								params.contest == 'leg' ? ' disabled' : '',
-							'" id="btnRound2">',
+								params.round == 2 ? ' selected' : '', '" id="btnRound2">',
 						'round2'.T(),
 					'</a>',
 				'</div>',
@@ -1703,6 +1701,20 @@ function nationalEnabled() {
 		var selected = ( candidate.id == current.party ) ? ' selected' : '';
 		var cls = i === 0 ? ' first' : '';
 		var pct = formatPercent( candidate.vsAll );
+		var voteDivs = candidate.wonRound1 ? S(
+			'<div class="candidate-won">',
+				'wonRound1'.T(),
+			'</div>'
+		) : S(
+			'<div class="candidate-percent">',
+				pct,
+			'</div>',
+			web() ? S(
+				'<div class="candidate-votes">',
+					formatNumber( candidate.votes ),
+				'</div>'
+			) : ''
+		)
 		return S(
 			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
 				'<td class="left">',
@@ -1728,14 +1740,7 @@ function nationalEnabled() {
 					formatCandidateAreaPatch( candidate, 24 ),
 				'</td>',
 				'<td style="text-align:right; padding-left:6px;">',
-					'<div class="candidate-percent">',
-						pct,
-					'</div>',
-					web() ? S(
-						'<div class="candidate-votes">',
-							formatNumber( candidate.votes ),
-						'</div>'
-					) : '',
+					voteDivs,
 				'</td>',
 				'<td class="right" style="text-align:right; padding-left:6px;">',
 					//current.national  &&  view != 'county' ? S(
@@ -1795,6 +1800,7 @@ function nationalEnabled() {
 			row.geoid = geoid;
 			row.geo = geo;
 			top = getTopCandidates( results, row, 'votes', 4 );
+			if( row.wonRound1 ) top[0].wonRound1 = true;
 			var content = S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, true ),
@@ -1806,6 +1812,7 @@ function nationalEnabled() {
 		}
 		
 		var reporting =
+			row && row.wonRound1 ? '' :
 			boxes ? 'percentReporting'.T({
 				percent: formatPercent( counted / boxes ),
 				counted: counted,
@@ -2086,8 +2093,6 @@ function nationalEnabled() {
 		
 		$topbar.delegate( '#btnContest-pres,#btnContest-leg', {
 			click: function( event ) {
-				if( this.id == 'btnContest-leg' )
-					params.round = 1;
 				setContest( this.id.replace(/^btnContest-/, '' ) );
 				event.preventDefault();
 			}
@@ -2284,6 +2289,10 @@ function nationalEnabled() {
 		electionLoading = electionids[0];
 		electionsPending = [].concat( electionids );
 		electionids.forEach( function( electionid ) {
+// TEMP:
+			if( electionid == 2788 ) electionid = 2786;
+			if( electionid == 2789 ) electionid = 2787;
+// :PMET
 			var url = S(
 				'https://pollinglocation.googleapis.com/results?',
 				'electionid=', electionid,
@@ -2371,6 +2380,12 @@ function nationalEnabled() {
 	}
 	
 	loadResults = function( json, electionid, mode ) {
+// TEMP:
+			if( params.contest == 'leg'  &&  params.round == 2 ) {
+				if( electionid == 2786 ) electionid = 2788;
+				if( electionid == 2787 ) electionid = 2789;
+			}
+// :PMET
 		deleteFromArray( electionsPending, electionid );
 		json.electionid = '' + electionid;
 		json.mode = mode;
@@ -2486,6 +2501,7 @@ function nationalEnabled() {
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		var geoid = geo.id;
+		var winners = election.winners || {};
 		for( var row, iRow = -1;  row = rows[++iRow]; ) {
 			var id = row[colID];
 			row[colID] = id = fixup( geoid, id );
@@ -2497,6 +2513,36 @@ function nationalEnabled() {
 			rowsByID[id] = row;
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var max = 0,  candidateMax = -1;
+			if( winners[id] ) {
+				var winner = winners[id];
+				row[0] = 1;
+				row[1] = winner.firstName;
+				row[2] = winner.lastName;
+				row[3] = winner.party;
+				for( var iCol = 4;  iCol < colID;  iCol += colIncr ) {
+					row[iCol] = 0;
+					row[iCol+1] = '';
+					row[iCol+2] = '';
+					row[iCol+3] = '';
+				}
+				row[col.TabTotal] = 1;
+				row[col.NumBallotBoxes] = 1;
+				row[col.NumCountedBallotBoxes] = 1;
+				row.wonRound1 = true;
+			}
+			// TEMP:
+			else if( election.winners ) {
+				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
+					row[iCol] = 0;
+					row[iCol+1] = '';
+					row[iCol+2] = '';
+					row[iCol+3] = '';
+				}
+				row[col.TabTotal] = 0;
+				row[col.NumBallotBoxes] = 0;
+				row[col.NumCountedBallotBoxes] = 0;
+			}
+			// :PMET
 			if( zero ) {
 				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 					row[iCol] = 0;
