@@ -1520,10 +1520,14 @@ function nationalEnabled() {
 			colIncr = 1;
 		}
 		var top = ( row.candidates || results.parties || [] ).slice();
+		var total = 0;
+		for( var i = 0, iCol = 0;  i < top.length; ++i, iCol += colIncr ) {
+			total += row[iCol];
+		}
 		for( var i = 0, iCol = 0;  i < top.length; ++i, iCol += colIncr ) {
 			var candidate = top[i], votes = row[iCol];
 			candidate.votes = votes;
-			candidate.vsAll = votes / row[col.TabTotal];
+			candidate.vsAll = votes / total;
 			//candidate.total = total;
 		}
 		top = sortArrayBy( top, sortBy, { numeric:true } )
