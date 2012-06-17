@@ -1123,6 +1123,7 @@ function nationalEnabled() {
 		var cols = results && results.cols, col = results && results.colsById;
 		var parties = election.parties;
 		if( !( parties && current.party ) ) {
+			// Multiple party view
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
 				if( legislative ) {
@@ -1156,6 +1157,7 @@ function nationalEnabled() {
 			}
 		}
 		else {
+			// Single party heatmap
 			var rows = results.rows;
 			var minFract = Infinity, maxFract = 0;
 			var partyID = current.party, party = parties.by.id[partyID],
@@ -1192,9 +1194,11 @@ function nationalEnabled() {
 				var row = featureResults( results, feature );
 				feature.fillColor = party.color;
 				feature.fillOpacity =
-					row  &&  row.fract > 0  &&  fractRange > 0 ?
+					! row  ||  row.fract == 0 ?
+						0 :
+					fractRange > 0 ?
 						( row.fract - minFract ) / fractRange * .75 :
-						0;
+						.75;
 				//var complete = row &&
 				//	row[col.NumCountedBallotBoxes] ==
 				//	row[col.NumBallotBoxes];
@@ -1503,12 +1507,14 @@ function nationalEnabled() {
 	}
 	
 	function getTopCandidates( results, row, sortBy, max ) {
+		var showAll = false;
 		var legislative = isLegislative();
 		var colIncr = legislative ? 4 : 1;
 		max = max || Infinity;
 		if( ! row ) return [];
 		var col = results.colsById;
 		if( row == -1 ) {
+			showAll = legislative;
 			row = results.totals.row;
 			col = results.totals.colsById;
 			colIncr = 1;
@@ -1523,8 +1529,9 @@ function nationalEnabled() {
 		top = sortArrayBy( top, sortBy, { numeric:true } )
 			.reverse()
 			.slice( 0, max );
-		while( top.length  &&  ! top[top.length-1].votes )
-			top.pop();
+		if( ! showAll )
+			while( top.length  &&  ! top[top.length-1].votes )
+				top.pop();
 		if( top.length ) {
 			var most = top[0].votes;
 			for( var i = -1;  ++i < top.length; ) {
@@ -1542,7 +1549,7 @@ function nationalEnabled() {
 	}
 	
 	function makeCurrentCandidateValid() {
-		if( ! current.party )
+		if( ! current.party  ||  isLegislative() )
 			return;
 		var results = geoResults();
 		var col = results.totals.colsById[ 'TabCount-' + current.party ];
@@ -2562,7 +2569,7 @@ function nationalEnabled() {
 				row[col.TabTotal] = 1;
 				row[col.NumBallotBoxes] = 1;
 				row[col.NumCountedBallotBoxes] = 0;
-				row.wonRound1 = true;
+				row.wonRound1 = winner.party;
 				rows.push( row );
 				rowsByID[id] = row;
 			}
@@ -2627,8 +2634,8 @@ function nationalEnabled() {
 				rowT[colT.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
 			}
 			row.candidateMax = candidateMax;
-			if( legislative  &&  params.round == 2 ) {
-				party = row[candidateMax+3];
+			if( legislative  &&  params.round == 2  &&  candidateMax >= 0 ) {
+				party = candidates[candidateMax].party;
 				++rowT[ colT[ 'TabCount-' + party ] ];
 			}
 		}
