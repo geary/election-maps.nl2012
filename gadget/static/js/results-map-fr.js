@@ -1125,12 +1125,14 @@ function nationalEnabled() {
 		if( !( parties && current.party ) ) {
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
+				if( legislative ) {
+					feature.click = false;
+				}
 				//if( row.wonRound1 ) feature.click = false;
 				if( ! row  ||  row.candidateMax < 0 ) {
 					var candidate = null;
 				}
 				else if( legislative ) {
-					feature.click = false;
 					var candidate = row && row.candidates[row.candidateMax];
 				}
 				else {
