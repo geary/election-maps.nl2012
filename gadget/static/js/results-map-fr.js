@@ -2598,7 +2598,8 @@ function nationalEnabled() {
 								lastName: last
 							});
 						}
-						rowT[ colT[ 'TabCount-' + party ] ] += count;
+						if( params.round != 2 )
+							rowT[ colT[ 'TabCount-' + party ] ] += count;
 						if( count > max ) {
 							max = count;
 							candidateMax = iCol / colIncr;
@@ -2623,6 +2624,10 @@ function nationalEnabled() {
 				rowT[colT.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
 			}
 			row.candidateMax = candidateMax;
+			if( legislative  &&  params.round == 2 ) {
+				party = row[candidateMax+3];
+				++rowT[ colT[ 'TabCount-' + party ] ];
+			}
 		}
 		var missing = [];
 		if( debug  &&  ! features.didMissingCheck ) {
