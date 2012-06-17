@@ -1130,6 +1130,7 @@ function nationalEnabled() {
 					var candidate = null;
 				}
 				else if( legislative ) {
+					feature.click = false;
 					var candidate = row && row.candidates[row.candidateMax];
 				}
 				else {
