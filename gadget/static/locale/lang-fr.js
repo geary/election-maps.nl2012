@@ -70,5 +70,5 @@ loadStrings({
 "viewUSA": "&laquo; Revenir \u00e0 la carte g\u00e9n\u00e9rale des \u00c9tats-Unis", 
 "votes": "Votes", 
 "waitingForVotes": "En attente des r\u00e9sultats", 
-"wonRound1": "\u00c9lu au premier tour"
+"wonRound1": "\u00c9lu(e) au premier tour"
 })
