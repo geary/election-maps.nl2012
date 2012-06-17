@@ -2560,7 +2560,7 @@ function nationalEnabled() {
 				row[colID] = id;
 				row[col.TabTotal] = 1;
 				row[col.NumBallotBoxes] = 1;
-				row[col.NumCountedBallotBoxes] = 1;
+				row[col.NumCountedBallotBoxes] = 0;
 				row.wonRound1 = true;
 				rows.push( row );
 				rowsByID[id] = row;
