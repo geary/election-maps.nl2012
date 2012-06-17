@@ -1306,7 +1306,7 @@ function nationalEnabled() {
 		}];
 		return {
 			images: images,
-			hittest: /*! legislative &&*/ function( image, x, y ) {
+			hittest: ! legislative && function( image, x, y ) {
 				var i = Math.floor( x / size );
 				var j = Math.floor( y / size );
 				var ids = [
