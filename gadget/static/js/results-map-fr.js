@@ -1495,6 +1495,7 @@ function nationalEnabled() {
 		var rows = results.rows;
 		var counted = 0, total = 0;
 		for( var row, i = -1;  row = rows[++i]; ) {
+			if( row.wonRound1 ) continue;
 			counted += row[col.NumCountedBallotBoxes];
 			total += row[col.NumBallotBoxes];
 		}
