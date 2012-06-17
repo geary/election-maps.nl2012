@@ -1,6 +1,7 @@
 application: election-maps
 version: fr2012
-runtime: python
+runtime: python27
+threadsafe: no
 api_version: 1
 
 default_expiration: "2m"
