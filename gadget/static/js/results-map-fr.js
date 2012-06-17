@@ -2543,7 +2543,8 @@ function nationalEnabled() {
 		var rows = results.rows;
 		var geoid = geo.id;
 		var winners = current.geoid == 'FRL' && election.winners;
-		if( winners ) {
+		if( winners  &&  ! results.didWinners ) {
+			results.didWinners = true;
 			for( var id in winners ) {
 				var winner = winners[id];
 				var row = [];
