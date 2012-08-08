@@ -381,7 +381,7 @@ function longDateFromYMD( yyyymmdd ) {
 	if( ymd.length == 1 ) return ymd[0];
 	var month = monthNames[ +ymd[1]-1 ];
 	return(
-		ymd.length == 2 ? S( monthNames[ +ymd[1]-1 ], ' ', ymd[0] ) :
-		S( monthNames[ +ymd[1]-1 ], ' ', +ymd[2], ', ', ymd[0] )
+		ymd.length == 2 ? S( month, ' ', ymd[0] ) :
+		S( month, ' ', +ymd[2], ', ', ymd[0] )
 	);
 }
