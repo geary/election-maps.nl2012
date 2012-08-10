@@ -28,7 +28,7 @@ feed = json.load( urllib2.urlopen(url) )['feed']
 for entry in feed['entry']:
 	id = entry['gsx$id']['$t']
 	for col in entry:
-		match = re.match( 'gsx\$text-(\w+)$', col )
+		match = re.match( 'gsx\$text-(.+)$', col )
 		if match:
 			lang = match.group( 1 )
 			if lang not in langs: langs[lang] = {}
