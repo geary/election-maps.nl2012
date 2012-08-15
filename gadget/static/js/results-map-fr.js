@@ -50,6 +50,16 @@ function setElection() {
 	election = elections[electionKey] || elections[defaultElectionKey];
 }
 
+function longDateFromYMD( yyyymmdd ) {
+	var ymd = yyyymmdd.split('-'), year = ymd[0];
+	if( ymd.length == 1 ) return year;
+	return 'dateFormat'.T({
+		year: year,
+		monthName: ( 'monthName' + ymd[1] ).T(),
+		dayOfMonth: +ymd[2]
+	});
+}
+
 if( params.date ) {
 	var d = dateFromYMD( params.date, election.tzHour, election.tzMinute );
 	times.offset = d - times.gadgetLoaded;
@@ -607,7 +617,10 @@ function nationalEnabled() {
 					type: 'Polygon'
 				},
 				id: id,
-				name: S( "Fran&ccedil;ais de l'Etranger", ' ', ordinal(district), ' ', 'district'.T() ),
+				name: 'districtNum'.T({
+					name: "Fran&ccedil;ais de l'Etranger",
+					ordinal: ordinal(district)
+				}),
 				type: 'Feature'
 			};
 			features.push( feature );
@@ -1813,7 +1826,10 @@ function nationalEnabled() {
 		var dept = geoJSON.FRL.departement.features.by[deptID];
 		if( ! dept )
 			return feature.name;
-		return S( dept.name, ' ', ordinal(distNum), ' ', 'district'.T() );
+		return 'districtNum'.T({
+			name: dept.name,
+			ordinal: ordinal(distNum)
+		});
 	}
 	
 	function mayHaveResults( row, col ) {
@@ -2445,15 +2461,15 @@ function nationalEnabled() {
 		loadResultTable( json, true );
 	};
 	
-	var lsadPrefixes = {
-		cd: 'district'.T() + ' ',
-		shd: 'district'.T() + ' '
-	};
+	//var lsadPrefixes = {
+	//	cd: 'district'.T() + ' ',
+	//	shd: 'district'.T() + ' '
+	//};
 	
-	var lsadSuffixes = {
-		city: ' ' + 'city'.T(),
-		county: ' ' + 'county'.T()
-	};
+	//var lsadSuffixes = {
+	//	city: ' ' + 'city'.T(),
+	//	county: ' ' + 'county'.T()
+	//};
 	
 	function featureResults( results, feature ) {
 		if( !( results && feature ) ) return null;
