@@ -847,24 +847,22 @@ function nationalEnabled() {
 		outlineFeature( null );
 		
 		var bboxFR = {
-			bbox: [ -1060000, 5060000, 1070000, 6650000 ],
-			centerLL: [ 0.2104, 46.2260 ]
+			bbox: [ -1060000, 5060000, 1070000, 6650000 ]
 		};
 		
 		var geo = {
 			'FR': bboxFR,
 			'FRL': bboxFR,
 			'988': {
-				bbox: [ 18205000, -2600000, 18720000, -2215000 ],
-				centerLL: [ 165.85, -21.13 ]
+				bbox: [ 18205000, -2600000, 18720000, -2215000 ]
 			},
 			_: 0
 		}[current.geoid] || json.departement || json.legislative;
-		geo && fitBbox( geo.bbox, geo.centerLL );
+		geo && fitBbox( geo.bbox );
 	}
 	
 	var setCenter = 'setCenter';
-	function fitBbox( bbox, centerLL ) {
+	function fitBbox( bbox ) {
 		addBboxOverlay( bbox );
 		var z;
 		if( params.zoom  &&  params.zoom != 'auto' ) {
@@ -881,6 +879,10 @@ function nationalEnabled() {
 		
 		// Force a poly draw if the map is not going to move (much)
 		// TODO: better calculation using pixel position
+		var centerLL = PolyGonzo.Mercator.coordToLngLat([
+			( bbox[0] + bbox[2] ) / 2,
+			( bbox[1] + bbox[3] ) / 2,
+		]);
 		var centerNew = new gm.LatLng( centerLL[1], centerLL[0] );
 		function near( a, b ) { return Math.abs( a - b ) < .001; }
 		var centerMap = map.getCenter();
