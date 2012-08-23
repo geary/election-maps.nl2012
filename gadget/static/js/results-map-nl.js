@@ -1762,16 +1762,16 @@ function nationalEnabled() {
 				kind: ''
 			}) :
 			future ? longDateFromYMD(st.date) :
-			geo.draw === false ? 'clickForLocal'.T() :
+			//geo.draw === false ? 'clickForLocal'.T() :
 			'waitingForVotes'.T();
 		
-		var clickForLocal =
-			top.length &&
-			current.national ? S(
-				'<div class="click-for-local faint-text">',
-					( feature.click === false ? 'noLocal' : touch ? 'tapForLocal' : 'clickForLocal' ).T(),
-				'</div>'
-			) : '';
+		//var clickForLocal =
+		//	top.length &&
+		//	current.national ? S(
+		//		'<div class="click-for-local faint-text">',
+		//			( feature.click === false ? 'noLocal' : touch ? 'tapForLocal' : 'clickForLocal' ).T(),
+		//		'</div>'
+		//	) : '';
 		// TODO
 		var parent = null;  /* data.state.geo &&
 			data.state.geo.features.by.id[feature.parent]; */
@@ -1812,8 +1812,8 @@ function nationalEnabled() {
 					) : '',
 				'</div>',
 			'</div>',
-			content,
-			clickForLocal
+			content/*,
+			clickForLocal*/
 		);
 	}
 	
