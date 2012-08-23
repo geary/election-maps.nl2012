@@ -41,6 +41,7 @@ var partiesNL2012 = [
 	else {
 		party.name = party.nameNL;
 	}
+	party.lastName = party.name;
 	return party;
 });
 
