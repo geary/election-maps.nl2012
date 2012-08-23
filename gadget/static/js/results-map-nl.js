@@ -531,11 +531,32 @@ function nationalEnabled() {
 	
 	var tweakGeoJSON = {
 		NL: function( json, geoid ) {
-			//var features = geoJSON.FR.departement.features;
-			//features.by['986'].click = false;  // Wallis et Futuna
-			//features.by['987'].click = false;  // French Polynesia
+			var features = json.muni.features;
+			nlTempHack( features );
 			//addLivingAbroad( features );
 		}
+	}
+	
+	// Temp workaround for projection error in NL GeoJSON
+	function nlTempHack( features ) {
+		var dx = 500, dy = 42000;
+		function fix( points ) {
+			for( var i = 0, n = points.length - 1;  i < n;  i += 2 ) {
+				points[i] += dx;
+				points[i+1] += dy;
+			}
+		}
+		features.forEach( function( feature ) {
+			fix( feature.bbox );
+			fix( feature.centroid );
+			feature.geometry.coordinates.forEach( function( poly ) {
+				poly.forEach( function( ring ) {
+					ring.forEach( function( point ) {
+						fix( point );
+					});
+				});
+			});
+		});
 	}
 	
 	function addLivingAbroad( features ) {
