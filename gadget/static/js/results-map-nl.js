@@ -2454,8 +2454,12 @@ function nationalEnabled() {
 		var rowsByID = results.rowsByID = {};
 		var rows = results.rows;
 		
-		for( var row, iRow = -1;  row = rows[++iRow]; ) {
-			row[colID] = 'GM' + row[colID];
+		// Fix up NL
+		if( ! results.didFixup ) {
+			for( var row, iRow = -1;  row = rows[++iRow]; ) {
+				row[colID] = 'GM' + row[colID];
+			}
+			results.didFixup = true;
 		}
 		
 		var geoid = geo.id;
