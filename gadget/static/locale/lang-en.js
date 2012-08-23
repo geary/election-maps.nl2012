@@ -112,6 +112,7 @@ loadStrings({
 "state-WY": "Wyoming", 
 "tapForLocal": "Tap again for detailed results", 
 "testData": "TEST DATA", 
+"theNetherlands": "Netherlands", 
 "thousandsSep": ",", 
 "titleViewNational-fr": "View nationwide results", 
 "titleViewNational-us": "View state-by-state results", 
