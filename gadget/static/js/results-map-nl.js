@@ -1080,7 +1080,6 @@ function nationalEnabled() {
 			// Multiple party view
 			for( var iFeature = -1, feature;  feature = features[++iFeature]; ) {
 				var row = featureResults( results, feature );
-				//if( row.wonRound1 ) feature.click = false;
 				if( ! row  ||  row.candidateMax < 0 ) {
 					var candidate = null;
 				}
@@ -1424,7 +1423,6 @@ function nationalEnabled() {
 		var rows = results.rows;
 		var counted = 0, total = 0;
 		for( var row, i = -1;  row = rows[++i]; ) {
-			if( row.wonRound1 ) continue;
 			counted += row[col.NumCountedBallotBoxes];
 			total += row[col.NumBallotBoxes];
 		}
@@ -1661,11 +1659,7 @@ function nationalEnabled() {
 		var selected = ( candidate.id == current.party ) ? ' selected' : '';
 		var cls = i === 0 ? ' first' : '';
 		var pct = formatPercent( candidate.vsAll );
-		var voteDivs = candidate.wonRound1 ? S(
-			'<div class="candidate-won">',
-				'wonRound1'.T(),
-			'</div>'
-		) : S(
+		var voteDivs = S(
 			'<div class="candidate-percent">',
 				pct,
 			'</div>',
@@ -1750,7 +1744,6 @@ function nationalEnabled() {
 			row.geoid = geoid;
 			row.geo = geo;
 			top = getTopCandidates( results, row, 'votes', 4 );
-			if( row.wonRound1 ) top[0].wonRound1 = true;
 			var content = S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, true ),
@@ -1762,7 +1755,6 @@ function nationalEnabled() {
 		}
 		
 		var reporting =
-			row && row.wonRound1 ? '' :
 			boxes ? 'percentReporting'.T({
 				percent: formatPercent( counted / boxes ),
 				counted: counted,
@@ -2466,7 +2458,6 @@ function nationalEnabled() {
 				row[col.TabTotal] = 1;
 				row[col.NumBallotBoxes] = 1;
 				row[col.NumCountedBallotBoxes] = 0;
-				row.wonRound1 = winner.party;
 				rows.push( row );
 				rowsByID[id] = row;
 			}
@@ -2482,7 +2473,7 @@ function nationalEnabled() {
 			rowsByID[id] = row;
 			if( /^\d\d000$/.test(id) ) rowsByID[id.slice(0,2)] = row;
 			var max = 0,  candidateMax = -1;
-			if( zero  &&  ! row.wonRound1 ) {
+			if( zero ) {
 				for( var iCol = 0;  iCol < colID;  iCol += colIncr ) {
 					row[iCol] = 0;
 				}
