@@ -1639,7 +1639,7 @@ function nationalEnabled() {
 		var thead = header ? S(
 			'<tr>',
 				'<th colspan="3" style="text-align:left; padding-bottom:4px;">',
-					'candidate'.T(),
+					'party'.T(),
 				'</th>',
 				'<th style="text-align:right; padding-bottom:4px;">',
 					'votes'.T(),
