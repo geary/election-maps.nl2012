@@ -802,11 +802,14 @@ function nationalEnabled() {
 		
 		outlineFeature( null );
 		
-		//var bboxFR = {
-		//	bbox: [ -1060000, 5060000, 1070000, 6650000 ]
-		//};
+		var bboxNL = {
+			bbox: [ 373491, 6536883, 803613, 7043980 ]
+		};
 		
-		var geo = json.muni;
+		var geo = {
+			'NL': bboxNL,
+			_: 0
+		}[current.geoid] || json.muni;
 		geo && fitBbox( geo.bbox );
 	}
 	
