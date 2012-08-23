@@ -52,6 +52,7 @@ loadStrings({
 "neverVotesHere": "Esta ubicaci\u00f3n no notifica los resultados electorales", 
 "noLocal": "Resultados detallados no est\u00e1 disponible", 
 "noVotesHere": "Esta ubicaci\u00f3n no ha notificado los resultados electorales", 
+"party": "Partido", 
 "percentReporting": "{{percent}} de los resultados transmitidos ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Presidencial", 
 "primaries": "Primarias de {{name}}", 

@@ -52,6 +52,7 @@ loadStrings({
 "neverVotesHere": "Deze locatie geeft geen stemresultaten door", 
 "noLocal": "Geen gedetailleerde resultaten beschikbaar", 
 "noVotesHere": "Deze locatie heeft geen stemresultaten doorgegeven", 
+"party": "Partij", 
 "percentReporting": "{{percent}} van resultaten doorgegeven ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Presidentieel", 
 "primaries": "{{name}} Voorverkiezingen", 
