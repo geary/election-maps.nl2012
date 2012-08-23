@@ -112,6 +112,7 @@ loadStrings({
 "state-WY": "Wyoming", 
 "tapForLocal": "Appuyez de nouveau pour obtenir des r\u00e9sultats d\u00e9taill\u00e9s", 
 "testData": "DONN\u00c9ES DE TEST", 
+"theNetherlands": "Nederland", 
 "thousandsSep": "&nbsp;", 
 "titleViewNational-fr": "Voir les r\u00e9sultats dans tout le pays", 
 "titleViewNational-us": "Consulter les r\u00e9sultats par \u00c9tat", 
