@@ -533,7 +533,7 @@ function nationalEnabled() {
 		NL: function( json, geoid ) {
 			var features = json.muni.features;
 			nlTempHack( features );
-			//addLivingAbroad( features );
+			addLivingAbroad( features );
 		}
 	}
 	
@@ -565,63 +565,23 @@ function nationalEnabled() {
 			bbox: [ -radius, -radius, radius, radius ],
 			centroid: [ 0, 0 ],
 			click: false,
-			draw: false,
+			draw: true,
 			geometry: {
 				coordinates: drawCircle( radius, 32 ),
 				type: 'Polygon'
 			},
-			id: '099',
-			name: "Fran&ccedil;ais de l'Etranger",
+			id: 'GM0998',
+			name: "Briefstemmers",
 			type: 'Feature'
 		};
 		features.push( feature );
-		features.by['099'] = feature;
+		features.by['GM0998'] = feature;
 	}
 	
 	function drawCircle( radius, steps ) {
 		var ring = [];
 		var pi2 = Math.PI * 2;
 		for( var i = 0;  i < steps;  ++i ) {
-			ring.push([
-				radius * Math.sin( i / steps * pi2 ),
-				radius * Math.cos( i / steps * pi2 )
-			]);
-		}
-		ring.push( ring[0] );
-		return [ ring ];
-	}
-	
-	// TODO: refactor with addLivingAbroad()
-	function addLivingAbroadLegislative( features ) {
-		var radius = 100000;
-		for( var district = 1;  district <= 11;  ++district ) {
-			var id = S( '099', district < 10 ? '0' : '', district );
-			var feature = {
-				bbox: [ -radius, -radius, radius, radius ],
-				centroid: [ 0, 0 ],
-				click: false,
-				draw: false,
-				geometry: {
-					coordinates: drawWedge( radius, 33, ( district - 1 ) * 3, 3 ),
-					type: 'Polygon'
-				},
-				id: id,
-				name: 'districtNum'.T({
-					name: "Fran&ccedil;ais de l'Etranger",
-					ordinal: ordinal(district)
-				}),
-				type: 'Feature'
-			};
-			features.push( feature );
-			features.by[id] = feature;
-		}
-	}
-	
-	function drawWedge( radius, steps, start, count ) {
-		var ring = [];
-		var pi2 = Math.PI * 2;
-		ring.push([ 0, 0 ]);
-		for( var i = start;  i <= start + count;  ++i ) {
 			ring.push([
 				radius * Math.sin( i / steps * pi2 ),
 				radius * Math.cos( i / steps * pi2 )
@@ -1167,19 +1127,13 @@ function nationalEnabled() {
 	}
 	
 	function useInset() {
-		return false;
-		if( ! current.national ) return false;
-		var zoom = map.getZoom();
-		return zoom >= 3  &&  zoom <= 6;
+		return true;
 	}
 	
 	function getInsetUnderlay() {
-		return false;
-		if( ! current.national ) return null;
 		var zoom = map.getZoom();
 		var extra = zoom - 5;
 		var pow = Math.pow( 2, extra );
-		var size = 50 * pow;
 		function clear( feature ) {
 			delete feature.zoom;
 			delete feature.offset;
@@ -1192,108 +1146,33 @@ function nationalEnabled() {
 		}
 		function insetAll( action ) {
 			function inset( id, z, x, y ) {
-				var feature = featuresDept[id];
+				var feature = featuresMuni[id];
 				if( feature ) {
 					action( feature, z, x, y );
-					var featureRgn = featuresRgn[ '0' + feature.code_reg ];
-					if( featureRgn )
-						action( featureRgn, z, x, y, feature );
-				}
-				if( featuresLeg ) {
-					for(
-						var featureLeg, i = 1;
-						featureLeg = featuresLeg[S( id, i < 10 ? '0' : '', i )];
-						++i
-					) {
-						action( featureLeg, z, x, y, feature );
-					}
+					//var featureRgn = featuresRgn[ '0' + feature.code_reg ];
+					//if( featureRgn )
+					//	action( featureRgn, z, x, y, feature );
 				}
 			}
-			inset( 971, 6.1, -200, -1325 );  // Guadeloupe
-			inset( 972, 6.2, -200, -1275 );  // Martinique
-			inset( 973, 3.3, -200, -1225 );  // Guyane
-			inset( 974, 5.8, -200, -1175 );  // La Reunion
-			inset( 975, 6.8, -200, -1125 );  // Saint Pierre et Miquelon
-			inset( 976, 7.2, -150, -1325 );  // Mayotte
-			inset( 988, 3.6, -150, -1275 );  // Nouvelle Caledoni
-			inset( 987, 6.2, -150, -1225 );  // Polynesie Francais
-			inset( 986, 7.5, -150, -1175 );  // Wallis-et-Futuna
-			inset( '099', 4.8, -150, -1125 );  // Francais de l'Etranger
-			
-			// Wallis-et-Futuna
-			function fixWeF( feature, centroidFeature ) {
-				feature.geometry.coordinates.forEach( function( poly ) {
-					poly.centroid = ( centroidFeature || feature ).centroid;  // hack
-					var ring = poly[0];
-					var coord = ring[0];
-					if( coord[0] < -19700000 )
-						action( poly, 7.5, -30, -1235, feature );
-					else
-						action( poly, 7.5, -257, -1117, feature );
-				});
-			}
-			featureDept = featuresDept[986];
-			fixWeF( featureDept );
-			if( featuresLeg ) {
-				for( var featureLeg, i = 1;  featureLeg = featuresLeg[ '9860' + i ];  ++i ) {
-					fixWeF( featureLeg, featureDept );
-				}
-			}
-			
-			// Francais de l'Etranger (French living abroad)
-			geo.departement.features.by['099'].draw = ( action == set );
+			inset( 'GM9003', 5.8, 86, -1429 );  // Saba
+			inset( 'GM9002', 5.8, 90, -1425 );  // Sint Eustatius
+			inset( 'GM9001', 5.0, 84, -1416 );  // Bonaire
+			inset( 'GM0998', 2.1, 95, -1415 );  // Overseas
 		}
 		var geo = geoJSON[current.geoid];
 		if( ! geo ) return null;
-		var featuresDept = geo.departement.features.by;
-		var featuresRgn = geo.region.features.by;
+		var featuresMuni = geo.muni.features.by;
+		//var featuresRgn = geo.region.features.by;
 		if( ! useInset() ) {
 			insetAll( clear );
 			return null;
 		}
 		insetAll( set );
-		var images = [{
-			//src: imgUrl('insets-fr.png'),
-			width: size * 2, height: size * 5,
-			left: -225 * pow, top: -1350 * pow
-		}];
-		return {
-			images: images,
-			hittest: function( image, x, y ) {
-				var i = Math.floor( x / size );
-				var j = Math.floor( y / size );
-				var ids = [
-					[ 971, 972, 973, 974, 975 ],
-					[ 976, 988, 987, 986, '099' ]
-				];
-				var id = ids[i][j], feature = featuresDept[id];
-				if( feature ) {
-					return {
-						geo: geo.departement,
-						feature: feature
-					}
-				}
-/*
-				if( image.abbr )
-					return {
-						geo: geo.departement,
-						feature: features.by[image.abbr]
-					}
-				var feature =
-					x < 81 ? features.by.AK || features.by['02'] :
-					view != 'county' ? features.by.HI :
-					hittestBboxes( features, bboxesInsetHI, x, y );
-				if( feature )
-					return { geo: stateUS.geo, feature: feature }
-*/
-
-				return null;
-			}
-		};
+		return null;
 	}
 	
 	function insetGeo() {
-		var bbox = [ -1072000, 5350000, -600000, 6630000 ];
+		var bbox = [ 385000, 6895000, 490000, 7006000 ];
 		var geo = makeBboxGeo( bbox, {
 			fillColor: '#F8F8F8',
 			fillOpacity: 1,
@@ -1314,13 +1193,6 @@ function nationalEnabled() {
 		}
 		return null;
 	}
-	
-	var bboxesInsetHI = [
-		{ id: '15001', bbox: [ 138,44, 163,67 ] },  // Hawaii
-		{ id: '15003', bbox: [ 112,21, 129,47 ] },  // Honolulu
-		{ id: '15007', bbox: [ 90,15, 112,42 ] },  // Kauai
-		{ id: '15009', bbox: [ 129,29, 151,54 ] }  // Maui
-	];
 	
 	// TODO: refactor this into PolyGonzo
 	var outlineOverlay;
