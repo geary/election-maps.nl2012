@@ -31,6 +31,7 @@ loadStrings({
 "delegatesAttrib": "Associated Press projections", 
 "district": "District {{name}}", 
 "districtNum": "{{name}} {{ordinal}} District", 
+"finalResults": "Final Results", 
 "frSource": "Source: Ministry of the Interior", 
 "googlePoliticsTitle": "Google Politics & Elections", 
 "languageName": "English", 
@@ -52,6 +53,7 @@ loadStrings({
 "neverVotesHere": "This location does not report voting results", 
 "noLocal": "Detailed results not available", 
 "noVotesHere": "This location has not reported voting results", 
+"partialResults": "Partial Results", 
 "party": "Party", 
 "percentReporting": "{{percent}} reporting ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Presidential", 
@@ -124,6 +126,6 @@ loadStrings({
 "viewNational-us": "&laquo; Back to U.S. Overview Map", 
 "viewUSA": "&laquo; Back to U.S. Overview Map", 
 "votes": "Votes", 
-"waitingForVotes": "Waiting for results", 
+"waitingForVotes": "Waiting for Results", 
 "wonRound1": "Elected in round 1"
 })

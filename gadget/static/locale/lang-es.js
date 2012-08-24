@@ -31,6 +31,7 @@ loadStrings({
 "delegatesAttrib": "Pron\u00f3sticos de Associated Press", 
 "district": "Distrito {{name}}", 
 "districtNum": "{{name}} {{ordinal}} Distrito", 
+"finalResults": "Resultados Finales", 
 "frSource": "Fuente: Ministerio del Interior", 
 "googlePoliticsTitle": "Pol\u00edtica y elecciones de Google", 
 "languageName": "Espa\u00f1ol", 
@@ -52,6 +53,7 @@ loadStrings({
 "neverVotesHere": "Esta ubicaci\u00f3n no notifica los resultados electorales", 
 "noLocal": "Resultados detallados no est\u00e1 disponible", 
 "noVotesHere": "Esta ubicaci\u00f3n no ha notificado los resultados electorales", 
+"partialResults": "Resultados Parciales", 
 "party": "Partido", 
 "percentReporting": "{{percent}} de los resultados transmitidos ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Presidencial", 
@@ -124,6 +126,6 @@ loadStrings({
 "viewNational-us": "&laquo; Volver al mapa general de EE.UU.", 
 "viewUSA": "&laquo; Volver al mapa general de EE.UU.", 
 "votes": "Votos", 
-"waitingForVotes": "Esperando resultados", 
+"waitingForVotes": "Esperando Resultados", 
 "wonRound1": "Elegido en la 1 \u00aa ronda"
 })
