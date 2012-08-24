@@ -31,6 +31,7 @@ loadStrings({
 "delegatesAttrib": "Voorspellingen van Associated Press", 
 "district": "District {{name}}", 
 "districtNum": "{{name}} {{ordinal}} District", 
+"finalResults": "Definitieve Resultaten", 
 "frSource": "Bron: Ministerie van Binnenlandse Zaken", 
 "googlePoliticsTitle": "Google Politics & Elections", 
 "languageName": "Nederlands", 
@@ -52,6 +53,7 @@ loadStrings({
 "neverVotesHere": "Deze locatie geeft geen stemresultaten door", 
 "noLocal": "Geen gedetailleerde resultaten beschikbaar", 
 "noVotesHere": "Deze locatie heeft geen stemresultaten doorgegeven", 
+"partialResults": "Gedeeltelijke Resultaten", 
 "party": "Partij", 
 "percentReporting": "{{percent}} van resultaten doorgegeven ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Presidentieel", 
@@ -124,6 +126,6 @@ loadStrings({
 "viewNational-us": "&laquo; Terug naar overzichtskaart van de VS", 
 "viewUSA": "&laquo; Terug naar overzichtskaart van de VS", 
 "votes": "Stemmen", 
-"waitingForVotes": "Wachten op resultaten", 
+"waitingForVotes": "Wachten op Resultaten", 
 "wonRound1": "Verkozen in eerste ronde"
 })

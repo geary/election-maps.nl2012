@@ -1439,20 +1439,29 @@ function nationalEnabled() {
 		);
 	}
 	
-	function totalReporting( results ) {
-		var col = results.colsById;
-		var rows = results.rows;
-		var counted = 0, total = 0;
-		for( var row, i = -1;  row = rows[++i]; ) {
-			counted += row[col.NumCountedBallotBoxes];
-			total += row[col.NumBallotBoxes];
+	function formatSidebarReporting( results ) {
+		var totals = results.totals,
+			col = totals.colsById.NumCountedBallotBoxes,
+			counts = totals.row[col],
+			total = counts[0] + counts[1] + counts[2];
+		function formatRow( iCount, title ) {
+			var count = counts[iCount];
+			return count ? S(
+				'<tr>',
+					'<td align="right">', count, '</td>',
+					'<td>', title.T(), ' (', formatPercent( count / total ),  ')</td>',
+					//'<td>', title.T(), '</td>',
+					//'<td align="right">(', formatPercent( count / total ),  ')</td>',
+				'</tr>'
+			) : '';
 		}
-		return {
-			counted: counted,
-			total: total,
-			percent: formatPercent( counted / total ),
-			kind: ''  // TODO
-		};
+		return S(
+			'<table>',
+				formatRow( 2, 'finalResults' ),
+				formatRow( 1, 'partialResults' ),
+				formatRow( 0, 'waitingForVotes' ),
+			'</table>'
+		);
 	}
 	
 	function getTopCandidates( results, row, sortBy, max ) {
@@ -1539,7 +1548,7 @@ function nationalEnabled() {
 			) : '&nbsp;';
 			resultsHeaderHTML = S(
 				'<div id="percent-reporting" class="body-text">',
-					'percentReporting'.T( totalReporting(results) ),
+					formatSidebarReporting( results ),
 				'</div>',
 				'<div id="auto-update" class="subtitle-text" style="margin-bottom:8px; ',
 					test ? 'color:red; font-weight:bold;' : '',
@@ -1746,13 +1755,6 @@ function nationalEnabled() {
 		return feature.name;
 	}
 	
-	function mayHaveResults( row, col ) {
-		return(
-			row[col.TabTotal] > 0  ||
-			row[col.NumCountedBallotBoxes] < row[col.NumBallotBoxes]
-		);
-	}
-	
 	function formatTip( where ) {
 		var feature = where && where.feature;
 		if( ! feature ) return null;
@@ -1761,7 +1763,8 @@ function nationalEnabled() {
 		var geo = where.geo, results = geoResults(geo), col = results && results.colsById;
 		var row = geo.draw !== false  &&  featureResults( results, where.feature );
 		var top = [];
-		if( row  &&  col  &&  mayHaveResults(row,col) ) {
+		var iCount = 0;
+		if( row  &&  col ) {
 			row.geoid = geoid;
 			row.geo = geo;
 			top = getTopCandidates( results, row, 'votes', 4 );
@@ -1771,20 +1774,10 @@ function nationalEnabled() {
 				'</div>'
 			);
 			
-			var boxes = row[col.NumBallotBoxes];
-			var counted = row[col.NumCountedBallotBoxes];
+			iCount = row[col.NumCountedBallotBoxes];
 		}
 		
-		var reporting =
-			boxes ? 'percentReporting'.T({
-				percent: formatPercent( counted / boxes ),
-				counted: counted,
-				total: boxes,
-				kind: ''
-			}) :
-			future ? longDateFromYMD(st.date) :
-			//geo.draw === false ? 'clickForLocal'.T() :
-			'waitingForVotes'.T();
+		var reporting = [ 'waitingForVotes', 'partialResults', 'finalResults' ][iCount].T();
 		
 		//var clickForLocal =
 		//	top.length &&
@@ -2446,7 +2439,7 @@ function nationalEnabled() {
 		});
 		totalPush( null, 'TabTotal', 0 );
 		totalPush( null, 'NumBallotBoxes', 0 );
-		totalPush( null, 'NumCountedBallotBoxes', 0 );
+		totalPush( null, 'NumCountedBallotBoxes', [0,0,0] );
 		
 		//var fix = state.fix || {};
 		var features = geo.features;
@@ -2482,7 +2475,7 @@ function nationalEnabled() {
 				row[colID] = id;
 				row[col.TabTotal] = 1;
 				row[col.NumBallotBoxes] = 1;
-				row[col.NumCountedBallotBoxes] = 0;
+				row[col.NumCountedBallotBoxes] = [0,0,0];
 				rows.push( row );
 				rowsByID[id] = row;
 			}
@@ -2504,7 +2497,7 @@ function nationalEnabled() {
 				}
 				row[col.TabTotal] = 0;
 				rowT[colT.NumBallotBoxes] += row[col.NumBallotBoxes];
-				row[col.NumCountedBallotBoxes] = 0;
+				row[col.NumCountedBallotBoxes] = [0,0,0];
 			}
 			else {
 				var candidates = row.candidates = [];
@@ -2520,7 +2513,7 @@ function nationalEnabled() {
 				}
 				rowT[colT.TabTotal] += row[col.TabTotal];
 				rowT[colT.NumBallotBoxes] += row[col.NumBallotBoxes];
-				rowT[colT.NumCountedBallotBoxes] += row[col.NumCountedBallotBoxes];
+				++rowT[colT.NumCountedBallotBoxes][ row[col.NumCountedBallotBoxes] ];
 			}
 			row.candidateMax = candidateMax;
 		}

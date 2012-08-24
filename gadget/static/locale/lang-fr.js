@@ -31,6 +31,7 @@ loadStrings({
 "delegatesAttrib": "Estimations de l'Associated Press", 
 "district": "Circonscription {{name}}", 
 "districtNum": "{{name}} {{ordinal}} Circonscription", 
+"finalResults": "R\u00e9sultats Finaux", 
 "frSource": "Source: Minist\u00e8re de l'Int\u00e9rieur", 
 "googlePoliticsTitle": "Google\u00a0Politics\u00a0&\u00a0Elections", 
 "languageName": "Fran\u00e7ais", 
@@ -52,6 +53,7 @@ loadStrings({
 "neverVotesHere": "Ce lieu ne transmet pas de r\u00e9sultats de vote", 
 "noLocal": "R\u00e9sultats d\u00e9taill\u00e9s non disponibles", 
 "noVotesHere": "Ce lieu n'a pas transmis de r\u00e9sultats de vote", 
+"partialResults": "R\u00e9sultats Partiels", 
 "party": "Parti", 
 "percentReporting": "{{percent}} de r\u00e9sultats transmis ({{counted}}/{{total}}{{kind}})", 
 "presidential": "Pr\u00e9sidentielle", 
@@ -124,6 +126,6 @@ loadStrings({
 "viewNational-us": "&laquo; Revenir \u00e0 la carte g\u00e9n\u00e9rale des \u00c9tats-Unis", 
 "viewUSA": "&laquo; Revenir \u00e0 la carte g\u00e9n\u00e9rale des \u00c9tats-Unis", 
 "votes": "Votes", 
-"waitingForVotes": "En attente des r\u00e9sultats", 
+"waitingForVotes": "En Attente des R\u00e9sultats", 
 "wonRound1": "\u00c9lu(e) au premier tour"
 })
