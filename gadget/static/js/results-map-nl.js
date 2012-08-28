@@ -12,6 +12,7 @@ var defaultElectionKey = '2012';
 params.year = params.year || '2012';
 
 var $body = $('body');
+$body.addClass( 'source-anp' );
 
 // Hide Google Elections logo in IE <= 7
 if( $.browser.msie ) {
@@ -271,16 +272,16 @@ document.write(
 		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
 		'body.source-ap #gop-logo { display:none; }',
 		'#ap-logo { right:64px; width:41px; background: url(', imgUrl('ap-logo-48x41.png'), ') no-repeat; }',
-		'#articque-logo { right:64px; width:37px; background: url(', imgUrl('articque-logo-37x48.png'), ') no-repeat; display:none; }',
-		'#articque-attrib { display:none; position:absolute; font-family: Arial,sans-serif; font-size:13px; color:#444; text-align:right; right:2px; bottom:22px; }',
-		'body.source-gop #ap-logo, body.source-articque #ap-logo { display:none; }',
-		'body.source-articque #articque-logo, body.source-articque #articque-attrib { display:block; }',
+		'#anp-logo { right:64px; width:48px; background: url(', imgUrl('anp-tk2012-48x48-masked.png'), ') no-repeat; display:none; }',
+		'#anp-attrib { display:none; position:absolute; font-family: Arial,sans-serif; font-size:13px; color:#444; text-align:right; right:2px; bottom:22px; }',
+		'body.source-gop #ap-logo, body.source-anp #ap-logo { display:none; }',
+		'body.source-anp #anp-logo, body.source-anp #anp-attrib { display:block; }',
 		'#google-logo { right:4px; background: url(', imgUrl('google-politics-48.png'), ') no-repeat; }',
-		'body.source-articque #google-logo, body.source-articque #articque-logo { bottom:38px; }',
+		'body.source-anp #google-logo, body.source-anp #anp-logo { bottom:38px; }',
 		'#gop-logo { right:64px; width:48px; background: url(', imgUrl('gop-nv-48.png'), ') no-repeat; }',
-		'body.hidelogo #gop-logo, body.hidelogo #ap-logo, body.hidelogo #articque-logo  { right:4px; }',
+		'body.hidelogo #gop-logo, body.hidelogo #ap-logo, body.hidelogo #anp-logo  { right:4px; }',
 		'body.hidelogo #google-logo { display:none; }',
-		'body.ie7 #gop-logo, body.ie7 #ap-logo, body.ie7 #articque-logo { right:4px; }',
+		'body.ie7 #gop-logo, body.ie7 #ap-logo, body.ie7 #anp-logo { right:4px; }',
 		'body.ie7 #google-logo, body.ie7 #linkToMap { display:none; }',
 	'</style>'
 );
@@ -319,14 +320,14 @@ document.write(
 	//'</a>',
 	//'<a id="gop-logo" class="logo" target="_blank" href="http://www.nvgopcaucus.com/" title="', 'dataAttribTitleGOP'.T(), '">',
 	//'</a>',
-	'<a id="articque-logo" class="logo" target="_blank" href="http://www.articque.com/" title="', 'articqueCopyright'.T(), '">',
+	'<a id="anp-logo" class="logo" target="_blank" href="http://www.anp.nl/" title="', 'anpCopyright'.T(), '">',
 	'</a>',
 	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.fr/elections/ed/fr" title="', 'googlePoliticsTitle'.T(), '">',
 	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
-	'<div id="articque-attrib">',
-		'articqueCopyright'.T(),
+	'<div id="anp-attrib">',
+		'anpCopyright'.T(),
 	'</div>',
 	'<div id="spinner">',
 		'<img border="0" style="width:128px; height:128px;" src="', imgUrl('spinner-124.gif'), '" />',
