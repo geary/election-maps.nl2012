@@ -561,15 +561,16 @@ function nationalEnabled() {
 	}
 	
 	function addLivingAbroad( features ) {
-		var radius = 100000;
+		var width = 210000, height = 150000;
+		var env = envelope( width, height );
 		var feature = {
-			bbox: [ -radius, -radius, radius, radius ],
+			bbox: env.bbox,
 			centroid: [ 0, 0 ],
 			click: false,
 			draw: true,
 			geometry: {
-				coordinates: drawCircle( radius, 32 ),
-				type: 'Polygon'
+				coordinates: env.coordinates,
+				type: 'MultiPolygon'
 			},
 			id: 'GM0998',
 			name: "Briefstemmers",
@@ -579,17 +580,46 @@ function nationalEnabled() {
 		features.by['GM0998'] = feature;
 	}
 	
-	function drawCircle( radius, steps ) {
-		var ring = [];
-		var pi2 = Math.PI * 2;
-		for( var i = 0;  i < steps;  ++i ) {
-			ring.push([
-				radius * Math.sin( i / steps * pi2 ),
-				radius * Math.cos( i / steps * pi2 )
-			]);
+	function envelope( width, height ) {
+		var right = width / 2, left = -right, top = height / 2, bottom = -top,
+			peak = top - right, inset = 2 / 35 * width,
+			cornerY = inset / 2, cornerX = peak + cornerY;
+		
+		return {
+			bbox: [ left, bottom, right, top ],
+			coordinates: [
+				//[[	// outer
+				//	[ left, bottom ],
+				//	[ left, top ],
+				//	[ right, top ],
+				//	[ right, bottom ]
+				//]],
+				[[	// flap
+					[ 0, peak ],
+					[ left, top ],
+					[ right, top ]
+				]],
+				[[	// left
+					[ left, bottom ],
+					[ left, top ],
+					[ cornerX, -cornerY ],
+					[ left + inset, bottom ]
+				]],
+				[[	// right
+					[ right, bottom ],
+					[ right, top ],
+					[ -cornerX, -cornerY ],
+					[ right - inset, bottom ]
+				]],
+				[[	// bottom
+					[ left + inset, bottom ],
+					[ cornerX, -cornerY ],
+					[ 0, peak ],
+					[ -cornerX, -cornerY ],
+					[ right - inset, bottom ]
+				]]
+			]
 		}
-		ring.push( ring[0] );
-		return [ ring ];
 	}
 	
 	function setPlayback() {
@@ -1155,9 +1185,9 @@ function nationalEnabled() {
 					//	action( featureRgn, z, x, y, feature );
 				}
 			}
-			inset( 'GM9003', 5.8, 86, -1429 );  // Saba
-			inset( 'GM9002', 5.8, 90, -1425 );  // Sint Eustatius
-			inset( 'GM9001', 5.0, 84, -1416 );  // Bonaire
+			inset( 'GM9003', 5.8, 85, -1427 );  // Saba
+			inset( 'GM9002', 5.8, 89, -1423 );  // Sint Eustatius
+			inset( 'GM9001', 5.0, 84, -1416.5 );  // Bonaire
 			inset( 'GM0998', 2.1, 95, -1415 );  // Overseas
 		}
 		var geo = geoJSON[current.geoid];
@@ -1173,7 +1203,7 @@ function nationalEnabled() {
 	}
 	
 	function insetGeo() {
-		var bbox = [ 385000, 6895000, 490000, 7006000 ];
+		var bbox = [ 385000, 6900000, 491000, 7000000 ];
 		var geo = makeBboxGeo( bbox, {
 			fillColor: '#F8F8F8',
 			fillOpacity: 1,
