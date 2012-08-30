@@ -7,6 +7,9 @@ var times = {
 	offset: 0
 };
 
+// Temp workaround for projection error in NL GeoJSON
+var nlDX = 500, nlDY = 42000;
+
 // Default params
 var defaultElectionKey = '2012';
 params.year = params.year || '2012';
@@ -538,10 +541,9 @@ function nationalEnabled() {
 		}
 	}
 	
-	// Temp workaround for projection error in NL GeoJSON
 	function nlTempHack( features ) {
-		var dx = 500, dy = 42000;
 		function fix( points ) {
+			var dx = nlDX, dy = nlDY;
 			for( var i = 0, n = points.length - 1;  i < n;  i += 2 ) {
 				points[i] += dx;
 				points[i+1] += dy;
@@ -815,7 +817,8 @@ function nationalEnabled() {
 		outlineFeature( null );
 		
 		var bboxNL = {
-			bbox: [ 373491, 6536883, 803613, 7043980 ]
+			//bbox: [ 373491, 6536883, 803613, 7043980 ]
+			bbox: [ 373491+nlDX, 6536883+nlDY, 803613+nlDX, 7043980+nlDY ]
 		};
 		
 		var geo = {
