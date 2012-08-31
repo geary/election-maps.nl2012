@@ -214,7 +214,7 @@ document.write(
 		'div.scroller::-webkit-scrollbar-thumb:horizontal { border-width:0; border-bottom:1px; border-top:6px; }',
 		'div.scroller::-webkit-scrollbar-track:hover { -webkit-box-shadow:inset 1px 0 0 rgba(0,0,0,.1); background-color:rgba(0,0,0,.05); }',
 		'div.scroller::-webkit-scrollbar-track:active { -webkit-box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px -1px 0 rgba(0,0,0,.07); background-color:rgba(0,0,0,.05); }',
-		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; min-width:300px; }',
+		'#maptip { position:absolute; z-index:10; border:1px solid #333; background:white; color:#222; white-space: nowrap; display:none; min-width:200px; }',
 		'div.candidate-name { line-height:1em; }',
 		'div.first-name { font-size:85%; }',
 		'body.tv #election-title { font-size:24px; font-weight:bold; }',
@@ -229,7 +229,7 @@ document.write(
 		'body.tv span.tiptitletext { font-size:28px; }',
 		'body.tv div.tipreporting { font-size:20px; }',
 		'body.tv table.candidates td { padding:4px 0; }',
-		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; }',
+		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; margin-bottom:4px; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
 		'.tipcontent { padding:4px 8px 8px 8px; border-bottom:1px solid #AAA; }',
 		'.tipreporting { font-size:80%; padding:2px 0; }',
@@ -1572,15 +1572,17 @@ function nationalEnabled() {
 			return 'waitingForVotes'.T();
 		var thead = header ? S(
 			'<tr>',
-				'<th colspan="3" style="text-align:left; padding-bottom:4px;">',
+				'<th colspan="1" style="padding-bottom:4px;">',
+				'</th>',
+				'<th colspan="2" style="text-align:center; padding-bottom:4px;">',
 					'party'.T(),
 				'</th>',
-				'<th style="text-align:right; padding-bottom:4px;">',
+				'<th colspan="2" style="text-align:center; padding-bottom:4px;">',
 					'votes'.T(),
 				'</th>',
-				'<th style="text-align:right; padding-bottom:4px;">',
-					//current.national  &&  view != 'county' ? 'delegatesAbbr'.T() : '',
-				'</th>',
+				//'<th style="text-align:right; padding-bottom:4px;">',
+				//	//current.national  &&  view != 'county' ? 'delegatesAbbr'.T() : '',
+				//'</th>',
 			'</tr>'
 		) : '';
 		return S(
@@ -1595,16 +1597,16 @@ function nationalEnabled() {
 		var selected = ( candidate.id == current.party ) ? ' selected' : '';
 		var cls = i === 0 ? ' first' : '';
 		var pct = formatPercent( candidate.vsAll );
-		var voteDivs = S(
-			'<div class="candidate-percent">',
-				pct,
-			'</div>',
-			web() ? S(
-				'<div class="candidate-votes">',
-					formatNumber( candidate.votes ),
-				'</div>'
-			) : ''
-		)
+		//var voteDivs = S(
+		//	'<div class="candidate-percent">',
+		//		pct,
+		//	'</div>',
+		//	web() ? S(
+		//		'<div class="candidate-votes">',
+		//			formatNumber( candidate.votes ),
+		//		'</div>'
+		//	) : ''
+		//)
 		return S(
 			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
 				'<td class="left">',
@@ -1614,6 +1616,9 @@ function nationalEnabled() {
 						'</div>'
 					) : '',
 				'</td>',
+				'<td style="text-align:center;">',
+					formatCandidateAreaPatch( candidate, 20 ),
+				'</td>',
 				'<td>',
 					'<div class="candidate-name" style="',
 								election.photos ? '' : 'margin-top:4px; margin-bottom:4px;',
@@ -1622,23 +1627,28 @@ function nationalEnabled() {
 							candidate.firstName,
 						'</div>',
 						'<div class="last-name" style="font-weight:bold;">',
-							candidate.lastName,
+							//candidate.lastName,
+							candidate.id,
 						'</div>',
 					'</div>',
 				'</td>',
-				'<td style="text-align:center;">',
-					formatCandidateAreaPatch( candidate, 24 ),
+				'<td style="text-align:right; xpadding-left:6px;">',
+					'<div class="candidate-percent">',
+						pct,
+					'</div>',
 				'</td>',
-				'<td style="text-align:right; padding-left:6px;">',
-					voteDivs,
+				'<td style="text-align:right; xpadding-left:6px;">',
+					'<div class="candidate-votes">',
+						formatNumber( candidate.votes ),
+					'</div>',
 				'</td>',
-				'<td class="right" style="text-align:right; padding-left:6px;">',
-					//current.national  &&  view != 'county' ? S(
-					//	'<div class="candidate-delegates">',
-					//		candidate.delegates,
-					//	'</div>'
-					//) : '',
-				'</td>',
+				//'<td class="right" style="text-align:right; padding-left:6px;">',
+				//	//current.national  &&  view != 'county' ? S(
+				//	//	'<div class="candidate-delegates">',
+				//	//		candidate.delegates,
+				//	//	'</div>'
+				//	//) : '',
+				//'</td>',
 			'</tr>'
 		);
 	}
@@ -1673,10 +1683,10 @@ function nationalEnabled() {
 		if( row  &&  col ) {
 			row.geoid = geoid;
 			row.geo = geo;
-			top = getTopCandidates( results, row, 'votes', 4 );
+			top = getTopCandidates( results, row, 'votes', 8 );
 			var content = S(
 				'<div class="tipcontent">',
-					formatCandidateList( top, formatListCandidate, true ),
+					formatCandidateList( top, formatListCandidate, false ),
 				'</div>'
 			);
 			
@@ -1727,7 +1737,7 @@ function nationalEnabled() {
 					reporting,
 					test ? S(
 						'<span style="color:red; font-weight:bold; font-size:100%;"> ',
-							'testData'.T(),
+							'TEST',  // 'testData'.T(),
 						'</span>'
 					) : '',
 				'</div>',
@@ -1750,6 +1760,7 @@ function nationalEnabled() {
 			y < mapPixBounds.top  ||
 			y >= mapPixBounds.bottom
 		) {
+			if( params.debug == 'tip' ) return;
 			showTip( false );
 		}
 		x += tipOffset.x;
