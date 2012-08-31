@@ -42,6 +42,16 @@ var partiesNL2012 = [
 
 
 var elections = {
+	'2010': {
+		date: '2012-06-09',
+		tzHour: +2,
+		photos: false,
+		candidates: partiesNL2012,
+		parties: partiesNL2012,
+		electionids: {
+			'NL': 2792
+		}
+	},
 	'2012': {
 		date: '2012-09-12',
 		tzHour: +2,
