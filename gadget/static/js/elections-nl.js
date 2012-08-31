@@ -5,7 +5,7 @@
 var partiesNL2012 = [
 	// "color|id|nameNL|nameEN"
 	"#CC33CC|50PLUS|50PLUS|50PLUS",
-	"#EE6600|AEP|Anti Euro Partij|Anti Euro Party",
+	"#EE6600|AEP|Anti Europa Partij|Anti Europa Party",
 	"#FFFF00|CDA|CDA|CDA",
 	"#FFCC00|CU|ChristenUnie|ChristianUnion",
 	"#00FFAA|D66|D66|D66",
@@ -14,6 +14,7 @@ var partiesNL2012 = [
 	"#1166AA|LP|Libertarische Partij|Libertarian Party ",
 	"#223388|LibDem|Liberaal Democratische Partij|Liberal Democratic Party",
 	"#0000FF|NedLok|Nederland Lokaal|Nederland Lokaal",
+	"#AACCFF|NXD|Politieke Partij NXD|Political Party NXD",
 	"#555555|Overige|Overige 2010|Other 2010",
 	"#552299|PIRATEN|Piratenpartij|Pirate Party",
 	"#44AA44|PVDD|Partij voor de Dieren|Party for the Animals",
