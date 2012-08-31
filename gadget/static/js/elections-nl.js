@@ -13,7 +13,7 @@ var partiesNL2012 = [
 	"#44FF00|GL|GroenLinks|GreenLeft",
 	"#1166AA|LP|Libertarische Partij|Libertarian Party ",
 	"#223388|LibDem|Liberaal Democratische Partij|Liberal Democratic Party",
-	"#0000FF|NedLok|Nederland Lokaal|Nederland Lokaal",
+	"#0000FF|NedLok|Nederland Lokaal|Netherlands Local",
 	"#AACCFF|NXD|Politieke Partij NXD|Political Party NXD",
 	"#555555|Overige|Overige 2010|Other 2010",
 	"#552299|PIRATEN|Piratenpartij|Pirate Party",
