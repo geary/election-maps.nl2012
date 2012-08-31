@@ -1492,7 +1492,23 @@ function nationalEnabled() {
 			'<div id="sidebar">',
 				'<div class="sidebar-header">',
 					'<div id="election-title" class="title-text">',
-						'theNetherlands'.T(),
+						'<div style="font-weight:bold; padding:5px 0 0 2px; float:left;">',
+							'theNetherlands'.T(),
+						'</div>',
+
+						'<div style="margin:0; padding:3px; float:right;">',
+							'<a class="button', params.year == 2010 ? ' selected' : '', '" id="btn2010">',
+								2010,
+							'</a>',
+							'&nbsp;',
+							'<a class="button', params.year == 2012 ? ' selected' : '', '" id="btn2012">',
+								2012,
+							'</a>',
+						'</div>',
+						'<div style="clear:both;">',
+						'</div>',
+
+
 					'</div>',
 					'<div id="election-date-row" class="" style="margin-bottom:8px; position:relative;">',
 						'<div id="election-date" class="subtitle-text" style="float:left;">',
@@ -1957,34 +1973,34 @@ function nationalEnabled() {
 			}
 		});
 		
-		$topbar.delegate( '#btn2007,#btn2012', {
+		$sidebar.delegate( '#btn2010,#btn2012', {
 			click: function( event ) {
 				setYear( this.id.replace(/^btn/, '' ) );
 				event.preventDefault();
 			}
 		});
 		
-		$topbar.delegate( '#btnContest-pres,#btnContest-leg', {
-			click: function( event ) {
-				setContest( this.id.replace(/^btnContest-/, '' ) );
-				event.preventDefault();
-			}
-		});
+		//$topbar.delegate( '#btnContest-pres,#btnContest-leg', {
+		//	click: function( event ) {
+		//		setContest( this.id.replace(/^btnContest-/, '' ) );
+		//		event.preventDefault();
+		//	}
+		//});
 		
-		$topbar.delegate( '#btnRound1,#btnRound2', {
-			click: function( event ) {
-				if( ! $(this).hasClass('disabled') )
-					setRound( this.id.replace(/^btnRound/, '' ) );
-				event.preventDefault();
-			}
-		});
+		//$topbar.delegate( '#btnRound1,#btnRound2', {
+		//	click: function( event ) {
+		//		if( ! $(this).hasClass('disabled') )
+		//			setRound( this.id.replace(/^btnRound/, '' ) );
+		//		event.preventDefault();
+		//	}
+		//});
 		
-		$sidebar.delegate( '#viewNational', {
-			click: function( event ) {
-				gotoGeo( 'NL', 'return' );
-				event.preventDefault();
-			}
-		});
+		//$sidebar.delegate( '#viewNational', {
+		//	click: function( event ) {
+		//		gotoGeo( 'NL', 'return' );
+		//		event.preventDefault();
+		//	}
+		//});
 		
 		//$sidebar.delegate( '#btnCycle', {
 		//	click: function( event ) {
