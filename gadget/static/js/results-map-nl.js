@@ -1179,18 +1179,21 @@ function nationalEnabled() {
 			feature.offset = { x: ( x - p[0] ) * pow, y: ( y - p[1] ) * pow };
 		}
 		function insetAll( action ) {
-			function inset( id, z, x, y ) {
+			function inset( id, z, x, y, hide2010 ) {
 				var feature = featuresMuni[id];
 				if( feature ) {
 					action( feature, z, x, y );
+					if( hide2010 ) {
+						feature.draw = feature.hittest = ( params.year != 2010 );
+					}
 					//var featureRgn = featuresRgn[ '0' + feature.code_reg ];
 					//if( featureRgn )
 					//	action( featureRgn, z, x, y, feature );
 				}
 			}
-			inset( 'GM9003', 5.8, 85, -1427 );  // Saba
-			inset( 'GM9002', 5.8, 89, -1423 );  // Sint Eustatius
-			inset( 'GM9001', 5.0, 84, -1416.5 );  // Bonaire
+			inset( 'GM9003', 5.8, 85, -1427, true );  // Saba
+			inset( 'GM9002', 5.8, 89, -1423, true );  // Sint Eustatius
+			inset( 'GM9001', 5.0, 84, -1416.5, true );  // Bonaire
 			inset( 'GM0998', 2.1, 95, -1415 );  // Overseas
 		}
 		var geo = geoJSON[current.geoid];
@@ -1206,7 +1209,9 @@ function nationalEnabled() {
 	}
 	
 	function insetGeo() {
-		var bbox = [ 385000, 6900000, 491000, 7000000 ];
+		var bbox = params.year == 2010 ?
+			[ 438000, 6900000, 491000, 6945000 ] :
+			[ 385000, 6900000, 491000, 7000000 ];
 		var geo = makeBboxGeo( bbox, {
 			fillColor: '#F8F8F8',
 			fillOpacity: 1,
