@@ -3,11 +3,12 @@
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
 var partiesNL2012 = [
+	// "color|id|nameNL|nameEN"
 	"#CC33CC|50PLUS|50PLUS|50PLUS",
 	"#EE6600|AEP|Anti Euro Partij|Anti Euro Party",
-	"#FFFF00|CDA|Christen-Democratisch App&egrave;l|Christian Democratic Appeal",
+	"#FFFF00|CDA|CDA|CDA",
 	"#FFCC00|CU|ChristenUnie|ChristianUnion",
-	"#00FFAA|D66|Democraten 66|Democrats 66",
+	"#00FFAA|D66|D66|D66",
 	"#2299DD|DPK|Democratisch Politiek Keerpunt|Democratic Political Turning Point",
 	"#44FF00|GL|GroenLinks|GreenLeft",
 	"#1166AA|LP|Libertarische Partij|Libertarian Party ",
@@ -20,10 +21,10 @@ var partiesNL2012 = [
 	"#BBBBBB|PVV|Partij voor de Vrijheid|Party for Freedom",
 	"#FF0000|PvdA|Partij van de Arbeid|Labour Party",
 	"#442277|PvdT|Partij van de Toekomst|Party of the Future",
-	"#EEAA00|SGP|Staatkundig Gereformeerde Partij|Reformed Political Party",
+	"#EEAA00|SGP|SGP|Reformed Political Party",
 	"#5588AA|SOPN|Soeverein Onafhankelijke Pioniers Nederland|Sovereign Independent Pioneers Netherlands",
-	"#CC0000|SP|Socialistische Partij|Socialist Party",
-	"#0066EE|VVD|Volkspartij voor Vrijheid en Democratie|People's Party for Freedom and Democracy|VVD|Volkspartij voor Vrijheid en Democratie|VVD"
+	"#CC0000|SP|SP|Socialist Party",
+	"#0066EE|VVD|VVD|VVD"
 ].map( function( s ) {
 	s = s.split('|');
 	var party = {
