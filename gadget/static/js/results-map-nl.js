@@ -325,7 +325,7 @@ document.write(
 	//'</a>',
 	'<a id="anp-logo" class="logo" target="_blank" href="http://www.anp.nl/" title="', 'anpCopyright'.T(), '">',
 	'</a>',
-	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.fr/elections/ed/fr" title="', 'googlePoliticsTitle'.T(), '">',
+	'<a id="google-logo" class="logo" target="_blank" href="http://www.google.nl/elections/ed/nl" title="', 'googlePoliticsTitle'.T(), '">',
 	'</a>',
 	'<div id="error" style="display:none;">',
 	'</div>',
