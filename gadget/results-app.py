@@ -30,7 +30,7 @@ def checkReferer( req, required ):
 	ver = req.environ['CURRENT_VERSION_ID'].split('.')[0]
 	if ver == 'nv2012': return True
 	if ver == 'fr2012': return True
-	if ver == 'fr2012-test': return True
+	if ver == 'nl2012': return True
 	return checkRefererURL( req.headers.get('Referer'), required )
 
 
