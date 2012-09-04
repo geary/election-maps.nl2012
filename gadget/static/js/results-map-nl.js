@@ -124,7 +124,7 @@ var debug = params.debug;
 //opt.candidate = '1';
 //opt.zoom = opt.zoom || 3;
 opt.fontsize = '15px';
-var sidebarWidth = params.play ? 340 : 280;
+var sidebarWidth = 260;  // params.play ? 340 : 280;
 
 opt.resultCacheTime = 30 * 1000;
 opt.reloadTime = 60 * 1000;
@@ -1571,7 +1571,7 @@ function nationalEnabled() {
 				'</td>',
 				'<td>',
 					'<div class="legend-candidate">',
-						candidate.name || candidate.lastName,
+						candidate.id,  // candidate.name || candidate.lastName,
 					'</div>',
 				'</td>',
 				'<td>',
