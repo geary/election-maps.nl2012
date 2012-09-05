@@ -1579,7 +1579,7 @@ function nationalEnabled() {
 	function formatSidebarCandidate( candidate ) {
 		var selected = ( candidate.id == current.party ) ? ' selected' : '';
 		return S(
-			'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '">',
+			'<tr class="legend-candidate', selected, '" id="legend-candidate-', candidate.id, '" title="', candidate.name, ' (', candidate.id, ')">',
 				'<td class="left">',
 					'<div class="legend-candidate">',
 						formatSpanColorPatch( candidate.color, 8 ),
