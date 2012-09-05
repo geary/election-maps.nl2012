@@ -251,7 +251,9 @@ document.write(
 		'#sidebar-scroll { padding:0 4px; }',
 		'#election-title { padding-bottom:2px; }',
 		'#election-date-row { display:none; }',
-		'tr.legend-candidate td, tr.legend-filler td { border:1px solid white; }',
+		'tr.legend-candidate td, tr.legend-filler td { border-top:1px solid white; border-bottom:1px solid white; }',
+		'tr.legend-candidate td.left, tr.legend-filler td.left { border-left:1px solid white; }',
+		'tr.legend-candidate td.right, tr.legend-filler td.right { border-right:1px solid white; }',
 		'div.legend-candidate, div.legend-filler { font-size:13px; padding:3px 0 3px 3px; }',
 		//'body.tv div.legend-candidate, body.tv div.legend-filler { font-size:22px; }',
 		'body.web div.legend-candidate { color:#333; }',
@@ -259,10 +261,11 @@ document.write(
 		'td.legend-filler { border-color:transparent; }',
 		//'tr.legend-candidate td { width:20%; }',
 		'tr.legend-candidate td { cursor:pointer; }',
-		'tr.legend-candidate.hover td { background-color:#F5F5F5; border:1px solid #F5F5F5; border-top:1px solid #D9D9D9; border-bottom:1px solid #D9D9D9; }',
+		'#maptip table.candidates tr.legend-candidate td { padding-top:2px; }',
+		'tr.legend-candidate.hover td { background-color:#F5F5F5; border-top:1px solid #D9D9D9; border-bottom:1px solid #D9D9D9; }',
 		'tr.legend-candidate.hover td.left { border-left:1px solid #D9D9D9; }',
 		'tr.legend-candidate.hover td.right { border-right:1px solid #D9D9D9; }',
-		'tr.legend-candidate.selected td { background-color:#E7E7E7; border:1px solid #E7E7E7; border-top:1px solid #CCCCCC; border-bottom:1px solid #CCCCCC; }',
+		'tr.legend-candidate.selected td { background-color:#E7E7E7; border-top:1px solid #CCCCCC !important; border-bottom:1px solid #CCCCCC !important; }',
 		'tr.legend-candidate.selected td.left { border-left:1px solid #CCCCCC; }',
 		'tr.legend-candidate.selected td.right { border-right:1px solid #CCCCCC; }',
 		'span.legend-candidate-color { font-size:15px; }',
@@ -1375,7 +1378,7 @@ function nationalEnabled() {
 		);
 	}
 	
-	function getTopCandidates( results, row, sortBy, max ) {
+	function getTopCandidates( results, row, sortBy, max, force ) {
 		var showAll = false;
 		var colIncr = 1;
 		max = max || Infinity;
@@ -1397,18 +1400,31 @@ function nationalEnabled() {
 			candidate.vsAll = votes / total;
 			//candidate.total = total;
 		}
+		if( force ) {
+			var forced = top.index('id').by.id[force];
+		}
 		top = sortArrayBy( top, sortBy, { numeric:true } )
 			.reverse()
 			.slice( 0, max );
-		if( ! showAll )
-			while( top.length  &&  ! top[top.length-1].votes )
-				top.pop();
 		if( top.length ) {
 			var most = top[0].votes;
 			for( var i = -1;  ++i < top.length; ) {
 				var candidate = top[i];
 				candidate.vsTop = candidate.votes / most;
 			}
+		}
+		if( ! showAll )
+			while( top.length  &&  ! top[top.length-1].votes )
+				top.pop();
+		if( forced ) {
+			if( ! top.index('id').by.id[force] ) {
+				//forced.vsTop = Math.max( forced.votes / most, .25 );
+				forced.vsTop = forced.votes / most;
+				if( top.length == max )
+					top.pop();
+				top.push( forced );
+			}
+			top.force = top.index('id').by.id[force].index;
 		}
 		return top;
 	}
@@ -1449,7 +1465,7 @@ function nationalEnabled() {
 		var results = geoResults();
 		if( results ) {
 			var topCandidates = getTopCandidates( results, -1, 'votes' );
-			var none = ! topCandidates.length;
+			var none = !( topCandidates.length && topCandidates[0].votes );
 			var top = none ? '' : formatSidebarTopCandidates( topCandidates.slice( 0, 4 ) );
 			var test = testFlag( results );
 			var viewNational = nationalEnabled() ? S(
@@ -1614,10 +1630,11 @@ function nationalEnabled() {
 		);
 	}
 	
-	function formatListCandidate( candidate, i ) {
-		var selected = ( candidate.id == current.party ) ? ' selected' : '';
-		var cls = i === 0 ? ' first' : '';
-		var pct = formatPercent( candidate.vsAll );
+	function formatListCandidate( candidate, i, list ) {
+		var cls = '';
+		if( i === 0 ) cls += ' first';
+		if( candidate.id == current.party ) cls += ' selected';
+		var vs = candidate.vsAll, pct = isNaN(vs) ? '&nbsp;' : formatPercent(vs);
 		//var voteDivs = S(
 		//	'<div class="candidate-percent">',
 		//		pct,
@@ -1630,7 +1647,7 @@ function nationalEnabled() {
 		//)
 		return S(
 			'<tr class="legend-candidate', cls, '" id="legend-candidate-', candidate.id, '">',
-				'<td class="left">',
+				'<td class="left" style="padding-left:2px;">',
 					election.photos ? S(
 						'<div style="margin:6px 0;">',
 							formatCandidateIcon( candidate, 32 ),
@@ -1658,7 +1675,7 @@ function nationalEnabled() {
 						pct,
 					'</div>',
 				'</td>',
-				'<td style="text-align:right; xpadding-left:6px;">',
+				'<td class="right" style="text-align:right; xpadding-left:6px; padding-right:4px;">',
 					'<div class="candidate-votes">',
 						formatNumber( candidate.votes ),
 					'</div>',
@@ -1704,7 +1721,8 @@ function nationalEnabled() {
 		if( row  &&  col ) {
 			row.geoid = geoid;
 			row.geo = geo;
-			top = getTopCandidates( results, row, 'votes', 8 );
+			var forced = election.parties && current.party;
+			top = getTopCandidates( results, row, 'votes', 8, forced );
 			var content = S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, false ),
