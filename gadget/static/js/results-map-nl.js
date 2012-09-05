@@ -172,7 +172,7 @@ document.write(
 		//'a:visited { color:#6611CC; }',
 		'a.button { display:inline-block; cursor:default; background-color:whiteSmoke; background-image:linear-gradient(top,#F5F5F5,#F1F1F1); border:1px solid #DCDCDC; border:1px solid rgba(0,0,0,0.1); border-radius:2px; box-shadow:none; color:#444; font-weight:bold; font-size:11px; xheight:27px; xline-height:27px; padding:2px 6px; text-decoration:none !important; }',
 		'a.button.hover { background-color: #F6F6F6; background-image:linear-gradient(top,#F8F8F8,#F1F1F1); border:1px solid #C6C6C6; box-shadow:0px 1px 1px rgba(0,0,0,0.1); color:#222; }',
-		'a.button.selected { background-color: #EEE; background-image:linear-gradient(top,#EEE,#E0E0E0); border:1px solid #CCC; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#333; }',
+		'a.button.selected { background-color: #DDD; background-image:linear-gradient(top,#DDD,#D0D0D0); border:1px solid #BBB; box-shadow:inset 0px 1px 2px rgba(0,0,0,0.1); color:#111; }',
 		'a.button.disabled { color:#AAA; }',
 		'#outer {}',
 		'.barvote { font-weight:bold; color:white; }',
