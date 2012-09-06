@@ -1017,8 +1017,8 @@ function nationalEnabled() {
 			showTip( false );
 		},
 		click: function( event, where ) {
-			event.stopPropagation();
 			if( touch  &&  ! touch.mouse ) return;
+			event.stopPropagation();
 			mousedown = false;
 			var didDrag = dragged;
 			dragged = false;
