@@ -540,6 +540,8 @@ function nationalEnabled() {
 		NL: function( json, geoid ) {
 			var features = json.muni.features;
 			nlTempHack( features );
+			nlTempHack( json.province.features );
+			//nlTempHack( json.nation.features );
 			addLivingAbroad( features );
 		}
 	}
@@ -804,7 +806,7 @@ function nationalEnabled() {
 	
 	function currentGeos() {
 		var json = geoJSON[current.geoid];
-		return [ json.muni ];
+		return [ json.muni, json.province/*, json.nation*/ ];
 	}
 	
 	function moveToGeo() {
@@ -1070,7 +1072,7 @@ function nationalEnabled() {
 	function colorize() {
 		var json = geoJSON[current.geoid];
 		colorVotes( json.muni, '#666666', 1, 1 );
-		//colorSimple( json.prov, '#FFFFFF', '#444444', 1, 1.5 );
+		colorSimple( json.province, '#FFFFFF', '#444444', 1, 2 );
 		//colorSimple( json.nation, '#FFFFFF', '#222222', 1, 2 );
 	}
 	
