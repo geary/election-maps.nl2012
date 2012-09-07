@@ -36,6 +36,6 @@ for entry in feed['entry']:
 
 for lang in langs:
 	j = json.dumps( langs[lang], indent=0, sort_keys=True )
-	file = 'lang-%s.js' % lang
+	file = '../gadget/static/locale/lang-%s.js' % lang
 	print 'Writing ' + file
 	open( file, 'wb' ).write( 'loadStrings(%s)' % j )
