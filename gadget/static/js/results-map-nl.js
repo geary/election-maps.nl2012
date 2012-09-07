@@ -1276,15 +1276,15 @@ function nationalEnabled() {
 	if( ! playType() ) {
 		$body.bind( 'click mousemove', moveTip );
 		$maptip.click( function( event ) {
-			if( event.target.id == 'close-tip' ) {
+			//if( event.target.id == 'close-tip' ) {
 				showTip( false );
 				event.preventDefault();
-			}
-			else if( current.national ) {
-				// Only touch devices for now
-				var feature = touch && touch.where && touch.where.feature;
-				if( feature ) gotoGeo( feature, 'tap' );
-			}
+			//}
+			//else if( current.national ) {
+			//	// Only touch devices for now
+			//	var feature = touch && touch.where && touch.where.feature;
+			//	if( feature ) gotoGeo( feature, 'tap' );
+			//}
 		});
 	}
 	
