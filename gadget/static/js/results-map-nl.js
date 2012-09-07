@@ -13,6 +13,7 @@ var nlDX = 500, nlDY = 42000;
 // Default params
 var defaultElectionKey = '2012';
 params.year = params.year || '2012';
+params.click = ( params.click != 'false' );
 
 var $body = $('body');
 $body.addClass( 'source-anp' );
@@ -1969,20 +1970,40 @@ function nationalEnabled() {
 			setCounties( this.checked );
 		});
 		
+		function candidateId( element, click ) {
+			var id = element.id.replace(/^legend-candidate-/,'');
+			if( id == 'top' ) id = null;
+			if( params.click  &&  id == current.party ) id = null;
+			return id;
+		}
+		
 		var $topbar = $('#topbar');
 		var $sidebar = $('#sidebar');
+		var sidebarOneshot = oneshot();
 		$sidebar.delegate( 'tr.legend-candidate', {
 			mouseover: function( event ) {
 				$(this).addClass( 'hover' );
+				if( ! params.click ) {
+					var id = candidateId( this );
+					if( id == current.party ) return;
+					sidebarOneshot( function() {
+						setCandidate( id );
+					}, 200 );
+				}
 			},
 			mouseout: function( event ) {
 				$(this).removeClass( 'hover' );
+				if( ! params.click ) {
+					sidebarOneshot();
+				}
 			},
 			click: function( event ) {
-				var id = this.id.replace(/^legend-candidate-/,'');
-				if( id == 'top'  ||  id == current.party ) id = null;
 				$('#chkCycle').prop({ checked:false });
 				stopCycle();
+				if( ! params.click ) {
+					sidebarOneshot();
+				}
+				var id = candidateId( this, true );
 				setCandidate( id, 'click' );
 			}
 		});
@@ -2034,8 +2055,10 @@ function nationalEnabled() {
 		//});
 		
 		setCandidate = function( id, why ) {
-			current.party = id;
-			loadView();
+			if( params.click  ||  id != current.party ) {
+				current.party = id;
+				loadView();
+			}
 			if( why ) analytics( why, 'candidate', id || 'all' );
 		}
 	}
