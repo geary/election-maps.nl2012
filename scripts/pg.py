@@ -383,6 +383,64 @@ class Database:
 		t2 = time.clock()
 		print 'UPDATE ST_Union %.1f seconds' %( t2 - t1 )
 	
+	# TODO: refactor with mergeGeometry
+	def createMergedGeometryTable( self,
+		sourceTable, sourceGeom,
+		targetTable, targetGeom,
+		cols, columns,
+		whereGroupBy
+	):
+		print 'createMergedGeometryTable %s %s %s %s %s' %(
+			sourceTable, sourceGeom,
+			targetTable, targetGeom,
+			whereGroupBy
+		)
+		t1 = time.clock()
+		srid = self.getSRID( sourceTable, sourceGeom )
+		self.executeCommit( '''
+			CREATE TABLE %(targetTable)s (
+				gid serial,
+				%(columns)s
+			);
+			ALTER TABLE %(targetTable)s ADD PRIMARY KEY (gid);
+		''' %({
+			'targetTable': targetTable,
+			'columns': columns,
+		}) )
+		self.addGeometryColumn( targetTable, targetGeom, srid )
+		self.executeCommit('''
+			INSERT INTO
+				%(targetTable)s
+			SELECT nextval('%(targetTable)s_gid_seq'),
+				%(cols)s,
+				ST_Multi(
+					ST_MakeValid(
+						ST_Union(
+							--ST_SnapToGrid(
+								%(sourceGeom)s
+							--	,
+							--	0.0000001
+							--)
+						)
+					)
+				)
+			FROM
+				%(sourceTable)s
+			%(whereGroupBy)s;
+			
+			SELECT Populate_Geometry_Columns();
+		''' % {
+			'sourceTable': sourceTable,
+			'sourceGeom': sourceGeom,
+			'targetTable': targetTable,
+			'targetGeom': targetGeom,
+			'cols': cols,
+			'columns': columns,
+			'whereGroupBy': whereGroupBy,
+		})
+		t2 = time.clock()
+		print 'UPDATE ST_Union %.1f seconds' %( t2 - t1 )
+	
 	def simplifyGeometry( self,
 		table, sourceGeom, targetGeom, tolerance
 	):
