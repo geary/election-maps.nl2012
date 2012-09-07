@@ -6,8 +6,8 @@ import pg, private
 
 database = 'nl2012'
 schema = 'nl'
-fullGeom = 'full_geom'
-boxGeom = fullGeom
+geom = 'geom'
+boxGeom = geom
 
 
 def createDatabase( database ):
@@ -26,58 +26,81 @@ def createSchema( db, schema ):
 def makeMunis():
 	db = pg.Database( database = database )
 	createSchema( db, schema )
-	table = schema + '.muni'
-	for level in ( 'full', '512', '1024', ):
-		db.dropTable( table )
+	for level in (
+		#'full',
+		'512',
+		'1024',
+	):
+		munitable = schema + '.muni' + level
+		provtable = schema + '.prov' + level
+		nltable = schema + '.nl' + level
+		
+		db.dropTable( munitable )
+		db.dropTable( provtable )
+		db.dropTable( nltable )
+		
 		srcfile = 'nl2012-%s' % level
 		filename = '../shapes/shp/%s/%s.shp' %( srcfile, srcfile )
 		print 'Loading %s' % filename
 		db.loadShapefile(
-			filename, private.TEMP_PATH, table,
-			fullGeom, '3857', 'LATIN1', True
+			filename, private.TEMP_PATH, munitable,
+			geom, '3857', 'LATIN1', True
 		)
-		#mergeGeometries( db, 'nl.muni', 'nl.prov', level, '''
-		#	WHERE
-		#		nl.muni.prov = nl.reg2012.region
-		#	GROUP BY
-		#		nl.muni.prov
-		#''' )
-		#mergeGeometries( db, 'nl.prov', 'nl.nl', level, '''
-		#	WHERE
-		#		true
-		#''' )
-		writeAllMunis( db, table, level )
+		mergeGeometries( db, munitable, provtable,
+			'prov',
+			'''
+				prov varchar(2)
+			''', '''
+				WHERE
+					%(munitable)s.prov IS NOT NULL
+				GROUP BY
+					%(munitable)s.prov
+			''' % {
+				'munitable': munitable,
+		})
+		mergeGeometries( db, munitable, nltable,
+			"'NL'",
+			'''
+				nation varchar(2)
+			''', '''
+				WHERE
+					%(munitable)s.prov IS NOT NULL
+			''' % {
+				'munitable': munitable,
+		})
+		writeAllMunis( db, munitable, level )
 	db.connection.commit()
 	db.connection.close()
 
 
-def mergeGeometries( db, sourceTable, targetTable, level, whereGroupBy ):
-	geom = fullGeom
-	db.mergeGeometry( sourceTable, geom, targetTable, geom, whereGroupBy )
+def mergeGeometries( db, sourceTable, targetTable, cols, columns, whereGroupBy ):
+	db.createMergedGeometryTable(
+		sourceTable, geom, targetTable, geom,
+		cols, columns, whereGroupBy
+	)
 
 
-def writeAllMunis( db, table, level ):
-	geom = fullGeom
+def writeAllMunis( db, munitable, level ):
 	where = 'true'
 	geoid = 'NL'  # TODO
 	geoMuni = db.makeFeatureCollection(
-		schema + '.muni',
-		boxGeom, geom, geoid, 'The Netherlands',
+		schema + '.muni' + level,
+		boxGeom, geom, geoid, 'Nederland',
 		'muni', 'name', 'prov', where #, fixGeoID
 	)
-	#geoRegion = db.makeFeatureCollection(
-	#	schema + '.prov',
-	#	None, None, geom, geoid, 'The Netherlands',
-	#	'region', 'nccenr', 'tncc', where, fixGeoID
-	#)
-	#geoNation = db.makeFeatureCollection(
-	#	schema + '.nl',
-	#	None, None, geom, geoid, 'The Netherlands',
-	#	'nation', 'nccenr', 'nation', where, fixGeoID
-	#)
+	geoProvince = db.makeFeatureCollection(
+		schema + '.prov' + level,
+		boxGeom, geom, geoid, 'Nederland',
+		'prov', 'prov', 'prov', where #, fixGeoID
+	)
+	geoNation = db.makeFeatureCollection(
+		schema + '.nl' + level,
+		boxGeom, geom, geoid, 'Nederland',
+		'nation', 'nation', 'nation', where #, fixGeoID
+	)
 	geo = {
 		#'nation': geoNation,
-		#'region': geoRegion,
+		'province': geoProvince,
 		'muni': geoMuni,
 	}
 	writeGeoJSON( db, geoid, level, geo )
