@@ -319,7 +319,7 @@ function oneshot() {
 	var timer;
 	return function( fun, time ) {
 		clearTimeout( timer );
-		timer = setTimeout( fun, time );
+		timer = fun && setTimeout( fun, time );
 	};
 }
 
