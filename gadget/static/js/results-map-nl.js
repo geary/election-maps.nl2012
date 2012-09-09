@@ -540,32 +540,8 @@ function nationalEnabled() {
 	var tweakGeoJSON = {
 		NL: function( json, geoid ) {
 			var features = json.muni.features;
-			nlTempHack( features );
-			nlTempHack( json.province.features );
-			//nlTempHack( json.nation.features );
 			addLivingAbroad( features );
 		}
-	}
-	
-	function nlTempHack( features ) {
-		function fix( points ) {
-			var dx = nlDX, dy = nlDY;
-			for( var i = 0, n = points.length - 1;  i < n;  i += 2 ) {
-				points[i] += dx;
-				points[i+1] += dy;
-			}
-		}
-		features.forEach( function( feature ) {
-			fix( feature.bbox );
-			fix( feature.centroid );
-			feature.geometry.coordinates.forEach( function( poly ) {
-				poly.forEach( function( ring ) {
-					ring.forEach( function( point ) {
-						fix( point );
-					});
-				});
-			});
-		});
 	}
 	
 	function addLivingAbroad( features ) {
