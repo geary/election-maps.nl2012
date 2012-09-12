@@ -2432,7 +2432,7 @@ function nationalEnabled() {
 				row[colID] = id;
 				row[col.TabTotal] = 1;
 				row[col.NumBallotBoxes] = 1;
-				row[col.NumCountedBallotBoxes] = [0,0,0];
+				row[col.NumCountedBallotBoxes] = 0;
 				rows.push( row );
 				rowsByID[id] = row;
 			}
@@ -2454,7 +2454,7 @@ function nationalEnabled() {
 				}
 				row[col.TabTotal] = 0;
 				rowT[colT.NumBallotBoxes] += row[col.NumBallotBoxes];
-				row[col.NumCountedBallotBoxes] = [0,0,0];
+				row[col.NumCountedBallotBoxes] = 0;
 			}
 			else {
 				var candidates = row.candidates = [];
