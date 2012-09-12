@@ -230,9 +230,9 @@ document.write(
 		'body.tv span.tiptitletext { font-size:28px; }',
 		'body.tv div.tipreporting { font-size:20px; }',
 		'body.tv table.candidates td { padding:4px 0; }',
-		'.tiptitlebar { padding:4px 8px; border-bottom:1px solid #AAA; margin-bottom:4px; }',
+		'.tiptitlebar { padding:4px 8px; }',
 		'.tiptitletext { font-weight:bold; font-size:120%; }',
-		'.tipcontent { padding:4px 8px 8px 8px; border-bottom:1px solid #AAA; }',
+		'.tipcontent { padding:4px 8px 8px 8px; border-top:1px solid #AAA; border-bottom:1px solid #AAA; }',
 		'.tipreporting { font-size:80%; padding:2px 0; }',
 		'#selectors { background-color:#D0E3F8; }',
 		'#selectors, #selectors * { font-size:14px; }',
@@ -1585,7 +1585,7 @@ function nationalEnabled() {
 	
 	function formatCandidateList( topCandidates, formatter, header ) {
 		if( ! topCandidates.length )
-			return 'waitingForVotes'.T();
+			return '';
 		var thead = header ? S(
 			'<tr>',
 				'<th colspan="1" style="padding-bottom:4px;">',
@@ -1702,7 +1702,7 @@ function nationalEnabled() {
 			row.geo = geo;
 			var forced = election.parties && current.party;
 			top = getTopCandidates( results, row, 'votes', 8, forced );
-			var content = S(
+			var content = ! top.length ? '' : S(
 				'<div class="tipcontent">',
 					formatCandidateList( top, formatListCandidate, false ),
 				'</div>'
