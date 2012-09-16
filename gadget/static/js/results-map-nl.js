@@ -7,9 +7,6 @@ var times = {
 	offset: 0
 };
 
-// Temp workaround for projection error in NL GeoJSON
-var nlDX = 500, nlDY = 42000;
-
 // Default params
 var defaultElectionKey = '2012';
 params.year = params.year || '2012';
@@ -799,8 +796,7 @@ function nationalEnabled() {
 		outlineFeature( null );
 		
 		var bboxNL = {
-			//bbox: [ 373491, 6536883, 803613, 7043980 ]
-			bbox: [ 373491+nlDX, 6536883+nlDY, 803613+nlDX, 7043980+nlDY ]
+			bbox: [ 373909, 6577311, 804514, 7086260 ]
 		};
 		
 		var geo = {
